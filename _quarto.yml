@@ -1,5 +1,6 @@
 project:
   title: "lab-01"
+  output-dir: docs
 
 
 

@@ -1,7 +1,15 @@
 ---
-title: "lab-01"
+title: "Lab 01: COVID Data"
+subtitle: "ESS 523c"
+author:
+  name: Kevin
+  email: kevin.horrell@colostate.edu
+format: html
 ---
 
 ## Quarto
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+```{r}
+
+```
+
