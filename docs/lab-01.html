@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -34,6 +68,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="lab-01_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="lab-01_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="lab-01_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="lab-01_files/libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
+
+<script src="lab-01_files/libs/tabwid-1.1.3/tabwid.js"></script>
+
 
 
 </head>
@@ -70,9 +108,67 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="quarto" class="level2">
-<h2 class="anchored" data-anchor-id="quarto">Quarto</h2>
-</section>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tidyverse' was built under R version 4.4.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'flextable' was built under R version 4.4.3</code></pre>
+</div>
+</div>
+<p>Question 1: Daily Summary To start, you should set up a reproducible framework to communicate the following in a way that can be updated every time new data is released (daily): 1. cumulative cases in the 5 worst counties 2. total NEW cases in the 5 worst counties 3. A list of safe counties</p>
+<p>You should build this analysis so that running it will extract the most current data straight from the NY-Times URL and the state name and date are parameters that can be changed allowing this report to be run for other states/dates.</p>
+<p>Read in Data</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 2502832 Columns: 6
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (3): county, state, fips
+dbl  (2): cases, deaths
+date (1): date
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
+<p>Initial Objects</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>my.date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2022-02-01"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>my.state <span class="ot">&lt;-</span> <span class="st">"Colorado"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Colorado Data</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>co_dat <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(state <span class="sc">==</span> my.state) <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(county) <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_cases =</span> cases <span class="sc">-</span> <span class="fu">lag</span>(cases, <span class="at">n =</span> <span class="dv">1</span>),</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_deaths =</span> deaths <span class="sc">-</span> <span class="fu">lag</span>(deaths, <span class="at">n =</span> <span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Data Tables</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>co_dat_cum <span class="ot">&lt;-</span> co_dat <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">==</span> my.date)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">slice_max</span>(co_dat_cum, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> new_cases) <span class="sc">%&gt;%</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(county, state, cases, new_cases) <span class="sc">%&gt;%</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">"Top 5 Counties with New Cases"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-bacd4652{}.cl-bab7142c{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-babf3e54{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-babf3e68{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-babfa844{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-babfa858{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-babfa862{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-babfa863{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-babfa86c{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-babfa876{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-bacd4652"><thead><tr style="overflow-wrap:break-word;"><th class="cl-babfa844"><p class="cl-babf3e54"><span class="cl-bab7142c">county</span></p></th><th class="cl-babfa844"><p class="cl-babf3e54"><span class="cl-bab7142c">state</span></p></th><th class="cl-babfa858"><p class="cl-babf3e68"><span class="cl-bab7142c">cases</span></p></th><th class="cl-babfa858"><p class="cl-babf3e68"><span class="cl-bab7142c">new_cases</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-babfa862"><p class="cl-babf3e54"><span class="cl-bab7142c">El Paso</span></p></td><td class="cl-babfa862"><p class="cl-babf3e54"><span class="cl-bab7142c">Colorado</span></p></td><td class="cl-babfa863"><p class="cl-babf3e68"><span class="cl-bab7142c">170,673</span></p></td><td class="cl-babfa863"><p class="cl-babf3e68"><span class="cl-bab7142c">630</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-babfa862"><p class="cl-babf3e54"><span class="cl-bab7142c">Arapahoe</span></p></td><td class="cl-babfa862"><p class="cl-babf3e54"><span class="cl-bab7142c">Colorado</span></p></td><td class="cl-babfa863"><p class="cl-babf3e68"><span class="cl-bab7142c">144,255</span></p></td><td class="cl-babfa863"><p class="cl-babf3e68"><span class="cl-bab7142c">401</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-babfa862"><p class="cl-babf3e54"><span class="cl-bab7142c">Denver</span></p></td><td class="cl-babfa862"><p class="cl-babf3e54"><span class="cl-bab7142c">Colorado</span></p></td><td class="cl-babfa863"><p class="cl-babf3e68"><span class="cl-bab7142c">159,022</span></p></td><td class="cl-babfa863"><p class="cl-babf3e68"><span class="cl-bab7142c">389</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-babfa862"><p class="cl-babf3e54"><span class="cl-bab7142c">Adams</span></p></td><td class="cl-babfa862"><p class="cl-babf3e54"><span class="cl-bab7142c">Colorado</span></p></td><td class="cl-babfa863"><p class="cl-babf3e68"><span class="cl-bab7142c">126,768</span></p></td><td class="cl-babfa863"><p class="cl-babf3e68"><span class="cl-bab7142c">326</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-babfa86c"><p class="cl-babf3e54"><span class="cl-bab7142c">Jefferson</span></p></td><td class="cl-babfa86c"><p class="cl-babf3e54"><span class="cl-bab7142c">Colorado</span></p></td><td class="cl-babfa876"><p class="cl-babf3e68"><span class="cl-bab7142c">113,240</span></p></td><td class="cl-babfa876"><p class="cl-babf3e68"><span class="cl-bab7142c">291</span></p></td></tr></tbody></table></div>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slice_max</span>(co_dat_cum, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> new_deaths) <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(county, state, cases, deaths, new_deaths) <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">"Top 5 Counties with Most Deaths"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-baf78f52{}.cl-bae4840c{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-baebbd30{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-baebbd4e{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-baebf1ba{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-baebf1ce{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-baebf1d8{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-baebf1d9{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-baebf1e2{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-baebf1ec{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-baf78f52"><thead><tr style="overflow-wrap:break-word;"><th class="cl-baebf1ba"><p class="cl-baebbd30"><span class="cl-bae4840c">county</span></p></th><th class="cl-baebf1ba"><p class="cl-baebbd30"><span class="cl-bae4840c">state</span></p></th><th class="cl-baebf1ce"><p class="cl-baebbd4e"><span class="cl-bae4840c">cases</span></p></th><th class="cl-baebf1ce"><p class="cl-baebbd4e"><span class="cl-bae4840c">deaths</span></p></th><th class="cl-baebf1ce"><p class="cl-baebbd4e"><span class="cl-bae4840c">new_deaths</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">Denver</span></p></td><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">Colorado</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">159,022</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">1,194</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">9</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">El Paso</span></p></td><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">Colorado</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">170,673</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">1,518</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">7</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">Jefferson</span></p></td><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">Colorado</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">113,240</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">1,219</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">7</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">Pueblo</span></p></td><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">Colorado</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">41,915</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">731</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">Boulder</span></p></td><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">Colorado</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">58,046</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">351</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">3</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-baebf1e2"><p class="cl-baebbd30"><span class="cl-bae4840c">Mesa</span></p></td><td class="cl-baebf1e2"><p class="cl-baebbd30"><span class="cl-bae4840c">Colorado</span></p></td><td class="cl-baebf1ec"><p class="cl-baebbd4e"><span class="cl-bae4840c">38,623</span></p></td><td class="cl-baebf1ec"><p class="cl-baebbd4e"><span class="cl-bae4840c">502</span></p></td><td class="cl-baebf1ec"><p class="cl-baebbd4e"><span class="cl-bae4840c">3</span></p></td></tr></tbody></table></div>
+</div>
+</div>
+<p>Question 2: Evaluating Census Data</p>
 
 </main>
 <!-- /main column -->

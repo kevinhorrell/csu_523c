@@ -7,9 +7,60 @@ author:
 format: html
 ---
 
-## Quarto
 
-```{r}
-
+```{r, echo = F, message = F, warning = F}
+library(tidyverse)
+library(flextable)
+library(zoo)
 ```
 
+
+Question 1: Daily Summary
+To start, you should set up a reproducible framework to communicate the following in a way that can be updated 
+every time new data is released (daily):
+    1. cumulative cases in the 5 worst counties
+    2. total NEW cases in the 5 worst counties
+    3. A list of safe counties
+
+You should build this analysis so that running it will extract the most current data straight from the NY-Times URL and the state name and date are parameters that can be changed allowing this report to be run for other states/dates.
+
+Read in Data
+```{r, echo = T}
+dat <- read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv")
+```
+
+Initial Objects
+```{r}
+my.date <- as.Date("2022-02-01")
+my.state <- "Colorado"
+```
+
+Colorado Data
+```{r}
+co_dat <- dat %>%
+  filter(state == my.state) %>%
+  group_by(county) %>%
+  mutate(new_cases = cases - lag(cases, n = 1),
+         new_deaths = deaths - lag(deaths, n = 1)) %>%
+  drop_na() %>%
+  ungroup()
+```
+
+Data Tables
+```{r}
+co_dat_cum <- co_dat %>%
+  filter(date == my.date)
+
+slice_max(co_dat_cum, n = 5, order_by = new_cases) %>%
+  select(county, state, cases, new_cases) %>%
+  flextable() %>%
+  set_caption("Top 5 Counties with New Cases")
+
+slice_max(co_dat_cum, n = 5, order_by = new_deaths) %>%
+  select(county, state, cases, deaths, new_deaths) %>%
+  flextable() %>%
+  set_caption("Top 5 Counties with Most Deaths") 
+  
+```
+
+Question 2: Evaluating Census Data
