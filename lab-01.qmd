@@ -172,7 +172,6 @@ In R, `paste()` provides a tool for concatenation. `paste()` can do two things:
 
 ```{r}
 paste("Hello", "world", sep=" ")
-paste0("hello", "world")
 ```
 
 2.  `collapse`  specifies the character(s) to be used between the elements of the vector to be collapsed.
@@ -200,9 +199,7 @@ pop_data <- read_csv(pop_url)
 pop_colo <- pop_data %>%
   filter(STNAME == 'Colorado') %>%
   filter(COUNTY > '000') %>%
-  mutate(fips = paste0(STATE, COUNTY))
-
-pop_colo <- pop_colo %>%
+  mutate(fips = paste0(STATE, COUNTY)) %>%
   select(fips, contains(c('NAME', '2021')))
 ```
 
@@ -229,11 +226,13 @@ skim(pop_colo)
 Join the population data to the Colorado COVID data and compute the per capita cumulative cases, per capita new cases, and per capita new deaths:
 
 ```{r}
-colo_join <- inner_join(pop_colo, co_dat_cum, by = 'fips')
-colo_join_tidy <- colo_join %>%
-  select(fips, STNAME, CTYNAME, POPESTIMATE2021, date, county, cases, deaths, new_cases, new_deaths)
+colo_join <- inner_join(pop_colo, co_dat, by = 'fips')
 
-colo_join_tidy <- colo_join_tidy %>%
+colo_join_tidy <- colo_join %>%
+  select(fips, POPESTIMATE2021, date, county, state, cases, deaths, new_cases, new_deaths)
+
+colo_join_mydate <- colo_join_tidy %>%
+  filter(date == my.date) %>%
   mutate(casespc = cases/POPESTIMATE2021,
          newcasespc = new_cases/POPESTIMATE2021,
          newdeathspc = new_deaths/POPESTIMATE2021)
@@ -244,13 +243,13 @@ Generate (**2**) new tables. The first should show the 5 counties with the most 
 (**Hint:** Use ``flextable::flextable()` and `flextable::set_caption()`)
 
 ```{r}
-slice_max(colo_join_tidy, n = 5, order_by = casespc) %>%
-  select(STNAME, CTYNAME, POPESTIMATE2021, date, cases, new_cases, casespc) %>%
+slice_max(colo_join_mydate, n = 5, order_by = casespc) %>%
+  select(date, state, county, POPESTIMATE2021, cases, new_cases, casespc) %>%
   flextable() %>%
   set_caption("Top 5 Counties with Most Cumulative Cases per Capita")
 
-slice_max(colo_join_tidy, n = 5, order_by = newcasespc) %>%
-  select(STNAME, CTYNAME, POPESTIMATE2021, date, cases, new_cases, newcasespc) %>%
+slice_max(colo_join_mydate, n = 5, order_by = newcasespc) %>%
+  select(date, state, county, POPESTIMATE2021, cases, new_cases, newcasespc) %>%
   flextable() %>%
   set_caption("Top 5 Counties with Most New Cases per Capita")
 ```
@@ -266,7 +265,19 @@ Print a table of the top 5 counties (consider `slice_max`), and, report the numb
 (**Hint**: Dates are numeric in R and thus operations like `max` `min`, `-`, `+`, `>`, and` < ` work.)
 
 ```{r}
+colo_join_14 <- colo_join_tidy %>%
+  filter(date >= my.date - 14 & date <= my.date)
 
+colo_join_sum <- colo_join_14 %>%
+  group_by(county, POPESTIMATE2021) %>%
+  summarize(total_new_cases = sum(new_cases)) %>%
+  mutate(tot_new_cases_std = total_new_cases/POPESTIMATE2021*100000) %>%
+  ungroup()
+
+slice_max(colo_join_sum, n = 5, order_by = tot_new_cases_std) %>%
+  select(county, POPESTIMATE2021, tot_new_cases_std) %>%
+  flextable() %>%
+  set_caption("Top 5 Counties with Most New Cases per 100,000 people over the last 14 days")
 ```
 
 # **Question 5**: Death toll
