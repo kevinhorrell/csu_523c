@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Kevin">
+<meta name="author" content="Kevin Horrell">
 
-<title>Lab 01: COVID Data</title>
+<title>Lab 1: COVID-19</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -73,6 +73,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="lab-01_files/libs/tabwid-1.1.3/tabwid.js"></script>
 
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -84,8 +113,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Lab 01: COVID Data</h1>
-<p class="subtitle lead">ESS 523c</p>
+<h1 class="title">Lab 1: COVID-19</h1>
+<p class="subtitle lead">Ecosystem Science and Sustainability 523c</p>
 </div>
 
 
@@ -95,7 +124,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Kevin <a href="mailto:kevin.horrell@colostate.edu" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> </p>
+             <p>Kevin Horrell <a href="mailto:kevin.horrell@colostate.edu" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> </p>
           </div>
   </div>
     
@@ -108,67 +137,568 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<p>In this lab you will practice data wrangling and visualization skills using COVID-19 data curated by the New York Times. This data is a large dataset measuring the cases and deaths per US county across the lifespan of COVID from its early beginnings to just past the peak. The data stored in daily cummulative counts, is a great example of data that needs to be wrangled and cleaned before any analysis can be done.</p>
+<section id="set-up" class="level1">
+<h1>Set-up</h1>
+<ol type="1">
+<li>Create a <code>csu-523c</code> repository</li>
+<li>Instatiate it with a git archive (<code>usethis::use_git()</code>) and Github repo (<code>usethis::use_github()</code>)</li>
+<li>Create a new Quarto (.qmd) file called <code>lab-01.qmd</code></li>
+</ol>
+<section id="libraries" class="level2">
+<h2 class="anchored" data-anchor-id="libraries">Libraries</h2>
+<p>You will need a few libraries for this lab. Make sure they are installed and loaded in your Qmd:</p>
+<ol type="1">
+<li><code>tidyverse</code> (data wrangling and visualization)</li>
+<li><code>flextable</code> (make nice tables)</li>
+<li><code>zoo</code> (rolling averages)</li>
+</ol>
+</section>
+<section id="data" class="level2">
+<h2 class="anchored" data-anchor-id="data">Data</h2>
+<p>We are going to practice some data wrangling skills using a real-world dataset about COVID cases curated and maintained by the New York Times. The data was used in the peak of the pandemic to create reports and data visualizations like <a href="https://www.nytimes.com/interactive/2020/us/coronavirus-spread.html?referringSource=articleShare">this</a>, and are archived on a GitHub repo <a href="https://github.com/nytimes/covid-19-data">here</a>. A history of the importance can be found <a href="https://www.nytimes.com/2023/03/22/us/covid-data-cdc.html">here</a>.</p>
+<p>Lets pretend it in <em>Feb 1st, 2022</em>. You are a data scientist for the state of Colorado Department of Public Health (this is actually a task I did in California!). You’ve been tasked with giving a report to Governor Polis each morning about the most current COVID-19 conditions at the county level.</p>
+<p>As it stands, the Colorado Department of Public Health maintains a watch list of counties that are being monitored for worsening corona virus trends. There are six criteria used to place counties on the watch list:</p>
+<ol type="1">
+<li>Doing fewer than 150 tests per 100,000 residents daily (over a 7-day average)</li>
+<li>More than 100 new cases per 100,000 residents over the past 14 days…</li>
+<li>25 new cases per 100,000 residents and an 8% test positivity rate</li>
+<li>10% or greater increase in COVID-19 hospitalized patients over the past 3 days</li>
+<li>Fewer than 20% of ICU beds available</li>
+<li>Fewer than 25% ventilators available</li>
+</ol>
+<p><strong>Of these 6 conditions, you are in charge of monitoring condition number 2.</strong></p>
+</section>
+</section>
+<section id="question-1-daily-summary" class="level1">
+<h1><strong>Question 1</strong>: Daily Summary</h1>
+<p>Looking at the README in the NYT repository we read:</p>
+<blockquote class="blockquote">
+<p>“We are providing two sets of data with cumulative counts of coronavirus cases and deaths: one with our most current numbers for each geography and another with historical data showing the tally for each day for each geography … the historical files are the final counts at the end of each day … The historical and live data are released in three files, one for each of these geographic levels: U.S., states and counties.”</p>
+</blockquote>
+<p>For this lab we will use the historic, county level data which is stored as a CSV at this URL:</p>
 <div class="cell">
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: package 'tidyverse' was built under R version 4.4.2</code></pre>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>https<span class="sc">:</span><span class="er">//</span>raw.githubusercontent.com<span class="sc">/</span>nytimes<span class="sc">/</span>covid<span class="dv">-19</span><span class="sc">-</span>data<span class="sc">/</span>master<span class="sc">/</span>us<span class="sc">-</span>counties.csv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: package 'flextable' was built under R version 4.4.3</code></pre>
-</div>
-</div>
-<p>Question 1: Daily Summary To start, you should set up a reproducible framework to communicate the following in a way that can be updated every time new data is released (daily): 1. cumulative cases in the 5 worst counties 2. total NEW cases in the 5 worst counties 3. A list of safe counties</p>
+<p>To start, you should set up a reproducible framework to communicate the following in a way that can be updated every time new data is released (daily):</p>
+<ol type="1">
+<li>cumulative cases in the 5 worst counties</li>
+<li>total <strong>NEW</strong> cases in the 5 worst counties</li>
+<li>A list of safe counties</li>
+</ol>
 <p>You should build this analysis so that running it will extract the most current data straight from the NY-Times URL and the state name and date are parameters that can be changed allowing this report to be run for other states/dates.</p>
+<section id="steps" class="level2">
+<h2 class="anchored" data-anchor-id="steps">Steps:</h2>
+<ol type="a">
+<li><p>Start by reading in the data from the NY-Times URL with <code>read_csv</code> (make sure to attach the <code>tidyverse</code>). The data read from Github is considered our “raw data”. Remember to always leave “raw-data-raw” and to generate meaningful subsets as you go.</p></li>
+<li><p>Create an object called <code>my.date</code> and set it as “2022-02-01” - ensure this is a <code>date</code> object.</p></li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>In R, <code>as.Date()</code> is a function used to convert character strings, numeric values, or other date-related objects into Date objects. It ensures that dates are stored in the correct format for date-based calculations and manipulations.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="a">
+<li><p>Create a object called <code>my.state</code> and set it to “Colorado”.</p></li>
+<li><p>Start by making a subset that limits the data to Colorado (<code>filter</code>), and add a new column (<code>mutate</code>) with the daily <em>new cases</em> using <code>diff/lag</code> by county (<code>group_by</code>). Do the same for <em>new deaths</em>. If lag is new to you, <code>lag</code> is a function that shifts a vector by a specified number of positions. The help file can be found with <code>?lag</code>. (<strong>Hint</strong>: you will need some combination of <code>filter</code>, <code>group_by</code>, <code>arrange</code>, <code>mutate</code>, <code>diff/lag</code>, and <code>ungroup</code>)</p></li>
+<li><p>Using your subset, generate (<strong>2</strong>) tables. The first should show the 5 counties with the most <strong>CUMULATIVE</strong> cases on your date of interest, and the second should show the 5 counties with the most <strong>NEW</strong> cases on that same date. Remember to use your <code>my.date</code> object as a proxy for today’s date:</p></li>
+</ol>
+<p>Your tables should have clear column names and descriptive captions.</p>
+<p>(<strong>Hint</strong>: Use <code>flextable::flextable()</code> and <code>flextable::set_caption()</code>)</p>
 <p>Read in Data</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Rows: 2502832 Columns: 6
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr  (3): county, state, fips
-dbl  (2): cases, deaths
-date (1): date
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Initial Objects</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>my.date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2022-02-01"</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>my.state <span class="ot">&lt;-</span> <span class="st">"Colorado"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>my.date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2022-02-01"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>my.state <span class="ot">&lt;-</span> <span class="st">"Colorado"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Colorado Data</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>co_dat <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(state <span class="sc">==</span> my.state) <span class="sc">%&gt;%</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(county) <span class="sc">%&gt;%</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_cases =</span> cases <span class="sc">-</span> <span class="fu">lag</span>(cases, <span class="at">n =</span> <span class="dv">1</span>),</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_deaths =</span> deaths <span class="sc">-</span> <span class="fu">lag</span>(deaths, <span class="at">n =</span> <span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>co_dat <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(state <span class="sc">==</span> my.state) <span class="sc">%&gt;%</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(county) <span class="sc">%&gt;%</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_cases =</span> cases <span class="sc">-</span> <span class="fu">lag</span>(cases, <span class="at">n =</span> <span class="dv">1</span>),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_deaths =</span> deaths <span class="sc">-</span> <span class="fu">lag</span>(deaths, <span class="at">n =</span> <span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Data Tables</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>co_dat_cum <span class="ot">&lt;-</span> co_dat <span class="sc">%&gt;%</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">==</span> my.date)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">slice_max</span>(co_dat_cum, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> new_cases) <span class="sc">%&gt;%</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(county, state, cases, new_cases) <span class="sc">%&gt;%</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">"Top 5 Counties with New Cases"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>co_dat_cum <span class="ot">&lt;-</span> co_dat <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">==</span> my.date)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">slice_max</span>(co_dat_cum, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> cases) <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(county, state, cases, new_cases, deaths) <span class="sc">%&gt;%</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">"Top 5 Counties with Most Cumulative Cases"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="tabwid"><style>.cl-bacd4652{}.cl-bab7142c{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-babf3e54{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-babf3e68{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-babfa844{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-babfa858{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-babfa862{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-babfa863{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-babfa86c{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-babfa876{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-bacd4652"><thead><tr style="overflow-wrap:break-word;"><th class="cl-babfa844"><p class="cl-babf3e54"><span class="cl-bab7142c">county</span></p></th><th class="cl-babfa844"><p class="cl-babf3e54"><span class="cl-bab7142c">state</span></p></th><th class="cl-babfa858"><p class="cl-babf3e68"><span class="cl-bab7142c">cases</span></p></th><th class="cl-babfa858"><p class="cl-babf3e68"><span class="cl-bab7142c">new_cases</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-babfa862"><p class="cl-babf3e54"><span class="cl-bab7142c">El Paso</span></p></td><td class="cl-babfa862"><p class="cl-babf3e54"><span class="cl-bab7142c">Colorado</span></p></td><td class="cl-babfa863"><p class="cl-babf3e68"><span class="cl-bab7142c">170,673</span></p></td><td class="cl-babfa863"><p class="cl-babf3e68"><span class="cl-bab7142c">630</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-babfa862"><p class="cl-babf3e54"><span class="cl-bab7142c">Arapahoe</span></p></td><td class="cl-babfa862"><p class="cl-babf3e54"><span class="cl-bab7142c">Colorado</span></p></td><td class="cl-babfa863"><p class="cl-babf3e68"><span class="cl-bab7142c">144,255</span></p></td><td class="cl-babfa863"><p class="cl-babf3e68"><span class="cl-bab7142c">401</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-babfa862"><p class="cl-babf3e54"><span class="cl-bab7142c">Denver</span></p></td><td class="cl-babfa862"><p class="cl-babf3e54"><span class="cl-bab7142c">Colorado</span></p></td><td class="cl-babfa863"><p class="cl-babf3e68"><span class="cl-bab7142c">159,022</span></p></td><td class="cl-babfa863"><p class="cl-babf3e68"><span class="cl-bab7142c">389</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-babfa862"><p class="cl-babf3e54"><span class="cl-bab7142c">Adams</span></p></td><td class="cl-babfa862"><p class="cl-babf3e54"><span class="cl-bab7142c">Colorado</span></p></td><td class="cl-babfa863"><p class="cl-babf3e68"><span class="cl-bab7142c">126,768</span></p></td><td class="cl-babfa863"><p class="cl-babf3e68"><span class="cl-bab7142c">326</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-babfa86c"><p class="cl-babf3e54"><span class="cl-bab7142c">Jefferson</span></p></td><td class="cl-babfa86c"><p class="cl-babf3e54"><span class="cl-bab7142c">Colorado</span></p></td><td class="cl-babfa876"><p class="cl-babf3e68"><span class="cl-bab7142c">113,240</span></p></td><td class="cl-babfa876"><p class="cl-babf3e68"><span class="cl-bab7142c">291</span></p></td></tr></tbody></table></div>
+<div class="tabwid"><style>.cl-90e2e0a8{}.cl-90d6e83e{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-90db5ee6{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-90db5ef0{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-90dd23de{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-90dd23f2{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-90dd23f3{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-90dd23fc{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-90dd2406{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-90dd2407{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-90e2e0a8"><thead><tr style="overflow-wrap:break-word;"><th class="cl-90dd23de"><p class="cl-90db5ee6"><span class="cl-90d6e83e">county</span></p></th><th class="cl-90dd23de"><p class="cl-90db5ee6"><span class="cl-90d6e83e">state</span></p></th><th class="cl-90dd23f2"><p class="cl-90db5ef0"><span class="cl-90d6e83e">cases</span></p></th><th class="cl-90dd23f2"><p class="cl-90db5ef0"><span class="cl-90d6e83e">new_cases</span></p></th><th class="cl-90dd23f2"><p class="cl-90db5ef0"><span class="cl-90d6e83e">deaths</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-90dd23f3"><p class="cl-90db5ee6"><span class="cl-90d6e83e">El Paso</span></p></td><td class="cl-90dd23f3"><p class="cl-90db5ee6"><span class="cl-90d6e83e">Colorado</span></p></td><td class="cl-90dd23fc"><p class="cl-90db5ef0"><span class="cl-90d6e83e">170,673</span></p></td><td class="cl-90dd23fc"><p class="cl-90db5ef0"><span class="cl-90d6e83e">630</span></p></td><td class="cl-90dd23fc"><p class="cl-90db5ef0"><span class="cl-90d6e83e">1,518</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-90dd23f3"><p class="cl-90db5ee6"><span class="cl-90d6e83e">Denver</span></p></td><td class="cl-90dd23f3"><p class="cl-90db5ee6"><span class="cl-90d6e83e">Colorado</span></p></td><td class="cl-90dd23fc"><p class="cl-90db5ef0"><span class="cl-90d6e83e">159,022</span></p></td><td class="cl-90dd23fc"><p class="cl-90db5ef0"><span class="cl-90d6e83e">389</span></p></td><td class="cl-90dd23fc"><p class="cl-90db5ef0"><span class="cl-90d6e83e">1,194</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-90dd23f3"><p class="cl-90db5ee6"><span class="cl-90d6e83e">Arapahoe</span></p></td><td class="cl-90dd23f3"><p class="cl-90db5ee6"><span class="cl-90d6e83e">Colorado</span></p></td><td class="cl-90dd23fc"><p class="cl-90db5ef0"><span class="cl-90d6e83e">144,255</span></p></td><td class="cl-90dd23fc"><p class="cl-90db5ef0"><span class="cl-90d6e83e">401</span></p></td><td class="cl-90dd23fc"><p class="cl-90db5ef0"><span class="cl-90d6e83e">1,172</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-90dd23f3"><p class="cl-90db5ee6"><span class="cl-90d6e83e">Adams</span></p></td><td class="cl-90dd23f3"><p class="cl-90db5ee6"><span class="cl-90d6e83e">Colorado</span></p></td><td class="cl-90dd23fc"><p class="cl-90db5ef0"><span class="cl-90d6e83e">126,768</span></p></td><td class="cl-90dd23fc"><p class="cl-90db5ef0"><span class="cl-90d6e83e">326</span></p></td><td class="cl-90dd23fc"><p class="cl-90db5ef0"><span class="cl-90d6e83e">1,224</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-90dd2406"><p class="cl-90db5ee6"><span class="cl-90d6e83e">Jefferson</span></p></td><td class="cl-90dd2406"><p class="cl-90db5ee6"><span class="cl-90d6e83e">Colorado</span></p></td><td class="cl-90dd2407"><p class="cl-90db5ef0"><span class="cl-90d6e83e">113,240</span></p></td><td class="cl-90dd2407"><p class="cl-90db5ef0"><span class="cl-90d6e83e">291</span></p></td><td class="cl-90dd2407"><p class="cl-90db5ef0"><span class="cl-90d6e83e">1,219</span></p></td></tr></tbody></table></div>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slice_max</span>(co_dat_cum, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> new_deaths) <span class="sc">%&gt;%</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(county, state, cases, deaths, new_deaths) <span class="sc">%&gt;%</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">"Top 5 Counties with Most Deaths"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slice_max</span>(co_dat_cum, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> new_cases) <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(county, state, cases, new_cases, deaths) <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">"Top 5 Counties with New Cases"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="tabwid"><style>.cl-baf78f52{}.cl-bae4840c{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-baebbd30{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-baebbd4e{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-baebf1ba{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-baebf1ce{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-baebf1d8{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-baebf1d9{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-baebf1e2{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-baebf1ec{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-baf78f52"><thead><tr style="overflow-wrap:break-word;"><th class="cl-baebf1ba"><p class="cl-baebbd30"><span class="cl-bae4840c">county</span></p></th><th class="cl-baebf1ba"><p class="cl-baebbd30"><span class="cl-bae4840c">state</span></p></th><th class="cl-baebf1ce"><p class="cl-baebbd4e"><span class="cl-bae4840c">cases</span></p></th><th class="cl-baebf1ce"><p class="cl-baebbd4e"><span class="cl-bae4840c">deaths</span></p></th><th class="cl-baebf1ce"><p class="cl-baebbd4e"><span class="cl-bae4840c">new_deaths</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">Denver</span></p></td><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">Colorado</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">159,022</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">1,194</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">9</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">El Paso</span></p></td><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">Colorado</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">170,673</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">1,518</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">7</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">Jefferson</span></p></td><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">Colorado</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">113,240</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">1,219</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">7</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">Pueblo</span></p></td><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">Colorado</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">41,915</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">731</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">Boulder</span></p></td><td class="cl-baebf1d8"><p class="cl-baebbd30"><span class="cl-bae4840c">Colorado</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">58,046</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">351</span></p></td><td class="cl-baebf1d9"><p class="cl-baebbd4e"><span class="cl-bae4840c">3</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-baebf1e2"><p class="cl-baebbd30"><span class="cl-bae4840c">Mesa</span></p></td><td class="cl-baebf1e2"><p class="cl-baebbd30"><span class="cl-bae4840c">Colorado</span></p></td><td class="cl-baebf1ec"><p class="cl-baebbd4e"><span class="cl-bae4840c">38,623</span></p></td><td class="cl-baebf1ec"><p class="cl-baebbd4e"><span class="cl-bae4840c">502</span></p></td><td class="cl-baebf1ec"><p class="cl-baebbd4e"><span class="cl-bae4840c">3</span></p></td></tr></tbody></table></div>
+<div class="tabwid"><style>.cl-90fc9322{}.cl-90f003c8{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-90f42142{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-90f4214c{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-90f44186{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-90f44190{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-90f4419a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-90f4419b{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-90f4419c{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-90f441a4{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-90fc9322"><thead><tr style="overflow-wrap:break-word;"><th class="cl-90f44186"><p class="cl-90f42142"><span class="cl-90f003c8">county</span></p></th><th class="cl-90f44186"><p class="cl-90f42142"><span class="cl-90f003c8">state</span></p></th><th class="cl-90f44190"><p class="cl-90f4214c"><span class="cl-90f003c8">cases</span></p></th><th class="cl-90f44190"><p class="cl-90f4214c"><span class="cl-90f003c8">new_cases</span></p></th><th class="cl-90f44190"><p class="cl-90f4214c"><span class="cl-90f003c8">deaths</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-90f4419a"><p class="cl-90f42142"><span class="cl-90f003c8">El Paso</span></p></td><td class="cl-90f4419a"><p class="cl-90f42142"><span class="cl-90f003c8">Colorado</span></p></td><td class="cl-90f4419b"><p class="cl-90f4214c"><span class="cl-90f003c8">170,673</span></p></td><td class="cl-90f4419b"><p class="cl-90f4214c"><span class="cl-90f003c8">630</span></p></td><td class="cl-90f4419b"><p class="cl-90f4214c"><span class="cl-90f003c8">1,518</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-90f4419a"><p class="cl-90f42142"><span class="cl-90f003c8">Arapahoe</span></p></td><td class="cl-90f4419a"><p class="cl-90f42142"><span class="cl-90f003c8">Colorado</span></p></td><td class="cl-90f4419b"><p class="cl-90f4214c"><span class="cl-90f003c8">144,255</span></p></td><td class="cl-90f4419b"><p class="cl-90f4214c"><span class="cl-90f003c8">401</span></p></td><td class="cl-90f4419b"><p class="cl-90f4214c"><span class="cl-90f003c8">1,172</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-90f4419a"><p class="cl-90f42142"><span class="cl-90f003c8">Denver</span></p></td><td class="cl-90f4419a"><p class="cl-90f42142"><span class="cl-90f003c8">Colorado</span></p></td><td class="cl-90f4419b"><p class="cl-90f4214c"><span class="cl-90f003c8">159,022</span></p></td><td class="cl-90f4419b"><p class="cl-90f4214c"><span class="cl-90f003c8">389</span></p></td><td class="cl-90f4419b"><p class="cl-90f4214c"><span class="cl-90f003c8">1,194</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-90f4419a"><p class="cl-90f42142"><span class="cl-90f003c8">Adams</span></p></td><td class="cl-90f4419a"><p class="cl-90f42142"><span class="cl-90f003c8">Colorado</span></p></td><td class="cl-90f4419b"><p class="cl-90f4214c"><span class="cl-90f003c8">126,768</span></p></td><td class="cl-90f4419b"><p class="cl-90f4214c"><span class="cl-90f003c8">326</span></p></td><td class="cl-90f4419b"><p class="cl-90f4214c"><span class="cl-90f003c8">1,224</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-90f4419c"><p class="cl-90f42142"><span class="cl-90f003c8">Jefferson</span></p></td><td class="cl-90f4419c"><p class="cl-90f42142"><span class="cl-90f003c8">Colorado</span></p></td><td class="cl-90f441a4"><p class="cl-90f4214c"><span class="cl-90f003c8">113,240</span></p></td><td class="cl-90f441a4"><p class="cl-90f4214c"><span class="cl-90f003c8">291</span></p></td><td class="cl-90f441a4"><p class="cl-90f4214c"><span class="cl-90f003c8">1,219</span></p></td></tr></tbody></table></div>
 </div>
 </div>
-<p>Question 2: Evaluating Census Data</p>
+</section>
+</section>
+<section id="question-2-evaluating-census-data-eda" class="level1">
+<h1><strong>Question 2</strong>: Evaluating Census Data (EDA)</h1>
+<p>Raw count data can be deceiving given the wide range of populations in Colorado countries. To help us normalize data counts, we need additional information on the population of each county.</p>
+<p>Population data is offered by the Census Bureau and can be found <a href="https://www2.census.gov/programs-surveys/popest/datasets/2020-2023/counties/totals/co-est2023-alldata.csv">here</a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pop_url <span class="ot">&lt;-</span> <span class="st">'https://www2.census.gov/programs-surveys/popest/datasets/2020-2023/counties/totals/co-est2023-alldata.csv'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+FIPs codes: Federal Information Processing
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>How FIPS codes are used</strong><br>
+- FIPS codes are used in census products<br>
+- FIPS codes are used to identify geographic areas in files<br>
+- FIPS codes are used to identify American Indian, Alaska Native, and Native Hawaiian (AIANNH) areas<br>
+</p>
+<p><strong>How FIPS codes are structured</strong><br>
+- The number of digits in a FIPS code depends on the level of geography<br>
+- State FIPS codes have two digits<br>
+- County FIPS codes have five digits, with the first two digits representing the state FIPS code<br>
+</p>
+</div>
+</div>
+<p>You notice that the COVID data provides a 5 digit character FIP code representing the state in the first 2 digits and the county in the last 3. In the population data, the STATE and COUNTY FIP identifiers are seperate columns. To make these compatible we need to create a FIP variable that concatinates the 2 digit STATE and the 3 digit COUNTY FIP.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Concatinating Strings.
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>In R, <code>paste()</code> provides a tool for concatenation. <code>paste()</code> can do two things:</p>
+<ol type="1">
+<li>concatenate values into one “string”, e.g.&nbsp;where the argument <code>sep</code> specifies the character(s) to be used between the arguments to concatenate, or</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">paste</span>(<span class="st">"Hello"</span>, <span class="st">"world"</span>, <span class="at">sep=</span><span class="st">" "</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Hello world"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">paste0</span>(<span class="st">"hello"</span>, <span class="st">"world"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "helloworld"</code></pre>
+</div>
+</div>
+<ol start="2" type="1">
+<li><code>collapse</code> specifies the character(s) to be used between the elements of the vector to be collapsed.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">paste</span>(<span class="fu">c</span>(<span class="st">"Hello"</span>, <span class="st">"world"</span>), <span class="at">collapse=</span><span class="st">"-"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Hello-world"</code></pre>
+</div>
+</div>
+<p>In R, it is so common to want to separate no separator (e.g.&nbsp;<code></code>paste(“Hello”, “world”, sep=““)<code>) that the short cut</code>paste0` exists:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">paste</span>(<span class="st">"Hello"</span>, <span class="st">"world"</span>, <span class="at">sep =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Helloworld"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">paste0</span>(<span class="st">"Hello"</span>, <span class="st">"world"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Helloworld"</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<section id="steps-1" class="level2">
+<h2 class="anchored" data-anchor-id="steps-1">Steps:</h2>
+<ol type="a">
+<li>Given the above URL, and guidelines on string concatenation, read in the population data and (1) create a five digit FIP variable and only keep columns that contain “NAME” or “2021” (remember the tidyselect option found with <code>?dplyr::select</code>). Additionally, remove all state level rows (e.g.&nbsp;COUNTY FIP == “000”)</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>pop_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(pop_url)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>pop_colo <span class="ot">&lt;-</span> pop_data <span class="sc">%&gt;%</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(STNAME <span class="sc">==</span> <span class="st">'Colorado'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(COUNTY <span class="sc">&gt;</span> <span class="st">'000'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">fips =</span> <span class="fu">paste0</span>(STATE, COUNTY))</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>pop_colo <span class="ot">&lt;-</span> pop_colo <span class="sc">%&gt;%</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(fips, <span class="fu">contains</span>(<span class="fu">c</span>(<span class="st">'NAME'</span>, <span class="st">'2021'</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol start="2" type="a">
+<li>Now, explore the data … what attributes does it have, what are the names of the columns? Do any match the COVID data we have? What are the dimensions… In a few sentences describe the data obtained after modification:</li>
+</ol>
+<p>I intentionally named the “fips” column “fips” to match with the COVID data for Colorado. I knew we would be merging these data tables together. The “pop_colo” data contains information about estimated population, deaths, births, and immigration statistics by county in Colorado. There are 19 columns, and 64 rows for the 64 counties. I like these functions for browsing the data: names(), glimpse(), head(), and summary(). The skim() function is sort of like the summary() function but needs the skimr package installed.</p>
+<p>(<strong>Hint</strong>: <code>names()</code>, <code>dim()</code>, <code>nrow()</code>, <code>str()</code>, <code>glimpse()</code>, <code>skimr</code>,…))</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(pop_colo)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(pop_colo)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(pop_colo)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(pop_colo)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">'skimr'</span>)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(skimr)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(pop_colo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="question-3-per-capita-summary" class="level1">
+<h1><strong>Question 3</strong>: Per Capita Summary</h1>
+<p>Join the population data to the Colorado COVID data and compute the per capita cumulative cases, per capita new cases, and per capita new deaths:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>colo_join <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(pop_colo, co_dat_cum, <span class="at">by =</span> <span class="st">'fips'</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>colo_join_tidy <span class="ot">&lt;-</span> colo_join <span class="sc">%&gt;%</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(fips, STNAME, CTYNAME, POPESTIMATE2021, date, county, cases, deaths, new_cases, new_deaths)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>colo_join_tidy <span class="ot">&lt;-</span> colo_join_tidy <span class="sc">%&gt;%</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">casespc =</span> cases<span class="sc">/</span>POPESTIMATE2021,</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">newcasespc =</span> new_cases<span class="sc">/</span>POPESTIMATE2021,</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">newdeathspc =</span> new_deaths<span class="sc">/</span>POPESTIMATE2021)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Generate (<strong>2</strong>) new tables. The first should show the 5 counties with the most cumulative cases per capita on your date, and the second should show the 5 counties with the most <strong>NEW</strong> cases per capita on the same date. Your tables should have clear column names and descriptive captions.</p>
+<p>(<strong>Hint:</strong> Use `<code>flextable::flextable()</code> and <code>flextable::set_caption()</code>)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slice_max</span>(colo_join_tidy, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> casespc) <span class="sc">%&gt;%</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(STNAME, CTYNAME, POPESTIMATE2021, date, cases, new_cases, casespc) <span class="sc">%&gt;%</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">"Top 5 Counties with Most Cumulative Cases per Capita"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-91e0736c{}.cl-91d75d72{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-91dabac6{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-91dabada{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-91dad40c{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-91dad40d{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-91dad416{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-91dad420{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-91dad421{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-91dad42a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-91e0736c"><thead><tr style="overflow-wrap:break-word;"><th class="cl-91dad40c"><p class="cl-91dabac6"><span class="cl-91d75d72">STNAME</span></p></th><th class="cl-91dad40c"><p class="cl-91dabac6"><span class="cl-91d75d72">CTYNAME</span></p></th><th class="cl-91dad40d"><p class="cl-91dabada"><span class="cl-91d75d72">POPESTIMATE2021</span></p></th><th class="cl-91dad40d"><p class="cl-91dabada"><span class="cl-91d75d72">date</span></p></th><th class="cl-91dad40d"><p class="cl-91dabada"><span class="cl-91d75d72">cases</span></p></th><th class="cl-91dad40d"><p class="cl-91dabada"><span class="cl-91d75d72">new_cases</span></p></th><th class="cl-91dad40d"><p class="cl-91dabada"><span class="cl-91d75d72">casespc</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-91dad416"><p class="cl-91dabac6"><span class="cl-91d75d72">Colorado</span></p></td><td class="cl-91dad416"><p class="cl-91dabac6"><span class="cl-91d75d72">Crowley County</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">5,735</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">2022-02-01</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">2,935</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">56</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">0.5117698</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-91dad416"><p class="cl-91dabac6"><span class="cl-91d75d72">Colorado</span></p></td><td class="cl-91dad416"><p class="cl-91dabac6"><span class="cl-91d75d72">Bent County</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">5,339</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">2022-02-01</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">2,199</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">22</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">0.4118749</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-91dad416"><p class="cl-91dabac6"><span class="cl-91d75d72">Colorado</span></p></td><td class="cl-91dad416"><p class="cl-91dabac6"><span class="cl-91d75d72">Pitkin County</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">17,337</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">2022-02-01</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">5,946</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">7</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">0.3429659</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-91dad416"><p class="cl-91dabac6"><span class="cl-91d75d72">Colorado</span></p></td><td class="cl-91dad416"><p class="cl-91dabac6"><span class="cl-91d75d72">Lincoln County</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">5,473</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">2022-02-01</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">1,874</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">5</span></p></td><td class="cl-91dad420"><p class="cl-91dabada"><span class="cl-91d75d72">0.3424082</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-91dad421"><p class="cl-91dabac6"><span class="cl-91d75d72">Colorado</span></p></td><td class="cl-91dad421"><p class="cl-91dabac6"><span class="cl-91d75d72">Logan County</span></p></td><td class="cl-91dad42a"><p class="cl-91dabada"><span class="cl-91d75d72">21,006</span></p></td><td class="cl-91dad42a"><p class="cl-91dabada"><span class="cl-91d75d72">2022-02-01</span></p></td><td class="cl-91dad42a"><p class="cl-91dabada"><span class="cl-91d75d72">6,402</span></p></td><td class="cl-91dad42a"><p class="cl-91dabada"><span class="cl-91d75d72">25</span></p></td><td class="cl-91dad42a"><p class="cl-91dabada"><span class="cl-91d75d72">0.3047701</span></p></td></tr></tbody></table></div>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slice_max</span>(colo_join_tidy, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> newcasespc) <span class="sc">%&gt;%</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(STNAME, CTYNAME, POPESTIMATE2021, date, cases, new_cases, newcasespc) <span class="sc">%&gt;%</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">"Top 5 Counties with Most Cumulative Cases per Capita"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-91f67fea{}.cl-91ed25ee{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-91f06204{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-91f06218{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-91f07abe{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-91f07ac8{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-91f07ac9{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-91f07ad2{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-91f07ad3{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-91f07adc{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-91f67fea"><thead><tr style="overflow-wrap:break-word;"><th class="cl-91f07abe"><p class="cl-91f06204"><span class="cl-91ed25ee">STNAME</span></p></th><th class="cl-91f07abe"><p class="cl-91f06204"><span class="cl-91ed25ee">CTYNAME</span></p></th><th class="cl-91f07ac8"><p class="cl-91f06218"><span class="cl-91ed25ee">POPESTIMATE2021</span></p></th><th class="cl-91f07ac8"><p class="cl-91f06218"><span class="cl-91ed25ee">date</span></p></th><th class="cl-91f07ac8"><p class="cl-91f06218"><span class="cl-91ed25ee">cases</span></p></th><th class="cl-91f07ac8"><p class="cl-91f06218"><span class="cl-91ed25ee">new_cases</span></p></th><th class="cl-91f07ac8"><p class="cl-91f06218"><span class="cl-91ed25ee">newcasespc</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-91f07ac9"><p class="cl-91f06204"><span class="cl-91ed25ee">Colorado</span></p></td><td class="cl-91f07ac9"><p class="cl-91f06204"><span class="cl-91ed25ee">Crowley County</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">5,735</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">2022-02-01</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">2,935</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">56</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">0.009764603</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-91f07ac9"><p class="cl-91f06204"><span class="cl-91ed25ee">Colorado</span></p></td><td class="cl-91f07ac9"><p class="cl-91f06204"><span class="cl-91ed25ee">Bent County</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">5,339</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">2022-02-01</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">2,199</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">22</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">0.004120622</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-91f07ac9"><p class="cl-91f06204"><span class="cl-91ed25ee">Colorado</span></p></td><td class="cl-91f07ac9"><p class="cl-91f06204"><span class="cl-91ed25ee">Sedgwick County</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">2,326</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">2022-02-01</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">441</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">9</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">0.003869304</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-91f07ac9"><p class="cl-91f06204"><span class="cl-91ed25ee">Colorado</span></p></td><td class="cl-91f07ac9"><p class="cl-91f06204"><span class="cl-91ed25ee">Washington County</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">4,868</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">2022-02-01</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">937</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">14</span></p></td><td class="cl-91f07ad2"><p class="cl-91f06218"><span class="cl-91ed25ee">0.002875924</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-91f07ad3"><p class="cl-91f06204"><span class="cl-91ed25ee">Colorado</span></p></td><td class="cl-91f07ad3"><p class="cl-91f06204"><span class="cl-91ed25ee">Las Animas County</span></p></td><td class="cl-91f07adc"><p class="cl-91f06218"><span class="cl-91ed25ee">14,334</span></p></td><td class="cl-91f07adc"><p class="cl-91f06218"><span class="cl-91ed25ee">2022-02-01</span></p></td><td class="cl-91f07adc"><p class="cl-91f06218"><span class="cl-91ed25ee">3,183</span></p></td><td class="cl-91f07adc"><p class="cl-91f06218"><span class="cl-91ed25ee">38</span></p></td><td class="cl-91f07adc"><p class="cl-91f06218"><span class="cl-91ed25ee">0.002651039</span></p></td></tr></tbody></table></div>
+</div>
+</div>
+</section>
+<section id="question-4-rolling-thresholds" class="level1">
+<h1><strong>Question 4:</strong> Rolling thresholds</h1>
+<p>Filter the merged COVID/Population data for Colorado to only include the last 14 days. <em>Remember this should be a programmatic request and not hard-coded</em>.</p>
+<p>Then, use the <code>group_by</code>/<code>summarize</code> paradigm to determine the total number of new cases in the last 14 days per 100,000 people.</p>
+<p>Print a table of the top 5 counties (consider <code>slice_max</code>), and, report the number of counties that meet the watch list condition: “More than 100 new cases per 100,000 residents over the past 14 days…”</p>
+<p>(<strong>Hint</strong>: Dates are numeric in R and thus operations like <code>max</code> <code>min</code>, <code>-</code>, <code>+</code>, <code>&gt;</code>, and<code>&lt;</code> work.)</p>
+</section>
+<section id="question-5-death-toll" class="level1">
+<h1><strong>Question 5</strong>: Death toll</h1>
+<p>Given we are assuming it is February 1st, 2022. Your leadership has now asked you to determine what percentage of deaths in each county were attributed to COVID last year (2021). You eagerly tell them that with the current Census data, you can do this!</p>
+<p>From previous questions you should have a <code>data.frame</code> with daily COVID deaths in Colorado and the Census based, 2021 total deaths. For this question, you will find the ratio of total COVID deaths per county (2021) of all recorded deaths. In a plot of your choosing, visualize all counties where COVID deaths account for 20% or more of the annual death toll.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Dates in R
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>To extract a element of a date object in R, the <code>lubridate</code> package (part of <code>tidyverse</code>) is very helpful:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>tmp.date <span class="ot">=</span> <span class="fu">as.Date</span>(<span class="st">"2025-02-15"</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>lubridate<span class="sc">::</span><span class="fu">year</span>(tmp.date)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2025</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>lubridate<span class="sc">::</span><span class="fu">month</span>(tmp.date)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>lubridate<span class="sc">::</span><span class="fu">yday</span>(tmp.date)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 46</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="question-6-multi-state" class="level1">
+<h1><strong>Question 6</strong>: Multi-state</h1>
+<p>Congratulations! You have been promoted to the National COVID-19 Task Force.As part of this exercise, you have been tasked with building anaylsis to compare states to each other.</p>
+<p>In this question, we are going to look at the story of 4 states and the impact scale can have on data interpretation. The states include: <strong>New York</strong>, <strong>Colorado</strong>, <strong>Alabama</strong>, and <strong>Ohio</strong>.</p>
+<p>Your task is to make a <em>faceted</em> bar plot showing the number of daily, <strong>new</strong> cases at the state level.</p>
+<section id="steps-2" class="level2">
+<h2 class="anchored" data-anchor-id="steps-2">Steps:</h2>
+<ol type="a">
+<li>First, we need to <code>group/summarize</code> our county level data to the state level, <code>filter</code> it to the four states of interest, and calculate the number of daily new cases (<code>diff/lag</code>) and the 7-day rolling mean.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Rolling Averages
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The <code>rollmean</code> function from the <code>zoo</code> package in R is used to compute the rolling (moving) mean of a numeric vector, matrix, or <code>zoo</code>/<code>ts</code> object.</p>
+<p><code>rollmean(x, k, fill = NA, align = "center", na.pad = FALSE)</code><br>
+- <code>x</code>: Numeric vector, matrix, or time series.<br>
+- <code>k</code>: Window size (number of observations).<br>
+- <code>fill</code>: Values to pad missing results (default NA).<br>
+- <code>align</code>: Position of the rolling window (“center”, “left”, “right”).<br>
+- <code>na.pad</code>: If TRUE, pads missing values with NA.<br>
+</p>
+<section id="examples" class="level4">
+<h4 class="anchored" data-anchor-id="examples">Examples</h4>
+<ol type="1">
+<li>Rolling Mean on a Numeric Vector Since <code>align = "center"</code> by default, values at the start and end are dropped.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(zoo)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample data</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">10</span>)</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Rolling mean with a window size of 3</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rollmean</span>(x, <span class="at">k =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2 3 4 5 6 7 8 9</code></pre>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Rolling Mean with Padding Missing values are filled at the start and end.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rollmean</span>(x, <span class="at">k =</span> <span class="dv">3</span>, <span class="at">fill =</span> <span class="cn">NA</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] NA  2  3  4  5  6  7  8  9 NA</code></pre>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Aligning Left or Right The rolling mean is calculated with values aligned to the left or right</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rollmean</span>(x, <span class="at">k =</span> <span class="dv">3</span>, <span class="at">fill =</span> <span class="cn">NA</span>, <span class="at">align =</span> <span class="st">"left"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1]  2  3  4  5  6  7  8  9 NA NA</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rollmean</span>(x, <span class="at">k =</span> <span class="dv">3</span>, <span class="at">fill =</span> <span class="cn">NA</span>, <span class="at">align =</span> <span class="st">"right"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] NA NA  2  3  4  5  6  7  8  9</code></pre>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+<p><strong>Hint:</strong> You will need two <code>group_by</code> calls and the <code>zoo::rollmean</code> function.</p>
+<ol start="2" type="a">
+<li>Using the modified data, make a facet plot of the daily new cases and the 7-day rolling mean. Your plot should use compelling geoms, labels, colors, and themes.</li>
+</ol>
+<ol start="3" type="a">
+<li>The story of raw case counts can be misleading. To understand why, lets explore the cases per capita of each state. To do this, join the state COVID data to the population estimates and calculate the <span class="math inline">\(new cases / total population\)</span>. Additionally, calculate the 7-day rolling mean of the new cases per capita counts. <strong>This is a tricky task and will take some thought, time, and modification to existing code (most likely)!</strong></li>
+</ol>
+<p><strong>Hint</strong>: You may need to modify the columns you kept in your original population data. Be creative with how you join data (inner vs outer vs full)!</p>
+<ol start="4" type="a">
+<li>Using the per capita data, plot the 7-day rolling averages overlying each other (one plot) with compelling labels, colors, and theme.</li>
+</ol>
+<ol start="5" type="a">
+<li>Briefly describe the influence scaling by population had on the analysis? Does it make some states look better? Some worse? How so?</li>
+</ol>
+<blockquote class="blockquote">
+<p>…</p>
+</blockquote>
+</section>
+</section>
+<section id="question-7-space-time" class="level1">
+<h1><strong>Question 7</strong>: Space &amp; Time</h1>
+<p>You’ve now been tasked with understanding how COVID has spread through time across the country. You will do this by calculating the Weighted Mean Center of the COVID-19 outbreak to better understand the movement of the virus through time.</p>
+<p>To do this, we need to join the COVID data with location information. I have staged the latitude and longitude of county centers <a href="https://raw.githubusercontent.com/mikejohnson51/csu-ess-330/refs/heads/main/resources/county-centroids.csv">here</a>. For reference, this data was processed like this:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>counties <span class="ot">=</span> USAboundaries<span class="sc">::</span><span class="fu">us_counties</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="at">fips =</span> geoid) <span class="sc">%&gt;%</span> </span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  sf<span class="sc">::</span><span class="fu">st_centroid</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">LON =</span> sf<span class="sc">::</span><span class="fu">st_coordinates</span>(.)[,<span class="dv">1</span>], </span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">LAT =</span> sf<span class="sc">::</span><span class="fu">st_coordinates</span>(.)[,<span class="dv">2</span>]) <span class="sc">%&gt;%</span> </span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  sf<span class="sc">::</span><span class="fu">st_drop_geometry</span>()</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(counties, <span class="st">"../resources/county-centroids.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Please read in the data (<code>readr::read_csv()</code>); and join it to your raw COVID-19 data using the <code>fips</code> attributes using the following URL:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="st">'https://raw.githubusercontent.com/mikejohnson51/csu-ess-330/refs/heads/main/resources/county-centroids.csv'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "https://raw.githubusercontent.com/mikejohnson51/csu-ess-330/refs/heads/main/resources/county-centroids.csv"</code></pre>
+</div>
+</div>
+<ul>
+<li>The mean center of a set of spatial points is defined as the average X and Y coordinate. A weighted mean center can be found by weighting the coordinates by another variable such that:</li>
+</ul>
+<p><span class="math display">\[X_{coord} = \sum{(X_{i} * w_{i})} / \sum(w_{i})\]</span> <span class="math display">\[Y_{coord} = \sum{(Y_{i} * w_{i})}/ \sum(w_{i})\]</span></p>
+<ul>
+<li>For each date, calculate the Weighted Mean <span class="math inline">\(X_{coord}\)</span> and <span class="math inline">\(Y_{coord}\)</span> using the daily cumulative cases <em>and</em> deaths as the respective <span class="math inline">\(w_{i}\)</span>.</li>
+</ul>
+<p>Make two plots next to each other (using <code>patchwork</code>) showing cases in navy and deaths in red. Once complete, describe the differences in the plots and what they mean about the spatial patterns seen with COVID impacts. These points should be plotted over a map of the USA states which can be added to a ggplot object with:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">borders</span>(<span class="st">"state"</span>, <span class="at">fill =</span> <span class="st">"gray90"</span>, <span class="at">colour =</span> <span class="st">"white"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>(feel free to modify fill and <strong>colour</strong> (must be colour (see documentation)))</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Multiplots
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><a href="https://patchwork.data-imaginist.com/"><code>patchwork</code></a> is an R package designed for combining multiple <code>ggplot2</code> plots into a cohesive layout.</p>
+<section id="key-features" class="level4">
+<h4 class="anchored" data-anchor-id="key-features">Key Features:</h4>
+<ul>
+<li><strong>Simple Composition</strong>: Use +, /, and | operators to arrange plots intuitively.<br>
+</li>
+<li><strong>Flexible Layouts</strong>: Supports nesting, alignment, and customized positioning of plots.<br>
+</li>
+<li><strong>Annotation and Styling</strong>: Add titles, captions, and themes across multiple plots.<br>
+</li>
+</ul>
+</section>
+<section id="example" class="level4">
+<h4 class="anchored" data-anchor-id="example">Example:</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(mtcars, <span class="fu">aes</span>(mpg, hp)) <span class="sc">+</span> <span class="fu">geom_point</span>()</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(mtcars, <span class="fu">aes</span>(mpg, wt)) <span class="sc">+</span> <span class="fu">geom_point</span>()</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2  <span class="co"># Arrange side by side</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-01_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This places p1 and p2 next to each other in a single figure.</p>
+</section>
+</div>
+</div>
+</div>
+</section>
+<section id="question-8-trends" class="level1">
+<h1><strong>Question 8:</strong> Trends</h1>
+<p>OK! This is a job well done. As your final task, your leadership has noticed that it is much easier to have a solid record of deaths, while a record of cases relies on testing protocols and availability. They ask you to explore the relationship between cases and deaths to see if deaths can be used as a proxy for cases. You will explore the relationship between cases and deaths along with other predictors of your chosing from the population data.</p>
+<section id="data-preparation" class="level2">
+<h2 class="anchored" data-anchor-id="data-preparation">Data Preparation</h2>
+<ol type="a">
+<li><p>Let’s start with the raw COVID dataset, and compute county level daily new cases and deaths (<code>lag</code>). Then, join it to the census data in order to use population data in the model.</p></li>
+<li><p>We are aware there was a strong seasonal component to the spread of COVID-19. To account for this, lets add a new column to the data for year (<code>lubridate::year()</code>), month (<code>lubridate::month()</code>), and <code>season</code> (<code>dplyr::case_when()</code>) which will be one of four values: “Spring” (Mar-May), “Summer” (Jun-Aug), “Fall” (Sep-Nov), or “Winter” (Dec - Jan) based on the computed Month.</p></li>
+<li><p>Next, lets group the data by state, year, and season and summarize the total population, new cases, and new deaths per grouping.</p></li>
+<li><p>Given the case/death counts are not scaled by population, we expect that each will exhibit a right skew behavior (you can confirm this with density plots, shapiro.test, or histrograms). Given an assumption of linear models is normality in the data, let’s apply a log transformation to cases, deaths, and population to normalize them.</p></li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>We know there are 0’s in the data (cases/deaths), so we can add 1 to the data before taking the log. As the log of 0 is undefined, adding 1 ensures that the log of 0 is -Inf.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span>(<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] -Inf</code></pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="model-building" class="level2">
+<h2 class="anchored" data-anchor-id="model-building">Model Building</h2>
+<ol type="a">
+<li><p>Once the data has been prepared, build a linear model (<code>lm</code>) to predict the log of cases using the log of deaths the log of population, and the season. Be sure to add an interaction term for population and deaths since they per capita realtionship is significant!</p></li>
+<li><p>Once the model is built, summarize it (summary) and report the R-squared value and the p-value of the model. What does this mean for the value of its application?</p></li>
+</ol>
+</section>
+</section>
+<section id="question-9-evaluation" class="level1">
+<h1><strong>Question 9:</strong> Evaluation</h1>
+<p>Now that you have built a model, it is time to evaluate it.</p>
+<ol type="a">
+<li><p>Start by using <code>broom::augment</code> to generate a data frame of predictions and residuals.</p></li>
+<li><p>Lets, create a scatter plot of the predicted cases vs.&nbsp;the actual cases. Add a line of best fit to the plot, and make the plot as appealing as possible using <code>themes</code>, <code>scales_*</code>, and <code>labels.</code> Describe the realtionship that you see… are you happy with the model?</p></li>
+<li><p>A final assumption of an appropriate model is that the residuals are normally distributed. Fortunatly <code>broom::augment</code> provides the .resid outputs for each feature. To visually check for residual normality, create a histogram of the residuals. Make the plot as appealing as possible using <code>themes</code>, <code>scales_*</code>, and <code>labels.</code> How does the distribution look? Was a linear model appropriate for this case?</p></li>
+</ol>
+</section>
+<section id="summary" class="level1">
+<h1>Summary</h1>
+<p>And that’s it! In this lab we have explored the COVID-19 data from the New York Times, wrangled it, and built a model to predict cases from deaths and population. This is a great example of how data science can be used to inform public health decisions.</p>
+<p>We covered alot of technical tools as well spanning readr, dplyr, ggplot, lubridate, and more. We also used some more advanced tools like <code>zoo</code> for rolling averages and <code>broom</code> for model evaluation.</p>
+<p>Through out the rest of class we will keep building on these skills and tools to become better data scientists.</p>
+</section>
+<section id="rubric" class="level1">
+<h1>Rubric</h1>
+<ul class="task-list">
+<li><label><input type="checkbox"><strong>Question 1</strong>: Daily Summaries (10pts)</label></li>
+<li><label><input type="checkbox"><strong>Question 2</strong>: Evaluating Census Data (EDA) (10pts)</label></li>
+<li><label><input type="checkbox"><strong>Question 3</strong>: Per Capita Summary (10pts)</label></li>
+<li><label><input type="checkbox"><strong>Question 4</strong>: Rolling Thresholds (20pts)</label></li>
+<li><label><input type="checkbox"><strong>Question 5</strong>: Death toll (10pts)</label></li>
+<li><label><input type="checkbox"><strong>Question 6</strong>: Multi-state (20pts)</label></li>
+<li><label><input type="checkbox"><strong>Question 7</strong>: Space and Time (20pts)</label></li>
+<li><label><input type="checkbox"><strong>Question 8</strong>: Trends (20pts)</label></li>
+<li><label><input type="checkbox"><strong>Question 9</strong>: Evaluation (10pts)</label></li>
+<li><label><input type="checkbox"><strong>Well Structured legible Qmd</strong> (10pts)</label></li>
+<li><label><input type="checkbox"><strong>Deployed as web page</strong> (10pts)</label></li>
+</ul>
+<p><strong>Total:</strong> 150 points</p>
+</section>
+<section id="submission" class="level1">
+<h1>Submission</h1>
+<p>To submit your lab, you will deploy your knitted HTMLto a webpage hosted with GitHub pages. To do this:</p>
+<ul>
+<li>Knit your lab document</li>
+<li>Stage/commit/push your files</li>
+<li>Activate Github Pages (GitHub –&gt; Setting –&gt; GitHub pages)</li>
+<li>If you followed the naming conventions in the “Set Up”, your link will be available at:</li>
+</ul>
+<p><code>https://USERNAME.github.io/csu-523c/lab-01.html</code></p>
+<p>Submit this URL in the appropriate Canvas dropbox. Also take a moment to update your personal webpage with this link and some bullet points of what you learned. While not graded as part of this lab, it will be eventually serve as extras credit!</p>
+</section>
 
 </main>
 <!-- /main column -->
