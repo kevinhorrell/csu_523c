@@ -24,12 +24,12 @@ library(zoo)
 ```
 
 
-In this lab you will practice data wrangling and visualization skills using COVID-19 data curated by the New York Times. This data is a large dataset measuring the cases and deaths per US county across the lifespan of COVID from its early beginnings to just past the peak. The data stored in daily cummulative counts, is a great example of data that needs to be wrangled and cleaned before any analysis can be done.
+In this lab you will practice data wrangling and visualization skills using COVID-19 data curated by the New York Times. This data is a large dataset measuring the cases and deaths per US county across the lifespan of COVID from its early beginnings to just past the peak. The data stored in daily cumulative counts, is a great example of data that needs to be wrangled and cleaned before any analysis can be done.
 
 # Set-up
 
 1. Create a `csu-523c` repository
-2. Instatiate it with a git archive (`usethis::use_git()`) and Github repo (`usethis::use_github()`)
+2. Instantiate it with a git archive (`usethis::use_git()`) and Github repo (`usethis::use_github()`)
 3. Create a new Quarto (.qmd) file called `lab-01.qmd`
 
 ## Libraries
@@ -638,8 +638,15 @@ a. Once the data has been prepared, build a linear model (`lm`) to predict the l
 b. Once the model is built, summarize it (summary) and report the R-squared value and the p-value of the model. What does this mean for the value of its application?
 
 ```{r}
-
+cases_lm <- lm(log_seasonal_deaths ~ log_seasonal_cases + log_population, data = pop_state_season)
+summary(cases_lm)
 ```
+**Results**
+r-squared = 0.7373
+p-value < 2.2e-16
+
+Since the p-value is so low, the seasonal deaths are dependent on population and seasonal cases. Therefore the model is useful could be used to predict deaths based on cases, season, and population.
+
 
 # **Question 9:** Evaluation
 
@@ -647,19 +654,34 @@ Now that you have built a model, it is time to evaluate it.
 
 a. Start by using `broom::augment` to generate a data frame of predictions and residuals.
 
-b. Lets, create a scatter plot of the predicted cases vs. the actual cases. Add a line of best fit to the plot, and make the plot as appealing as possible using `themes`, `scales_*`, and `labels.` Describe the realtionship that you see... are you happy with the model?
+b. Lets, create a scatter plot of the predicted cases vs. the actual cases. Add a line of best fit to the plot, and make the plot as appealing as possible using `themes`, `scales_*`, and `labels.` Describe the relationship that you see... are you happy with the model?
 
-c. A final assumption of an appropriate model is that the residuals are normally distributed. Fortunatly `broom::augment` provides the .resid outputs for each feature. To visually check for residual normality, create a histogram of the residuals. Make the plot as appealing as possible using `themes`, `scales_*`, and `labels.` How does the distribution look? Was a linear model appropriate for this case?
+c. A final assumption of an appropriate model is that the residuals are normally distributed. Fortunately `broom::augment` provides the .resid outputs for each feature. To visually check for residual normality, create a histogram of the residuals. Make the plot as appealing as possible using `themes`, `scales_*`, and `labels.` How does the distribution look? Was a linear model appropriate for this case?
 
 ```{r}
+pred_deaths <- broom::augment(cases_lm)
 
+ggplot(data = pred_deaths) +
+  geom_point(mapping = aes(x = log_seasonal_deaths, y = .fitted)) +
+  theme_classic() +
+  labs(x = 'Seasonal Deaths (log) - Actual',
+       y = 'Seasonal Deaths (log) - Predicted',
+       title = 'Actual vs. Predicted Seasonal Deaths using a Linear Model') +
+  geom_smooth(mapping = aes(x = log_seasonal_deaths, y = .fitted), color = 'navy')
+
+ggplot(data = pred_deaths, aes(.resid)) +
+  geom_histogram(binwidth = 0.1, fill = 'navy') +
+  theme_classic() +
+  labs(x = 'Residuals',
+       y = 'Number of Cases',
+       title = 'Distribution of Residuals in the Linear Model')
 ```
 
 # Summary
 
 And that's it! In this lab we have explored the COVID-19 data from the New York Times, wrangled it, and built a model to predict cases from deaths and population. This is a great example of how data science can be used to inform public health decisions.
 
-We covered alot of technical tools as well spanning readr, dplyr, ggplot, lubridate, and more. We also used some more advanced tools like `zoo` for rolling averages and `broom` for model evaluation.
+We covered a lot of technical tools as well spanning readr, dplyr, ggplot, lubridate, and more. We also used some more advanced tools like `zoo` for rolling averages and `broom` for model evaluation.
 
 Through out the rest of class we will keep building on these skills and tools to become better data scientists.
 
