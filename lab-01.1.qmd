@@ -1,0 +1,536 @@
+---
+title: 'Lab 1.1: COVID-19'
+subtitle: 'Ecosystem Science and Sustainability 523c'
+author:
+  - name: Kevin Horrell
+    email: kevin.horrell@colostate.edu
+format: html
+execute:
+  echo: true
+  warning: false
+  message: false
+  error: false
+---
+
+```{r, include = F}
+knitr::opts_chunk$set(fig.width = 6,
+                      comment = "", 
+                      cache = FALSE, 
+                      fig.retina = 3)
+
+library(tidyverse)
+library(flextable)
+library(zoo)
+```
+
+
+In this lab you will practice data wrangling and visualization skills using COVID-19 data curated by the New York Times. This data is a large data-set measuring the cases and deaths per US county across the lifespan of COVID from its early beginnings to just past the peak. The data stored in daily cumulative counts, is a great example of data that needs to be wrangled and cleaned before any analysis can be done.
+
+# Set-up
+
+1. Create a `csu-523c` repository
+2. Instantiate it with a git archive (`usethis::use_git()`) and Github repo (`usethis::use_github()`)
+3. Create a new Quarto (.qmd) file called `lab-01.qmd`
+
+## Libraries
+
+You will need a few libraries for this lab. Make sure they are installed and loaded in your Qmd:
+
+1. `tidyverse` (data wrangling and visualization)
+2. `flextable` (make nice tables)
+3. `zoo` (rolling averages)
+
+## Data
+
+We are going to practice some data wrangling skills using a real-world dataset about COVID cases curated and maintained by the New York Times. The data was used in the peak of the pandemic to create reports and data visualizations like [this](https://www.nytimes.com/interactive/2020/us/coronavirus-spread.html?referringSource=articleShare), and are archived on a GitHub repo [here](https://github.com/nytimes/covid-19-data). A history of the importance can be found [here](https://www.nytimes.com/2023/03/22/us/covid-data-cdc.html).
+
+Lets pretend it in _Feb 1st, 2022_. You are a data scientist for the state of Colorado Department of Public Health (this is actually a task I did in California!).  You've been tasked with giving a report to Governor Polis each morning about the most current COVID-19 conditions at the county level.
+
+As it stands, the Colorado Department of Public Health maintains a watch list of counties that are being monitored for worsening corona virus trends. There are six criteria used to place counties on the watch list:
+
+  1. Doing fewer than 150 tests per 100,000 residents daily (over a 7-day average)
+  2. More than 100 new cases per 100,000 residents over the past 14 days...
+  3. 25 new cases per 100,000 residents and an 8% test positivity rate 
+  4. 10% or greater increase in COVID-19 hospitalized patients over the past 3 days
+  5. Fewer than 20% of ICU beds available
+  6. Fewer than 25% ventilators available
+
+**Of these 6 conditions, you are in charge of monitoring condition number 2.** 
+
+# **Question 1**: Daily Summary
+
+Looking at the README in the NYT repository we read:
+
+> "We are providing two sets of data with cumulative counts of coronavirus cases and deaths: one with our most current numbers for each geography and another with historical data showing the tally for each day for each geography ... the historical files are the final counts at the end of each day ... The historical and live data are released in three files, one for each of these geographic levels: U.S., states and counties."
+
+For this lab we will use the historic, county level data which is stored as a CSV at this URL:
+
+```{r, eval = FALSE}
+https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv
+```
+
+To start, you should set up a reproducible framework to communicate the following in a way that can be updated every time new data is released (daily):
+
+  1. cumulative cases in the 5 worst counties
+  2. total **NEW** cases in the 5 worst counties
+  3. A list of safe counties
+
+You should build this analysis so that running it will extract the most current data straight from the NY-Times URL and the state name and date are parameters that can be changed allowing this report to be run for other states/dates. 
+Read in Data
+```{r, echo = T}
+dat <- read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv")
+```
+
+Initial Objects
+```{r}
+my.date <- as.Date("2022-02-01")
+my.state <- "Colorado"
+```
+
+Colorado Data
+```{r}
+co_dat <- dat %>%
+  filter(state == my.state) %>%
+  group_by(county) %>%
+  mutate(new_cases = cases - lag(cases, n = 1),
+         new_deaths = deaths - lag(deaths, n = 1)) %>%
+  drop_na() %>%
+  ungroup()
+```
+
+Data Tables
+```{r}
+co_dat_cum <- co_dat %>%
+  filter(date == my.date)
+
+slice_max(co_dat_cum, n = 5, order_by = cases) %>%
+  select(county, state, cases, new_cases, deaths) %>%
+  flextable() %>%
+  set_caption("Top 5 Counties with Most Cumulative Cases") 
+
+slice_max(co_dat_cum, n = 5, order_by = new_cases) %>%
+  select(county, state, cases, new_cases, deaths) %>%
+  flextable() %>%
+  set_caption("Top 5 Counties with New Cases")
+```
+
+
+# **Question 2**: Evaluating Census Data (EDA)
+
+Raw count data can be deceiving given the wide range of populations in Colorado countries. To help us normalize data counts, we need additional information on the population of each county. 
+
+Population data is offered by the Census Bureau and can be found [here](https://www2.census.gov/programs-surveys/popest/datasets/2020-2023/counties/totals/co-est2023-alldata.csv).
+
+```{r}
+pop_url <- 'https://www2.census.gov/programs-surveys/popest/datasets/2020-2023/counties/totals/co-est2023-alldata.csv'
+```
+
+## Steps:
+
+a. Given the above URL, and guidelines on string concatenation, read in the population data and (1) create a five digit FIP variable and only keep columns that contain "NAME" or "2021" (remember the tidyselect option found with `?dplyr::select`). Additionally, remove all state level rows (e.g. COUNTY FIP == "000")
+
+```{r}
+pop_data <- read_csv(pop_url)
+
+pop_colo <- pop_data %>%
+  filter(STNAME == 'Colorado') %>%
+  filter(COUNTY > '000') %>%
+  mutate(fips = paste0(STATE, COUNTY)) %>%
+  select(fips, contains(c('NAME', '2021')))
+```
+
+b. Now, explore the data ... what attributes does it have, what are the names of the columns? Do any match the COVID data we have? What are the dimensions... In a few sentences describe the data obtained after modification:
+
+I intentionally named the "fips" column "fips" to match with the COVID data for Colorado. I knew we would be merging these data tables together. The "pop_colo" data contains information about estimated population, deaths, births, and immigration statistics by county in Colorado. There are 19 columns, and 64 rows for the 64 counties.
+I like these functions for browsing the data: names(), glimpse(), head(), and summary(). The skim() function is sort of like the summary() function but needs the skimr package installed.
+
+(**Hint**: `names()`, `dim()`, `nrow()`, `str()`, `glimpse()`, `skimr`,...))
+
+<<<<<<< HEAD
+```{r, eval = FALSE}
+
+names(pop_colo)
+glimpse(pop_colo)
+str(pop_colo)
+head(pop_colo)
+
+install.packages('skimr')
+library(skimr)
+skim(pop_colo)
+```
+
+# **Question 3**: Per Capita Summary
+
+Join the population data to the Colorado COVID data and compute the per capita cumulative cases, per capita new cases, and per capita new deaths:
+
+```{r}
+colo_join <- inner_join(pop_colo, co_dat, by = 'fips') 
+
+colo_join2021 <- colo_join %>%
+  select(fips, POPESTIMATE2021, DEATHS2021, date, county, state, cases, deaths, new_cases, new_deaths) %>%
+  filter(date == my.date) %>%
+  mutate(casespc = cases/POPESTIMATE2021,
+         newcasespc = new_cases/POPESTIMATE2021,
+         newdeathspc = new_deaths/POPESTIMATE2021)
+```
+
+Generate (**2**) new tables. The first should show the 5 counties with the most cumulative cases per capita on your date, and the second should show the 5 counties with the most **NEW** cases per capita on the same date. Your tables should have clear column names and descriptive captions.
+
+```{r}
+slice_max(colo_join2021, n = 5, order_by = casespc) %>%
+  select(date, state, county, POPESTIMATE2021, cases, new_cases, casespc) %>%
+  flextable() %>%
+  set_caption("Top 5 Counties with Most Cumulative Cases per Capita")
+
+slice_max(colo_join2021, n = 5, order_by = newcasespc) %>%
+  select(date, state, county, POPESTIMATE2021, cases, new_cases, newcasespc) %>%
+  flextable() %>%
+  set_caption("Top 5 Counties with Most New Cases per Capita")
+
+```
+
+# **Question 4:** Rolling thresholds
+
+Filter the merged COVID/Population data for Colorado to only include the last 14 days. *Remember this should be a programmatic request and not hard-coded*. 
+
+Then, use the `group_by`/`summarize` paradigm to determine the total number of new cases in the last 14 days per 100,000 people. 
+
+Print a table of the top 5 counties (consider `slice_max`), and, report the number of counties that meet the watch list condition: "More than 100 new cases per 100,000 residents over the past 14 days..."
+
+(**Hint**: Dates are numeric in R and thus operations like `max` `min`, `-`, `+`, `>`, and` < ` work.)
+
+```{r}
+colo_join_14 <- colo_join %>%
+  filter(date >= my.date - 14 & date <= my.date) %>%
+  group_by(county, POPESTIMATE2021) %>%
+  summarize(total_new_cases = sum(new_cases)) %>%
+  mutate(tot_new_cases_std = total_new_cases/POPESTIMATE2021*100000) %>%
+  ungroup()
+
+slice_max(colo_join_14, n = 5, order_by = tot_new_cases_std) %>%
+  select(county, POPESTIMATE2021, tot_new_cases_std) %>%
+  flextable() %>%
+  set_caption("Top 5 Counties with Most New Cases per 100,000 people over the last 14 days")
+
+```
+
+# **Question 5**: Death toll
+
+Given we are assuming it is February 1st, 2022. Your leadership has now asked you to determine what percentage of deaths in each county were attributed to COVID last year (2021). You eagerly tell them that with the current Census data, you can do this!
+
+From previous questions you should have a `data.frame` with daily COVID deaths in Colorado and the Census based, 2021 total deaths. For this question, you will find the ratio of total COVID deaths per county (2021) of all recorded deaths. In a plot of your choosing, visualize all counties where COVID deaths account for 20% or more of the annual death toll.
+
+```{r}
+colo_join_2021 <- colo_join %>%
+  mutate(year = lubridate::year(date)) %>%
+  filter(year == 2021)
+
+colo_2021_deaths <- colo_join_2021 %>%
+  group_by(county, fips, POPESTIMATE2021, DEATHS2021, year, state) %>%
+  summarize(total_new_deaths = sum(new_deaths)) %>%
+  ungroup() %>%
+  mutate(percent_deaths = total_new_deaths/DEATHS2021*100)
+
+percent_deaths2021 <- colo_2021_deaths %>%
+  filter(percent_deaths >= 20)
+```
+
+```{r}
+ggplot(data = percent_deaths2021) +
+  geom_col(mapping = aes(x = county, y = percent_deaths, fill = percent_deaths)) +
+  geom_hline(yintercept = 20, linetype = 'dashed', color = 'black', size = 1) +
+  theme_dark() +
+  scale_fill_distiller(palette = 'Greens', direction = 1, guide = 'none') +
+  labs(x = 'County',
+       y = 'Percent Deaths',
+       title = 'Counties in Colorado with more than 20% COVID-19 Deaths in 2021') +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = 'none')
+```
+
+
+# **Question 6**: Multi-state
+
+Congratulations! You have been promoted to the National COVID-19 Task Force.As part of this exercise, you have been tasked with building analysis to compare states to each other.
+
+In this question, we are going to look at the story of 4 states and the impact scale can have on data interpretation. The states include: **New York**, **Colorado**, **Alabama**, and **Ohio**. 
+
+Your task is to make a _faceted_ bar plot showing the number of daily, **new** cases at the state level.
+
+## Steps:
+
+a. First, we need to `group/summarize` our county level data to the state level, `filter` it to the four states of interest, and calculate the number of daily new cases (`diff/lag`) and the 7-day rolling mean.
+
+**Hint:** You will need two `group_by` calls and the `zoo::rollmean` function.
+
+```{r}
+states <- c('Alabama', 'Colorado', 'New York', 'Ohio')
+
+state_data <- dat %>%
+  group_by(state, county) %>%
+  mutate(new_cases = cases - lag(cases, n = 1)) %>%
+  ungroup() %>%
+  group_by(state, date) %>%
+  summarise(daily_cases = sum(cases),
+            daily_deaths = sum(deaths),
+            daily_new_cases = sum(new_cases)) %>%
+  ungroup()
+
+state_filter <- state_data %>%
+  filter(state %in% states) %>%
+  select(-daily_new_cases) %>%
+  mutate(new_cases = daily_cases - lag(daily_cases, n = 1)) %>%
+  mutate(roll7_mean = zoo::rollmean(new_cases, k = 7, fill = NA, align = "right")) %>%
+  filter(roll7_mean >= 0)
+
+state_filter$roll7_mean <- round(state_filter$roll7_mean, 0)
+```
+
+b. Using the modified data, make a facet plot of the daily new cases and the 7-day rolling mean. Your plot should use compelling geoms, labels, colors, and themes.
+
+```{r}
+ggplot(data = state_filter) +
+  geom_line(mapping = aes(x = date, y = roll7_mean, color = roll7_mean), linewidth = 1) +
+  facet_wrap(. ~ state) +
+  theme_dark() +
+  scale_color_distiller(palette = 'Greens', name = 'Cases Gradient') +
+  labs(x = 'Date',
+       y = 'Number of Cases',
+       title = '7 Day Rolling Average Number of COVID-19 Cases') +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+c. The story of raw case counts can be misleading. To understand why, lets explore the cases per capita of each state. To do this, join the state COVID data to the population estimates and calculate the $new cases / total population$. Additionally, calculate the 7-day rolling mean of the new cases per capita counts. **This is a tricky task and will take some thought, time, and modification to existing code (most likely)!**
+
+**Hint**: You may need to modify the columns you kept in your original population data. Be creative with how you join data (inner vs outer vs full)! 
+
+```{r}
+pop_state <- pop_data %>%
+  filter(COUNTY > '000',
+         STNAME %in% states) %>%
+  mutate(fips = paste0(STATE, COUNTY)) %>%
+  select(fips, contains(c('NAME', 'POPE', 'DEATHS'))) %>%
+  group_by(STNAME) %>%
+  summarise(POP2020 = sum(POPESTIMATE2020),
+            POP2021 = sum(POPESTIMATE2021),
+            POP2022 = sum(POPESTIMATE2022),
+            POP2023 = sum(POPESTIMATE2023)) %>%
+  rename(state = 'STNAME')
+
+state_join <- full_join(pop_state, state_filter, by = 'state') %>%
+  select(-roll7_mean) %>%
+  mutate(year = lubridate::year(date)) %>%
+  mutate(percap_cases = if_else(year == 2020, new_cases/POP2020,
+                                if_else(year == 2021, new_cases/POP2021,
+                                        if_else(year == 2022, new_cases/POP2022,
+                                                if_else(year == 2023, new_cases/POP2023, NA))))) %>%
+  mutate(roll7_mean = zoo::rollmean(percap_cases, k = 7, fill = NA, align = "right"))
+```
+
+d. Using the per capita data, plot the 7-day rolling averages overlying each other (one plot) with compelling labels, colors, and theme. 
+
+```{r}
+ggplot(data = state_join) +
+  geom_line(mapping = aes(x = date, y = roll7_mean, color = state), linewidth = 1) +
+  theme_dark() +
+  scale_color_brewer(palette = "Spectral", name = "State") +
+  labs(x = 'Date',
+       y = 'per Capita Cases',
+       title = '7 Day per Capita Averages for COVID-19 Cases') +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+e. Briefly describe the influence scaling by population had on the analysis? Does it make some states look better? Some worse? How so?
+Scaling standardizes cases per capita, so the state that initially looks bad based on sheer numbers, New York, actually looks to have about the same number of cases per capita as the others looked at. New York looks bad because there is more population there, so there are more total cases.
+
+# **Question 7**: Space & Time
+
+You've now been tasked with understanding how COVID has spread through time across the country. You will do this by calculating the Weighted Mean Center of the COVID-19 outbreak to better understand the movement of the virus through time. 
+
+To do this, we need to join the COVID data with location information. I have staged the latitude and longitude of county centers [here](https://raw.githubusercontent.com/mikejohnson51/csu-ess-330/refs/heads/main/resources/county-centroids.csv). 
+
+Please read in the data (`readr::read_csv()`); and join it to your raw COVID-19 data using the `fips` attributes using the following URL:
+
+```{r}
+location_dat <- read_csv('https://raw.githubusercontent.com/mikejohnson51/csu-ess-330/refs/heads/main/resources/county-centroids.csv')
+
+covid_location <- full_join(location_dat, dat, by = 'fips') %>%
+  drop_na()
+```
+
+- The mean center of a set of spatial points is defined as the average X and Y coordinate. A weighted mean center can be found by weighting the coordinates by another variable such that:
+
+$$X_{coord} = \sum{(X_{i} * w_{i})} / \sum(w_{i})$$
+$$Y_{coord} = \sum{(Y_{i} * w_{i})}/ \sum(w_{i})$$
+
+- For each date, calculate the Weighted Mean $X_{coord}$ and $Y_{coord}$ using the daily cumulative cases _and_ deaths as the respective $w_{i}$. 
+
+```{r}
+covid_weight <- covid_location %>%
+  group_by(date) %>%
+  summarise(weight_x_cases = sum(cases*LON)/sum(cases),
+            weight_y_cases = sum(cases*LAT)/sum(cases),
+            weight_x_deaths = sum(deaths*LON)/sum(deaths),
+            weight_y_deaths = sum(deaths*LAT)/sum(deaths))
+```
+
+Make two plots next to each other (using `patchwork`) showing cases in navy and deaths in red. Once complete, describe the differences in the plots and what they mean about the spatial patterns seen with COVID impacts. These points should be plotted over a map of the USA states which can be added to a ggplot object with:
+
+```{r, eval = FALSE}
+borders("state", fill = "gray90", colour = "white")
+```
+
+(feel free to modify fill and **colour** (must be colour (see documentation)))
+
+
+```{r}
+pcases <- ggplot(data = covid_weight) +
+  borders('state', fill = 'gray90', colour = 'white') +
+  geom_point(mapping = aes(x = weight_x_cases, y = weight_y_cases), colour = 'navy') +
+  theme_minimal() +
+  labs(x = 'Longitude',
+       y = 'Latitude',
+       title = 'Cases')
+
+pdeaths <- ggplot(data = covid_weight) +
+  borders('state', fill = 'gray90', colour = 'white') +
+  geom_point(mapping = aes(x = weight_x_deaths, y = weight_y_deaths), colour = 'red4') +
+  theme_minimal() +
+  labs(x = 'Longitude',
+       y = 'Latitude',
+       title = 'Deaths')
+
+
+pcases | pdeaths
+  
+```
+
+**Plot Description:** The cases very quickly move from the West Coast into the interior of the country. There is a lag with the deaths, as they came more slowly, but eventually they also follow the same path as the number of cases. The deaths are centered in the middle of the country like the cases. There is an interesting dip in cases south, probably showing a spike in cases in Florida and Texas toward the end of this data. Both charts show an lean toward the right, when COVID hit the east coast hard and most of the cases and deaths were on the east side of the country.
+
+
+# **Question 8:** Trends
+
+OK! This is a job well done. As your final task, your leadership has noticed that it is much easier to have a solid record of deaths, while a record of cases relies on testing protocols and availability. They ask you to explore the relationship between cases and deaths to see if deaths can be used as a proxy for cases. You will explore the relationship between cases and deaths along with other predictors of your choosing from the population data.
+
+## Data Preparation
+
+a. Let's start with the raw COVID dataset, and compute county level daily new cases and deaths (`lag`). Then, join it to the census data in order to use population data in the model. 
+
+b. We are aware there was a strong seasonal component to the spread of COVID-19. To account for this, lets add a new column to the data for year (`lubridate::year()`), month (`lubridate::month()`), and `season` (`dplyr::case_when()`) which will be one of four values: "Spring" (Mar-May), "Summer" (Jun-Aug), "Fall" (Sep-Nov), or "Winter" (Dec - Jan) based on the computed Month.
+
+c. Next, lets group the data by state, year, and season and summarize the total population, new cases, and new deaths per grouping. 
+
+d. Given the case/death counts are not scaled by population, we expect that each will exhibit a right skew behavior (you can confirm this with density plots, shapiro.test, or histrograms). Given an assumption of linear models is normality in the data, let's apply a log transformation to cases, deaths, and population to normalize them. 
+
+```{r}
+state_dat <- dat %>%
+  group_by(state, county) %>%
+  mutate(new_cases = cases - lag(cases, n = 1),
+         new_deaths = deaths - lag(deaths, n = 1)) %>%
+  drop_na() %>%
+  ungroup()
+
+pop_state_cum <- pop_data %>%
+  filter(COUNTY > '000') %>%
+  mutate(fips = paste0(STATE, COUNTY))
+
+pop_state_join <- inner_join(pop_state_cum, state_dat, by = 'fips') %>%
+  select(CTYNAME, STNAME, contains(c('POPES', 'DEATHS')), fips, date, county, state, cases, deaths, new_cases, new_deaths) %>%
+  mutate(year = lubridate::year(date),
+         month = lubridate::month(date),
+         season = dplyr::case_when(month >= 3 & month <= 5 ~ 'Spring',
+                                   month >= 6 & month <= 8 ~ 'Summer',
+                                   month >= 9 & month <= 11 ~ 'Fall',
+                                   TRUE ~ 'Winter'))
+
+pop_state_season <- pop_state_join %>%
+  group_by(state, year, season) %>%
+  summarise(seasonal_cases = sum(new_cases),
+            seasonal_deaths = sum(new_deaths),
+            population = case_when(year == 2020 ~ first(POPESTIMATE2020),
+                                   year == 2021 ~ first(POPESTIMATE2021),
+                                   year == 2022 ~ first(POPESTIMATE2022),
+                                   year == 2023 ~ first(POPESTIMATE2023),
+                                   TRUE ~ NA_real_)) %>%
+  distinct() %>%
+  mutate(log_seasonal_cases = log(seasonal_cases + 1),
+         log_seasonal_deaths = log(seasonal_deaths + 1),
+         log_population = log(population))
+```
+
+## Model Building
+
+a. Once the data has been prepared, build a linear model (`lm`) to predict the log of cases using the log of deaths the log of population, and the season. Be sure to add an interaction term for population and deaths since the per capita realtionship is significant!
+
+b. Once the model is built, summarize it (summary) and report the R-squared value and the p-value of the model. What does this mean for the value of its application?
+
+```{r}
+cases_lm <- lm(log_seasonal_cases ~ log_seasonal_deaths*log_population + season, data = pop_state_season)
+summary(cases_lm)
+```
+**Results**
+r-squared = 0.8076
+p-value < 2.2e-16
+
+Since the p-value is so low, the overall model shows that the cases are dependent on a combination of deaths, season, and population. However digging into the data, population, the intersection of deaths and population, Winter and Summer seasons are not significantly affecting the number of cases. Overall though, the model is useful and could be used to predict cases based on deaths, season, and population.
+
+
+# **Question 9:** Evaluation
+
+Now that you have built a model, it is time to evaluate it. 
+
+a. Start by using `broom::augment` to generate a data frame of predictions and residuals.
+
+b. Lets, create a scatter plot of the predicted cases vs. the actual cases. Add a line of best fit to the plot, and make the plot as appealing as possible using `themes`, `scales_*`, and `labels.` Describe the relationship that you see... are you happy with the model?
+
+c. A final assumption of an appropriate model is that the residuals are normally distributed. Fortunately `broom::augment` provides the .resid outputs for each feature. To visually check for residual normality, create a histogram of the residuals. Make the plot as appealing as possible using `themes`, `scales_*`, and `labels.` How does the distribution look? Was a linear model appropriate for this case?
+
+```{r}
+pred_deaths <- broom::augment(cases_lm, new_data = pop_state_seas)
+
+ggplot(data = pred_deaths) +
+  geom_point(mapping = aes(x = log_seasonal_deaths, y = .fitted)) +
+  theme_classic() +
+  labs(x = 'Seasonal Deaths (log) - Actual',
+       y = 'Seasonal Deaths (log) - Predicted',
+       title = 'Actual vs. Predicted Seasonal Deaths using a Linear Model') +
+  geom_smooth(mapping = aes(x = log_seasonal_deaths, y = .fitted), color = 'navy')
+
+ggplot(data = pred_deaths, aes(.resid)) +
+  geom_histogram(binwidth = 0.1, fill = 'navy') +
+  theme_classic() +
+  labs(x = 'Residuals',
+       y = 'Number of Cases',
+       title = 'Distribution of Residuals in the Linear Model')
+```
+
+# Summary
+
+And that's it! In this lab we have explored the COVID-19 data from the New York Times, wrangled it, and built a model to predict cases from deaths and population. This is a great example of how data science can be used to inform public health decisions.
+
+We covered a lot of technical tools as well spanning readr, dplyr, ggplot, lubridate, and more. We also used some more advanced tools like `zoo` for rolling averages and `broom` for model evaluation.
+
+Through out the rest of class we will keep building on these skills and tools to become better data scientists.
+
+# Rubric
+
+- [ ] **Question 1**: Daily Summaries (10pts)
+- [ ] **Question 2**: Evaluating Census Data (EDA) (10pts)
+- [ ] **Question 3**: Per Capita Summary (10pts)
+- [ ] **Question 4**: Rolling Thresholds (20pts)
+- [ ] **Question 5**: Death toll (10pts)
+- [ ] **Question 6**: Multi-state (20pts)
+- [ ] **Question 7**: Space and Time (20pts)
+- [ ] **Question 8**: Trends (20pts)
+- [ ] **Question 9**: Evaluation (10pts)
+- [ ] **Well Structured legible Qmd** (10pts)
+- [ ] **Deployed as web page** (10pts)
+
+**Total:** 150 points
+
+# Submission
+
+`https://USERNAME.github.io/csu-523c/lab-01.html`
+
+Submit this URL in the appropriate Canvas dropbox. Also take a moment to update your personal webpage with this link and some bullet points of what you learned. While not graded as part of this lab, it will be eventually serve as extras credit!
