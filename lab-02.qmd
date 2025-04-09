@@ -14,7 +14,7 @@ execute:
 ---
 
 ```{r, include = F}
-knitr::opts_chunk$set(fig.width = 6,
+knitr::opts_chunk$set(fig.width = 10,
                       comment = "", 
                       cache = FALSE, 
                       fig.retina = 3)
@@ -113,7 +113,9 @@ Once installed:
 state_boundary <- us_states(resolution = 'low') %>%
   filter(!state_abbr %in% c('PR', 'HI', 'AK')) %>%
   st_transform(eqdc)
+```
 
+```{r, echo = F}
 st_crs(state_boundary)
 
 ggplot(data = state_boundary) +
@@ -140,13 +142,16 @@ na_boundaries <- rnaturalearth::countries110 %>%
   filter(ADMIN %in% c('United States of America', 'Canada', 'Mexico')) %>%
   st_as_sf() %>%
   st_transform(eqdc)
+```
 
+```{r, echo = F}
 st_crs(na_boundaries)
 
 ggplot(data = na_boundaries) +
   geom_sf() +
   theme_void()
 ```
+
 
 *****
 
@@ -169,13 +174,16 @@ us_cities <- read_csv('data/uscities.csv') %>%
   st_as_sf(coords = c('lng', 'lat'), crs = 4326) %>%
   st_transform(eqdc) %>%
   filter(!state_id %in% c('PR', 'HI', 'AK'))
+```
 
+```{r, echo = F}
 st_crs(us_cities)
 
 ggplot(data = us_cities) +
   geom_sf() +
   theme_void()
 ```
+
 
 # Question 2: 
 
@@ -404,7 +412,24 @@ Recently, Federal Agencies have claimed basic constitutional rights protected by
 - Does it match the ACLU estimate in the link above?
 
 ```{r}
+us_cities_distance_border <- us_cities_distance %>%
+  filter(distance_usa <= 161)
 
+n_cities <- as.numeric(nrow(us_cities_distance_border))
+danger_pop <- sum(us_cities_distance_border$population)
+total_pop <- sum(us_cities_distance$population)
+percent_pop <- danger_pop/total_pop*100
+
+Q_table <- tibble(
+  'Total Cities' = n_cities,
+  'Population within 100 miles' = danger_pop,
+  'Total U.S. Population' = total_pop,
+  '% in Danger Zone' = percent_pop,
+  'ACLU Estimate %' = '66.67')
+
+flextable(Q_table) %>%
+  set_caption('Data for Cities within 100 miles of a US Border') %>%
+  add_footer_lines('ACLU Estimate and calculated % from the lab data are within 2%. The ACLU used 2010 census data and the more current data matches that.')
 ```
 
 Report this information as a table.
@@ -416,13 +441,46 @@ Report this information as a table.
 - Label the 10 most populous cities in the Danger Zone
 
 ```{r}
+ten_pop <- us_cities_distance_border %>%
+  slice_max(n = 10, order_by = population)
 
+ggplot() +
+  geom_sf(data = us_cities_distance, color = 'black', alpha = 0.7, size = 0.5) +
+  geom_sf(data = us_cities_distance_border, aes(color = distance_usa)) +
+  scale_color_gradient(low = 'orange', high = 'darkred', name = 'Distance (km)') +
+  gghighlight(distance_usa <= 161) +
+  theme_void() +
+  geom_sf(data = state_boundary_line, color = 'black', alpha = 0.8) +
+  labs(title = 'U.S. Cities within 100 miles (160 km) of the Border') +
+  geom_label_repel(data = ten_pop,
+                   aes(x = st_coordinates(geometry)[,1],
+                       y = st_coordinates(geometry)[,2],
+                       label = city),
+                       size = 2.5)
 ```
 
 ### _4.3_ : Instead of labeling the 10 most populous cites, label the most populous city in each state within the Danger Zone.
 
 ```{r}
+state_pop <- us_cities_distance_border %>%
+  group_by(state_name) %>%
+  filter(population == max(population)) %>%
+  ungroup()
 
+ggplot() +
+  geom_sf(data = us_cities_distance, color = 'black', alpha = 0.7, size = 0.5) +
+  geom_sf(data = us_cities_distance_border, aes(color = distance_usa)) +
+  scale_color_gradient(low = 'orange', high = 'darkred', name = 'Distance (km)') +
+  gghighlight(distance_usa <= 161) +
+  theme_void() +
+  geom_sf(data = state_boundary_line, color = 'black', alpha = 0.8) +
+  labs(title = 'U.S. Cities within 100 miles (160 km) of the Border') +
+  geom_label_repel(data = state_pop,
+                   max.overlaps = getOption('ggrepel.max.overlaps', default = 30),
+                   aes(x = st_coordinates(geometry)[,1],
+                       y = st_coordinates(geometry)[,2],
+                       label = city),
+                       size = 2.5)
 ```
 
 ****
@@ -436,19 +494,3 @@ Report this information as a table.
 - [ ] **Well Structured and appealing Qmd deployed as web page** (10)
 
 **Total:** 150 points
-
-# Submission
-
-For this lab you will submit a URL to a webpage deployed with GitHub pages.
-
-To do this:
-
- - Render your lab document
- - Stage/commit/push your files
- - If you followed the naming conventions in the "Set Up", your lab 2 link will be available at: 
- 
-`https://USERNAME.github.io/csu-523c/lab-02.html``
-
-Submit this URL in the appropriate Canvas dropbox. Also take a moment to update your personal webpage with this link and some bullet points of what you learned. While not graded as part of this lab, it will be your final!
-
-
