@@ -13,9 +13,11 @@ execute:
   error: false
 ---
 
-```{r}
-#| eval: true
-knitr::include_graphics('images/03-aclu.jpg')
+```{r, include = F}
+knitr::opts_chunk$set(fig.width = 6,
+                      comment = "", 
+                      cache = FALSE, 
+                      fig.retina = 3)
 ```
 
 In this lab we will explore the properties of `sf`, `sfc`, and `sfg` features & objects; how they are stored; and issues related to distance calculation and coordinate transformation. 
@@ -24,32 +26,20 @@ We will continue to build on our data wrangling and data visualization skills; a
 
 ****
 
-# Set-up
-
-1. Navigage to your `csu-523c` repository
-2. Create a new Quarto (.qmd) file called `lab-02.qmd`
-3. Populate its YML with a title, author, subtitle, output type and theme. For example:
-
 # Libraries
 
 ```{r}
-#| eval: true
-#| echo: true
-#| message: false
-#| warning: false
-
-# spatial data science
+#Data Manipulation
 library(tidyverse)
 library(sf)
 library(units)
+library(flextable)
 
-# Data
+#Data Loading
 library(USAboundaries)
-install.packages('rnaturalearth')
 library(rnaturalearth)
 
 # Visualization
-install.packages('gghighlight')
 library(gghighlight)
 library(ggrepel)
 library(knitr)
@@ -78,7 +68,7 @@ For this lab we need three (3) datasets.
   2. Boundaries of Canada, Mexico and the United States (1.2)
   3. All USA cites (1.3)
   
-  
+
 ### _1.1_ Define a Projection
 
 For this lab we want to calculate distances between features, therefore we need a projection that preserves distance at the scale of CONUS. For this, we will use the North America Equidistant Conic:
@@ -108,10 +98,7 @@ In R, USA boundaries are stored in the `USAboundaries` package.
 In case this package and data are **not** installed: 
 
 ```{r}
-install.packages('remotes')
 library(remotes)
-remotes::install_github("ropensci/USAboundaries")
-remotes::install_github("ropensci/USAboundariesData")
 library(USAboundaries)
 library(USAboundariesData)
 ```
@@ -120,11 +107,18 @@ Once installed:
 
 - USA state boundaries can be accessed with `USAboundaries::us_states(resolution = "low")`. Given the precision needed for this analysis we are ok with the low resolution. 
 - Make sure you only have the states in the continental United States (CONUS) (**Hint** use `filter`)
-- Make sure the data is in a projected coordinate system suitable for distance measurements at the national scale (`eqdc`). 
+- Make sure the data is in a projected coordinate system suitable for distance measurements at the national scale (`eqdc`).
 
 ```{r}
-st_boundary <- us_states(resolution = 'low') %>%
-  filter(!state_abbr %in% c('PR', 'HI', 'AK'))
+state_boundary <- us_states(resolution = 'low') %>%
+  filter(!state_abbr %in% c('PR', 'HI', 'AK')) %>%
+  st_transform(eqdc)
+
+st_crs(state_boundary)
+
+ggplot(data = state_boundary) +
+  geom_sf() +
+  theme_void()
 ```
 
 
@@ -133,15 +127,6 @@ st_boundary <- us_states(resolution = 'low') %>%
 ### _1.3_ - Get country boundaries for Mexico, the United States of America, and Canada
 
 In R, country boundaries are stored in the `rnaturalearth` package.
-In case this package is not installed: 
-
-```{r}
-#| echo: true
-remotes::install_github("ropenscilabs/rnaturalearthdata")
-```
-
-Once installed: 
-
 - World boundaries can be accessed with `rnaturalearth::countries110`. 
 - Make sure the data is in simple features (`sf`) format (**Hint** use the `st_as_sf` variable).
 - Make sure you only have the countries you want (**Hint** `filter` on the `admin` variable)
@@ -149,13 +134,18 @@ Once installed:
 
 
 ```{r}
-states <- USAboundaries::us_states(resolution = "low") |> 
-  filter(!state_abbr %in% c("HI", "AK", "PR")) |> 
+rnaturalearth::countries110$ADMIN
+
+na_boundaries <- rnaturalearth::countries110 %>%
+  filter(ADMIN %in% c('United States of America', 'Canada', 'Mexico')) %>%
+  st_as_sf() %>%
   st_transform(eqdc)
 
-# USA State Boundaries
-countries <- rnaturalearth::countries110 |> 
-  st_transform(eqdc) 
+st_crs(na_boundaries)
+
+ggplot(data = na_boundaries) +
+  geom_sf() +
+  theme_void()
 ```
 
 *****
@@ -175,71 +165,90 @@ Finally, remove cities in states not wanted and make sure the data is in a proje
 Congratulations! You now have three real-world, large datasets ready for analysis.
 
 ```{r}
-cities <-  read_csv("data/uscities.csv", show_col_types = FALSE) |> 
-  st_as_sf(coords = c("lng", "lat"), crs = 4326) |> 
-  st_transform(eqdc) 
+us_cities <- read_csv('data/uscities.csv') %>%
+  st_as_sf(coords = c('lng', 'lat'), crs = 4326) %>%
+  st_transform(eqdc) %>%
+  filter(!state_id %in% c('PR', 'HI', 'AK'))
+
+st_crs(us_cities)
+
+ggplot(data = us_cities) +
+  geom_sf() +
+  theme_void()
 ```
 
 # Question 2: 
 
-Here we will focus on calculating the distance of each USA city to (1) the national border (2) the nearest state border (3) the Mexican border and (4) the Canadian border. You will need to manipulate you existing spatial geometries to do this using either `st_union` or `st_combine` depending on the situation. In all cases, since we are after distances to borders, we will need to cast (`st_cast`) our `MULTIPPOLYGON` geometries to `MULTILINESTRING` geometries. To perform these distance calculations we will use `st_distance`(). 
+Here we will focus on calculating the distance of each USA city to (1) the national border (2) the nearest state border (3) the Mexican border and (4) the Canadian border. You will need to manipulate you existing spatial geometries to do this using either `st_union` or `st_combine` depending on the situation. In all cases, since we are after distances to borders, we will need to cast (`st_cast`) our `MULTIPOLYGON` geometries to `MULTILINESTRING` geometries. To perform these distance calculations we will use `st_distance`(). 
 
 ### _2.1_ -  Distance to USA Border (coastline or national) (km)
 
-For **2.2** we are interested in calculating the distance of each USA city to the USA border (coastline or national border). To do this we need all states to act as single unit. Convert the USA state boundaries to a `MULTILINESTRING` geometry in which the state boundaries are **resolved**. Please do this starting with the states object and _NOT_ with a filtered country object.  In addition to storing this distance data as part of the cities `data.frame`, produce a table (`flextable`) documenting the five cities farthest from a state border. Include only the city name, state, and distance. 
+For **2.1** we are interested in calculating the distance of each USA city to the USA border (coastline or national border). To do this we need all states to act as single unit. Convert the USA state boundaries to a `MULTILINESTRING` geometry in which the state boundaries are **resolved**. Please do this starting with the states object and _NOT_ with a filtered country object.  In addition to storing this distance data as part of the cities `data.frame`, produce a table (`flextable`) documenting the five cities farthest from an international border. Include only the city name, state, and distance.
 
 ```{r}
-us <- st_union(states) |> 
-  st_cast("MULTILINESTRING") |> 
-  st_as_sf()
+state_boundary_u <- state_boundary %>%
+  st_union() %>%
+  st_cast(to = 'MULTILINESTRING')
 
-cities <- cities %>% 
-  st_filter(st_union(states)) %>%
-  mutate(distance_to_us_border = set_units(st_distance(., us), "km"))
+ggplot() +
+  geom_sf(data = state_boundary_u, aes()) +
+  theme_void()
 
-select(cities, city, state_name, distance_to_us_border) |>
-  st_drop_geometry() |> 
-  slice_max(distance_to_us_border, n = 5) |> 
-  flextable::flextable()
+us_cities_distance <- us_cities %>%
+  mutate(distance_usa = st_distance(us_cities, state_boundary_u)) %>%
+  mutate(distance_usa = units::set_units(distance_usa, km)) %>%
+  select(-c('city_ascii', 'source', 'military', 'incorporated', 'timezone', 'ranking', 'zips', 'id'))
+
+slice_max(us_cities_distance, n = 5, order_by = distance_usa) %>%
+  select(city, state_name, distance_usa) %>%
+  flextable() %>%
+  set_caption("5 Cities Furthest from a Coastal or International Border")
 ```
 
 
 ### _2.2_ -  Distance to States (km)
 
-For **2.1** we are interested in calculating the distance of each city to the nearest state boundary. To do this we need all states to act as single unit. Convert the USA state boundaries to a `MULTILINESTRING` geometry in which the state boundaries are **preserved** (not resolved). In addition to storing this distance data as part of the cities `data.frame`, produce a table (`flextable`) documenting the five cities farthest from a state border. Include only the city name, state, and distance.
+For **2.2** we are interested in calculating the distance of each city to the nearest state boundary. To do this we need all states to act as single unit. Convert the USA state boundaries to a `MULTILINESTRING` geometry in which the state boundaries are **preserved** (not resolved). In addition to storing this distance data as part of the cities `data.frame`, produce a table (`flextable`) documenting the five cities farthest from a state border. Include only the city name, state, and distance.
 
 ```{r}
-us <- st_combine(states) |> 
-  st_cast("MULTILINESTRING") |> 
-  st_as_sf()
+state_boundary_c <- state_boundary %>%
+  st_combine() %>%
+  st_cast(to = 'MULTILINESTRING')
 
-cities <- cities %>% 
-  st_filter(st_union(states)) %>%
-  mutate(distance_to_state_border = set_units(st_distance(., us), "km"))
+ggplot() +
+  geom_sf(data = state_boundary_c, aes()) +
+  theme_void()
 
-select(cities, city, state_name, distance_to_state_border) |>
-  st_drop_geometry() |> 
-  slice_max(distance_to_state_border, n = 5) |> 
-  flextable::flextable()
+us_cities_distance <- us_cities_distance %>%
+  mutate(distance_state = st_distance(us_cities_distance, state_boundary_c)) %>%
+  mutate(distance_state = units::set_units(distance_state, km))
+
+slice_max(us_cities_distance, n = 5, order_by = distance_state) %>%
+  select(city, state_name, distance_state) %>%
+  flextable() %>%
+  set_caption("5 Cities Furthest from a State Boundary")
+
 ```
 
 ### _2.3_ -  Distance to Mexico (km)
 
-For **2.3** we are interested in calculating the distance of each city to the Mexican border. To do this we need to isolate Mexico from the country objects. In addition to storing this data as part of the cities data.frame, produce a table (`flextable`) documenting the five cities farthest from a state border. Include only the city name, state, and distance.
+For **2.3** we are interested in calculating the distance of each city to the Mexican border. To do this we need to isolate Mexico from the country objects. In addition to storing this data as part of the cities data.frame, produce a table (`flextable`) documenting the five cities farthest from the Mexico border. Include only the city name, state, and distance.
 
 ```{r}
-mx <- filter(countries, ADMIN == "Mexico") |>
-  st_cast("MULTILINESTRING") |> 
-  st_as_sf()
+na_boundaries_mex <- na_boundaries %>%
+  filter(SOV_A3 == 'MEX') %>%
+  st_cast(to = 'MULTILINESTRING')
 
-cities <- cities %>% 
-  st_filter(st_union(states)) %>%
-  mutate(distance_to_mx_border = set_units(st_distance(., mx), "km"))
+plot(na_boundaries_mex)
 
-select(cities, city, state_name, distance_to_mx_border) |>
-  st_drop_geometry() |> 
-  slice_max(distance_to_mx_border, n = 5) |> 
-  flextable::flextable()
+us_cities_distance <- us_cities_distance %>%
+  mutate(distance_mex = st_distance(us_cities_distance, na_boundaries_mex)) %>%
+  mutate(distance_mex = units::set_units(distance_mex, km))
+  
+slice_max(us_cities_distance, n = 5, order_by = distance_mex) %>%
+  select(city, state_name, distance_mex) %>%
+  flextable() %>%
+  set_caption("5 Cities Furthest from the Mexico Border")
 ```
 
 ### _2.4_ -  Distance to Canada (km)
@@ -247,18 +256,20 @@ select(cities, city, state_name, distance_to_mx_border) |>
 For **2.4** we are interested in calculating the distance of each city to the Canadian border. To do this we need to isolate Canada from the country objects. In addition to storing this data as part of the cities data.frame, produce a table (`flextable`) documenting the five cities farthest from a state border. Include only the city name, state, and distance.
 
 ```{r}
-ca <- filter(countries, ADMIN == "Canada") |>
-  st_cast("MULTILINESTRING") |> 
-  st_as_sf()
+na_boundaries_can <- na_boundaries %>%
+  filter(SOV_A3 == 'CAN') %>%
+  st_cast(to = 'MULTILINESTRING')
 
-cities <- cities %>% 
-  st_filter(st_union(states)) %>%
-  mutate(distance_to_ca_border = set_units(st_distance(., ca), "km"))
+plot(na_boundaries_can)
 
-select(cities, city, state_name, distance_to_ca_border) |>
-  st_drop_geometry() |> 
-  slice_max(distance_to_ca_border, n = 5) |> 
-  flextable::flextable()
+us_cities_distance <- us_cities_distance %>%
+  mutate(distance_can = st_distance(us_cities_distance, na_boundaries_can)) %>%
+  mutate(distance_can = units::set_units(distance_can, km))
+
+slice_max(us_cities_distance, n = 5, order_by = distance_can) %>%
+  select(city, state_name, distance_can) %>%
+  flextable() %>%
+  set_caption("5 Cities Furthest from the Canada Border")
 ```
 
 # Question 3:
@@ -274,20 +285,22 @@ Show the 3 continents, CONUS outline, state boundaries, and 10 largest USA citie
  - Use `ggrepel::geom_label_repel` to label your cities
  
 ```{r}
-na <- filter(countries, ADMIN %in% c("Mexico", "Canada", "United States of America")) |>
-  st_as_sf()
+us_cities_size <- us_cities_distance %>%
+  slice_max(n = 10, order_by = population)
 
-big_cities <- cities |> 
-  slice_max(population, n = 10)
-
-ggplot() + 
-  geom_sf(data = na, fill = "grey") + 
-  geom_sf(data = states, fill = "white", lty = 2, size = 0.5) + 
-  geom_sf(data = big_cities, color = 'red', size = .5) + 
-  ggrepel::geom_label_repel(data = big_cities, 
-                               aes(geometry = geometry, label = city, label.size = .1),
-                               stat = "sf_coordinates") + 
-  theme_void()
+ggplot() +
+  geom_sf(data = na_boundaries, linewidth = 0.75, color = 'black') +
+  geom_sf(data = state_boundary) +
+  geom_sf(data = us_cities_size, aes(color = population)) +
+  scale_color_viridis_c(option = 'turbo') +
+  geom_label_repel(data = us_cities_size,
+                   aes(x = st_coordinates(geometry)[,1],
+                       y = st_coordinates(geometry)[,2],
+                       label = city),
+                   size = 2) +
+  theme_void() +
+  theme(legend.position = 'none') +
+  labs(title = "10 Largest U.S. Cities by Population")
 ```
 
  
@@ -296,20 +309,25 @@ ggplot() +
 Create a map that colors USA cities by their distance from the national border. In addition, re-draw and label the 5 cities that are farthest from the border.
 
 ```{r}
-five_farthest <- cities |> 
-  slice_max(distance_to_us_border, n = 5)
+us_cities_distance <- us_cities_distance %>%
+  mutate(distance_usa = as.numeric(distance_usa))
 
-ggplot() + 
-  geom_sf(data = st_union(states), fill = "grey", lty = 2, size = 0.5) + 
-  geom_sf(data = cities, aes(color = as.numeric(distance_to_us_border)), size = .5) + 
-  geom_sf(data = five_farthest, color = 'red', size = .7) + 
-  ggrepel::geom_label_repel(data = five_farthest, 
-                               aes(geometry = geometry, label = city, label.size = .1),
-                               stat = "sf_coordinates") + 
-  scale_color_viridis_c() +
-  theme_void() + 
-  theme(legend.position = "bottom") + 
-  labs(color = "Distance to Border (km)")
+us_cities_far <- us_cities_distance %>%
+  slice_max(n = 5, order_by = distance_usa) %>%
+  mutate(label = paste(city, state_id, sep = ','))
+
+ggplot() +
+  geom_sf(data = state_boundary) +
+  geom_sf(data = us_cities_distance, aes(color = distance_usa), alpha = 0.7, size = 1) +
+  scale_color_viridis_c(option = 'rocket', name = 'Distance (km)') +
+  theme_void() +
+  labs(title = 'U.S. Cities and Distances from the Nearest Border') +
+  geom_sf(data = us_cities_far, color = 'black') +
+  geom_label_repel(data = us_cities_far,
+                   aes(x = st_coordinates(geometry)[,1],
+                       y = st_coordinates(geometry)[,2],
+                       label = label),
+                       size = 2.5)
 ```
 
 ### _3.3_  City Distance from Nearest State
@@ -317,20 +335,7 @@ ggplot() +
 Create a map that colors USA cities by their distance from the nearest state border. In addition, re-draw and label the 5 cities that are farthest from any border.
 
 ```{r}
-five_farthest <- cities |> 
-  slice_max(distance_to_state_border, n = 5)
 
-ggplot() + 
-  geom_sf(data = st_union(states), fill = "grey", lty = 2, size = 0.5) + 
-  geom_sf(data = cities, aes(color = as.numeric(distance_to_state_border)), size = .5) + 
-  geom_sf(data = five_farthest, color = 'red', size = .7) + 
-  ggrepel::geom_label_repel(data = five_farthest, 
-                               aes(geometry = geometry, label = city, label.size = .1),
-                               stat = "sf_coordinates") + 
-  scale_color_viridis_c() +
-  theme_void() + 
-  theme(legend.position = "bottom") + 
-  labs(color = "Distance to Border (km)")
 ```
 
 ### _3.4_  Equidistance boundary from Mexico and Canada
@@ -340,24 +345,7 @@ Here we provide a little more challenge. Use `gghighlight` to identify the citie
 In addition, label the five (5) most populous cites in this zone.
 
 ```{r}
-cities <- cities |> 
-  mutate(can_mx_dist = as.numeric(abs(distance_to_ca_border - distance_to_mx_border)))
 
-five_farthest = filter(cities, can_mx_dist < 100) |> 
-  slice_max(population, n = 5)
-
-ggplot() + 
-  geom_sf(data = st_union(states), fill = "grey", lty = 2, size = 0.5) + 
-  geom_sf(data = cities, aes(color = as.numeric(distance_to_us_border)), size = .5) + 
-  geom_sf(data = five_farthest, color = 'red', size = .7) + 
-  ggrepel::geom_label_repel(data = five_farthest, 
-                               aes(geometry = geometry, label = city, label.size = .1),
-                               stat = "sf_coordinates") + 
-  scale_color_viridis_c() +
-  gghighlight(can_mx_dist < 100) +
-  theme_void() + 
-  theme(legend.position = "bottom") + 
-  labs(color = "Distance to Border (km)")
 ```
 
 **Hint**: (create a new variable that finds the absolute difference between the distance to Mexico and the distance to Canada)
@@ -376,13 +364,7 @@ Recently, Federal Agencies have claimed basic constitutional rights protected by
 - Does it match the ACLU estimate in the link above?
 
 ```{r}
-cities |> 
-  st_drop_geometry() |> 
-  filter(as.numeric(distance_to_us_border) < 160) |> 
-  summarise(`Impacted Cities` = n(), 
-            `Impacted Population` = sum(population), 
-            `Impacted Percentage` = round(sum(population) / sum(cities$population) * 100, 2)) |> 
-  flextable::flextable()
+
 ```
 
 Report this information as a table.
@@ -394,42 +376,13 @@ Report this information as a table.
 - Label the 10 most populous cities in the Danger Zone
 
 ```{r}
-largest_10 = filter(cities, as.numeric(distance_to_us_border) < 160) |> 
-  slice_max(population, n = 10)
 
-ggplot() + 
-  geom_sf(data = st_union(states), fill = "grey", lty = 2, size = 0.5) + 
-  geom_sf(data = cities, aes(color = as.numeric(distance_to_us_border)), size = .5) + 
-  geom_sf(data = largest_10, color = 'black', size = .8) + 
-  ggrepel::geom_label_repel(data = largest_10, 
-                               aes(geometry = geometry, label = city, label.size = .1),
-                               stat = "sf_coordinates") + 
-  scale_color_gradient(low = "orange", high = "darkred") +
-  gghighlight(as.numeric(distance_to_us_border) < 160) +
-  theme_void() + 
-  theme(legend.position = "bottom") + 
-  labs(color = "Distance to Border (km)")
 ```
 
 ### _4.3_ : Instead of labeling the 10 most populous cites, label the most populous city in each state within the Danger Zone.
 
 ```{r}
-largest_state = filter(cities, as.numeric(distance_to_us_border) < 160) |> 
-  group_by(state_name) |>
-  slice_max(population, n = 1)
 
-ggplot() + 
-  geom_sf(data = st_union(states), fill = "grey", lty = 2, size = 0.5) + 
-  geom_sf(data = cities, aes(color = as.numeric(distance_to_us_border)), size = .5) + 
-  geom_sf(data = largest_state, color = 'black', size = .8) + 
-  ggrepel::geom_label_repel(data = largest_state, 
-                               aes(geometry = geometry, label = city, label.size = .1),
-                               stat = "sf_coordinates") + 
-  scale_color_gradient(low = "orange", high = "darkred") +
-  gghighlight(as.numeric(distance_to_us_border) < 160) +
-  theme_void() + 
-  theme(legend.position = "bottom") + 
-  labs(color = "Distance to Border (km)")
 ```
 
 ****
