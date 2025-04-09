@@ -115,7 +115,7 @@ state_boundary <- us_states(resolution = 'low') %>%
   st_transform(eqdc)
 ```
 
-```{r, echo = F}
+```{r, echo = T, eval = F}
 st_crs(state_boundary)
 
 ggplot(data = state_boundary) +
@@ -144,7 +144,7 @@ na_boundaries <- rnaturalearth::countries110 %>%
   st_transform(eqdc)
 ```
 
-```{r, echo = F}
+```{r, echo = T, eval = F}
 st_crs(na_boundaries)
 
 ggplot(data = na_boundaries) +
@@ -176,7 +176,7 @@ us_cities <- read_csv('data/uscities.csv') %>%
   filter(!state_id %in% c('PR', 'HI', 'AK'))
 ```
 
-```{r, echo = F}
+```{r, echo = T, eval = F}
 st_crs(us_cities)
 
 ggplot(data = us_cities) +
@@ -208,6 +208,7 @@ us_cities_distance <- us_cities %>%
   select(-c('city_ascii', 'source', 'military', 'incorporated', 'timezone', 'ranking', 'zips', 'id'))
 
 slice_max(us_cities_distance, n = 5, order_by = distance_usa) %>%
+  st_drop_geometry() %>%
   select(city, state_name, distance_usa) %>%
   flextable() %>%
   set_caption("5 Cities Furthest from a Coastal or International Border")
@@ -232,6 +233,7 @@ us_cities_distance <- us_cities_distance %>%
   mutate(distance_state = units::set_units(distance_state, km))
 
 slice_max(us_cities_distance, n = 5, order_by = distance_state) %>%
+  st_drop_geometry() %>%
   select(city, state_name, distance_state) %>%
   flextable() %>%
   set_caption("5 Cities Furthest from a State Boundary")
@@ -254,6 +256,7 @@ us_cities_distance <- us_cities_distance %>%
   mutate(distance_mex = units::set_units(distance_mex, km))
   
 slice_max(us_cities_distance, n = 5, order_by = distance_mex) %>%
+  st_drop_geometry() %>%
   select(city, state_name, distance_mex) %>%
   flextable() %>%
   set_caption("5 Cities Furthest from the Mexico Border")
@@ -275,6 +278,7 @@ us_cities_distance <- us_cities_distance %>%
   mutate(distance_can = units::set_units(distance_can, km))
 
 slice_max(us_cities_distance, n = 5, order_by = distance_can) %>%
+  st_drop_geometry() %>%
   select(city, state_name, distance_can) %>%
   flextable() %>%
   set_caption("5 Cities Furthest from the Canada Border")
