@@ -136,8 +136,6 @@ In R, country boundaries are stored in the `rnaturalearth` package.
 
 
 ```{r}
-rnaturalearth::countries110$ADMIN
-
 na_boundaries <- rnaturalearth::countries110 %>%
   filter(ADMIN %in% c('United States of America', 'Canada', 'Mexico')) %>%
   st_as_sf() %>%
@@ -198,10 +196,6 @@ state_boundary_u <- state_boundary %>%
   st_union() %>%
   st_cast(to = 'MULTILINESTRING')
 
-ggplot() +
-  geom_sf(data = state_boundary_u, aes()) +
-  theme_void()
-
 us_cities_distance <- us_cities %>%
   mutate(distance_usa = st_distance(us_cities, state_boundary_u)) %>%
   mutate(distance_usa = units::set_units(distance_usa, km)) %>%
@@ -224,10 +218,6 @@ state_boundary_c <- state_boundary %>%
   st_combine() %>%
   st_cast(to = 'MULTILINESTRING')
 
-ggplot() +
-  geom_sf(data = state_boundary_c, aes()) +
-  theme_void()
-
 us_cities_distance <- us_cities_distance %>%
   mutate(distance_state = st_distance(us_cities_distance, state_boundary_c)) %>%
   mutate(distance_state = units::set_units(distance_state, km))
@@ -249,8 +239,6 @@ na_boundaries_mex <- na_boundaries %>%
   filter(SOV_A3 == 'MEX') %>%
   st_cast(to = 'MULTILINESTRING')
 
-plot(na_boundaries_mex)
-
 us_cities_distance <- us_cities_distance %>%
   mutate(distance_mex = st_distance(us_cities_distance, na_boundaries_mex)) %>%
   mutate(distance_mex = units::set_units(distance_mex, km))
@@ -270,8 +258,6 @@ For **2.4** we are interested in calculating the distance of each city to the Ca
 na_boundaries_can <- na_boundaries %>%
   filter(SOV_A3 == 'CAN') %>%
   st_cast(to = 'MULTILINESTRING')
-
-plot(na_boundaries_can)
 
 us_cities_distance <- us_cities_distance %>%
   mutate(distance_can = st_distance(us_cities_distance, na_boundaries_can)) %>%
