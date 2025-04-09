@@ -310,7 +310,10 @@ Create a map that colors USA cities by their distance from the national border. 
 
 ```{r}
 us_cities_distance <- us_cities_distance %>%
-  mutate(distance_usa = as.numeric(distance_usa))
+  mutate(distance_usa = as.numeric(distance_usa),
+         distance_state = as.numeric(distance_state),
+         distance_mex = as.numeric(distance_mex),
+         distance_can = as.numeric(distance_can))
 
 us_cities_far <- us_cities_distance %>%
   slice_max(n = 5, order_by = distance_usa) %>%
@@ -335,7 +338,25 @@ ggplot() +
 Create a map that colors USA cities by their distance from the nearest state border. In addition, re-draw and label the 5 cities that are farthest from any border.
 
 ```{r}
+us_cities_st_far <- us_cities_distance %>%
+  slice_max(n = 5, order_by = distance_state) %>%
+  mutate(label = paste(city, state_id, sep = ','))
 
+state_boundary_line <- state_boundary %>%
+  st_cast(to = 'MULTILINESTRING')
+
+ggplot() +
+  geom_sf(data = us_cities_distance, aes(color = distance_state), alpha = 0.7, size = 1) +
+  scale_color_viridis_c(option = 'rocket', name = 'Distance (km)') +
+  theme_void() +
+  geom_sf(data = state_boundary_line, color = 'black', alpha = 0.8) +
+  labs(title = 'U.S. Cities and Distances from the Nearest State Border') +
+  geom_sf(data = us_cities_st_far, color = 'black') +
+  geom_label_repel(data = us_cities_st_far,
+                   aes(x = st_coordinates(geometry)[,1],
+                       y = st_coordinates(geometry)[,2],
+                       label = label),
+                       size = 2.5)
 ```
 
 ### _3.4_  Equidistance boundary from Mexico and Canada
@@ -345,7 +366,26 @@ Here we provide a little more challenge. Use `gghighlight` to identify the citie
 In addition, label the five (5) most populous cites in this zone.
 
 ```{r}
+us_cities_eqd <- us_cities_distance %>%
+  mutate(equidistant = abs(distance_mex - distance_can))
 
+us_cities_eqd_pop <- us_cities_eqd %>%
+  filter(equidistant <= 100) %>%
+  slice_max(n = 5, order_by = population) %>%
+  mutate(label = paste(city, state_id, sep = ','))
+
+ggplot() +
+  geom_sf(data = us_cities_eqd, aes(color = equidistant), alpha = 0.7, size = 1) +
+  scale_color_viridis_c(option = 'rocket', name = 'Distance (km)') +
+  gghighlight(equidistant <= 100) +
+  theme_void() +
+  geom_sf(data = state_boundary_line, color = 'black', alpha = 0.8) +
+  labs(title = 'U.S. Cities Equidistant from Canada and Mexico +/- 100 km') +
+  geom_label_repel(data = us_cities_eqd_pop,
+                   aes(x = st_coordinates(geometry)[,1],
+                       y = st_coordinates(geometry)[,2],
+                       label = label),
+                       size = 2.5)
 ```
 
 **Hint**: (create a new variable that finds the absolute difference between the distance to Mexico and the distance to Canada)
