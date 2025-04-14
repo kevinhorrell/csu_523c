@@ -17,8 +17,7 @@ knitr:
 ---
 
 ```{r, include = F}
-knitr::opts_chunk$set(fig.width = 10,
-                      comment = "", 
+knitr::opts_chunk$set(comment = "", 
                       cache = FALSE, 
                       fig.retina = 3)
 ```
@@ -88,12 +87,15 @@ ggplot(data = counties) +
 For triangle based tessellations we need point locations to serve as our “anchors”.
 
 To achieve this:
+1. generate county centroids using st_centroid
+2. Since, we can only tessellate over a feature we need to combine or union the resulting 3,108 POINT features into a single MULTIPOINT feature
+3. Since these are point objects, the difference between union/combine is mute
 
-    generate county centroids using st_centroid
-
-    Since, we can only tessellate over a feature we need to combine or union the resulting 3,108 POINT features into a single MULTIPOINT feature
-
-    Since these are point objects, the difference between union/combine is mute
+```{r}
+counties_cent <- counties %>%
+  st_centroid() %>%
+  st_combine()
+```
 
 
 Step 1.3
@@ -109,33 +111,60 @@ Others generate equal area tiles over a known extent (st_make_grid)
 For this lab, we will create surfaces of CONUS using using 4 methods, 2 based on an extent and 2 based on point anchors:
 
 Tessellations :
+1. st_voronoi: creates voroni tessellation
+2. st_triangulate: triangulates set of points (not constrained)
 
-    st_voroni: creates voroni tessellation
+#Voronoi Grids
+```{r}
+vor_counties <- counties_cent %>%
+  st_voronoi() %>%
+  st_cast() %>%
+  st_as_sf() %>%
+  mutate(id = 1:n())
 
-    st_traingulate: triangulates set of points (not constrained)
+plot(vor_counties)
+```
+
+#Triangulations
+```{r}
+tri_counties <- counties_cent %>%
+  st_triangulate() %>%
+  st_cast() %>%
+  st_as_sf() %>%
+  mutate(id = 1:n())
+
+plot(tri_counties)
+```
 
 Coverage’s:
-
-    st_make_grid: Creates a square grid covering the geometry of an sf or sfc object
-
-    st_make_grid(square = FALSE): Create a hexagonal grid covering the geometry of an sf or sfc object
-
-    The side of coverage tiles can be defined by a cell resolution or a specified number of cell in the X and Y direction
+- st_make_grid: Creates a square grid covering the geometry of an sf or sfc object
+- st_make_grid(square = FALSE): Create a hexagonal grid covering the geometry of an sf or sfc object
+- The side of coverage tiles can be defined by a cell resolution or a specified number of cell in the X and Y direction
 
 For this step:
+1. Make a voroni tessellation over your county centroids (MULTIPOINT)
+2. Make a triangulated tessellation over your county centroids (MULTIPOINT)
+3. Make a gridded coverage with n = 70, over your counties object
+4. Make a hexagonal coverage with n = 70, over your counties object
 
-    Make a voroni tessellation over your county centroids (MULTIPOINT)
-    Make a triangulated tessellation over your county centroids (MULTIPOINT)
-    Make a gridded coverage with n = 70, over your counties object
-    Make a hexagonal coverage with n = 70, over your counties object
+#Coverages
+```{r}
+vorgrid_counties <- vor_counties %>%
+  st_make_grid(n = 70)
+
+plot(vorgrid_counties)
+
+hexgrid_counties <- vor_counties %>%
+  st_make_grid(square = FALSE, n = 70)
+
+plot(hexgrid_counties)
+```
 
 In addition to creating these 4 coverage’s we need to add an ID to each tile.
 
 To do this:
-
-    add a new column to each tessellation that spans from 1:n().
-
-    Remember that ALL tessellation methods return an sfc GEOMETRYCOLLECTION, and to add attribute information - like our ID - you will have to coerce the sfc list into an sf object (st_sf or st_as_sf)
+- add a new column to each tessellation that spans from 1:n().
+- Remember that ALL tessellation methods return an sfc GEOMETRYCOLLECTION, and to add attribute information - like our ID - you will have to coerce the sfc list into an sf object (st_sf or st_as_sf)
 
 Last, we want to ensure that our surfaces are topologically valid/simple.
 
