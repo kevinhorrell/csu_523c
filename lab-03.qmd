@@ -45,6 +45,7 @@ library(tidyverse)
 library(sf)
 library(units)
 library(flextable)
+library(rmapshaper)
 
 #Data Loading
 library(USAboundaries)
@@ -94,7 +95,7 @@ To achieve this:
 ```{r}
 counties_cent <- counties %>%
   st_centroid() %>%
-  st_combine()
+  st_union()
 ```
 
 
@@ -114,28 +115,6 @@ Tessellations :
 1. st_voronoi: creates voroni tessellation
 2. st_triangulate: triangulates set of points (not constrained)
 
-#Voronoi Grids
-```{r}
-vor_counties <- counties_cent %>%
-  st_voronoi() %>%
-  st_cast() %>%
-  st_as_sf() %>%
-  mutate(id = 1:n())
-
-plot(vor_counties)
-```
-
-#Triangulations
-```{r}
-tri_counties <- counties_cent %>%
-  st_triangulate() %>%
-  st_cast() %>%
-  st_as_sf() %>%
-  mutate(id = 1:n())
-
-plot(tri_counties)
-```
-
 Coverage’s:
 - st_make_grid: Creates a square grid covering the geometry of an sf or sfc object
 - st_make_grid(square = FALSE): Create a hexagonal grid covering the geometry of an sf or sfc object
@@ -147,19 +126,6 @@ For this step:
 3. Make a gridded coverage with n = 70, over your counties object
 4. Make a hexagonal coverage with n = 70, over your counties object
 
-#Coverages
-```{r}
-vorgrid_counties <- vor_counties %>%
-  st_make_grid(n = 70)
-
-plot(vorgrid_counties)
-
-hexgrid_counties <- vor_counties %>%
-  st_make_grid(square = FALSE, n = 70)
-
-plot(hexgrid_counties)
-```
-
 In addition to creating these 4 coverage’s we need to add an ID to each tile.
 
 To do this:
@@ -167,14 +133,42 @@ To do this:
 - Remember that ALL tessellation methods return an sfc GEOMETRYCOLLECTION, and to add attribute information - like our ID - you will have to coerce the sfc list into an sf object (st_sf or st_as_sf)
 
 Last, we want to ensure that our surfaces are topologically valid/simple.
+- To ensure this, we can pass our surfaces through st_cast.
+- Remember that casting an object explicitly (e.g. st_cast(x, "POINT")) changes a geometry
+- If no output type is specified (e.g. st_cast(x)) then the cast attempts to simplify the geometry.
+- If you don’t do this you might get unexpected “TopologyException” errors.
 
-    To ensure this, we can pass our surfaces through st_cast.
+#Tesselations
+```{r}
+vor_counties <- counties_cent %>%
+  st_voronoi() %>%
+  st_cast() %>%
+  st_as_sf() %>%
+  mutate(id = 1:n())
 
-    Remember that casting an object explicitly (e.g. st_cast(x, "POINT")) changes a geometry
+tri_counties <- counties_cent %>%
+  st_triangulate() %>%
+  st_cast() %>%
+  st_as_sf() %>%
+  mutate(id = 1:n())
 
-    If no output type is specified (e.g. st_cast(x)) then the cast attempts to simplify the geometry.
+sqgrid_counties <- counties_cent %>%
+  st_make_grid(n = 70) %>%
+  st_as_sf() %>%
+  mutate(id = 1:n())
+  
+hexgrid_counties <- counties_cent %>%
+  st_make_grid(square = FALSE, n = 70) %>%
+  st_as_sf() %>%
+  mutate(id = 1:n())
+```
 
-    If you don’t do this you might get unexpected “TopologyException” errors.
+```{r, echo = FALSE, eval = FALSE}
+ggplot(data = hexgrid_counties) +
+  geom_sf() +
+  theme_void()
+```
+
 
 Step 1.4
 
@@ -183,21 +177,47 @@ If you plot the above tessellations you’ll see the triangulated surfaces produ
 We need to cut these boundaries to CONUS border.
 
 To do this, we will call on st_intersection, but will first need a geometry of CONUS to serve as our differencing feature. We can get this by unioning our existing county boundaries.
+
+```{r}
+u_counties <- counties %>%
+  st_union()
+```
+
+
 Step 1.5
 
 With a single feature boundary, we must carefully consider the complexity of the geometry. Remember, the more points our geometry contains, the more computations needed for spatial predicates our differencing. For a task like ours, we do not need a finely resolved coastal boarder.
 
 To achieve this:
+- Simplify your unioned border using the Visvalingam algorithm provided by rmapshaper::ms_simplify.
+- Choose what percentage of vertices to retain using the keep argument and work to find the highest number that provides a shape you are comfortable with for the analysis:
+- Once you are happy with your simplification, use the mapview::npts function to report the number of points in your original object, and the number of points in your simplified object
+- How many points were you able to remove? What are the consequences of doing this computationally?
+- Finally, use your simplified object to crop the two triangulated tessellations with st_intersection:
 
-    Simplify your unioned border using the Visvalingam algorithm provided by rmapshaper::ms_simplify.
+```{r}
+simp_counties <- u_counties %>%
+  ms_simplify(keep = 0.01)
 
-    Choose what percentage of vertices to retain using the keep argument and work to find the highest number that provides a shape you are comfortable with for the analysis:
+ggplot() +
+  geom_sf(data=simp_counties) +
+  geom_sf(data = u_counties) +
+  theme_void()
 
-    Once you are happy with your simplification, use the mapview::npts function to report the number of points in your original object, and the number of points in your simplified object.
+mapview::npts(u_counties, by_feature = FALSE)
+#11292
+mapview::npts(simp_counties, by_feature = FALSE)
+#114
 
-    How many points were you able to remove? What are the consequences of doing this computationally?
+vor_conus <- st_intersection(simp_counties, vor_counties)
 
-    Finally, use your simplified object to crop the two triangulated tessellations with st_intersection:
+tri_conus <- st_intersection(simp_counties, tri_counties)
+
+sq_conus <- st_intersection(simp_counties, sqgrid_counties)
+
+hex_conus <- st_intersection(simp_counties, hexgrid_counties)
+```
+
 
 Step 1.6
 
@@ -214,24 +234,40 @@ name = function(arg1, arg2) {
 }
 
 For this function:
+The name can be anything you choose, arg1 should take an sf object, and arg2 should take a character string that will title the plot
 
-    The name can be anything you chose, arg1 should take an sf object, and arg2 should take a character string that will title the plot
+In your function, the code should follow our standard ggplot practice where your data is arg1, and your title is arg2
 
-    In your function, the code should follow our standard ggplot practice where your data is arg1, and your title is arg2
+The function should also enforce the following:
 
-    The function should also enforce the following:
+    a white fill
+    a navy border
+    a size of 0.2
+    `theme_void``
+    a caption that reports the number of features in arg1
+    You will need to paste character strings and variables together.
 
-        a white fill
+```{r}
+tessplot <- function(obj, char){
+  
+  ggplot(data = obj) +
+    geom_sf(fill = 'white', color = 'navy', size = 0.2) +
+    labs(title = char,
+         caption = paste('Number of points: ', mapview::npts(obj))) +
+    theme_void()
 
-        a navy border
+}
+```
 
-        a size of 0.2
-
-        `theme_void``
-
-        a caption that reports the number of features in arg1
-            You will need to paste character stings and variables together.
 
 Step 1.7
 
 Use your new function to plot each of your tessellated surfaces and the original county data (5 plots in total):
+```{r}
+tessplot(counties, char = 'CONUS Counties')
+tessplot(vor_conus, char = 'Voronoi Tesselation of CONUS Counties')
+tessplot(tri_conus, char = 'Triangulated Tesselation of CONUS Counties')
+tessplot(sq_conus, char = 'Square Coverage of CONUS Counties')
+tessplot(hex_conus, char = 'Hex Coverage of CONUS Counties')
+```
+
