@@ -135,14 +135,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(USAboundaries)</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(USAboundariesData)</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rnaturalearth)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">'mikejohnson51/AOI'</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(AOI)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualization</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gghighlight)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(AOI)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualization</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gghighlight)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
 </section>
@@ -152,7 +151,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="step-1.1" class="level2">
 <h2 class="anchored" data-anchor-id="step-1.1"><em>Step 1.1</em></h2>
 <p>First, we need a spatial file of CONUS counties. For future area calculations we want these in an equal area projection (EPSG:5070).</p>
-<p>To achieve this: * get an sf object of US counties (AOI::aoi_get(state = “conus”, county = “all”)) * transform the data to EPSG:5070</p>
+<p>To achieve this:</p>
+<ul>
+<li><p>get an sf object of US counties (AOI::aoi_get(state = “conus”, county = “all”))</p></li>
+<li><p>transform the data to EPSG:5070</p></li>
+</ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>counties <span class="ot">&lt;-</span> AOI<span class="sc">::</span><span class="fu">aoi_get</span>(<span class="at">state =</span> <span class="st">"conus"</span>, <span class="at">county =</span> <span class="st">"all"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">5070</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -165,7 +168,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="step-1.2" class="level2">
 <h2 class="anchored" data-anchor-id="step-1.2"><em>Step 1.2</em></h2>
 <p>For triangle based tessellations we need point locations to serve as our “anchors”.</p>
-<p>To achieve this: 1. generate county centroids using st_centroid 2. Since, we can only tessellate over a feature we need to combine or union the resulting 3,108 POINT features into a single MULTIPOINT feature 3. Since these are point objects, the difference between union/combine is mute</p>
+<p>To achieve this:</p>
+<ol type="1">
+<li><p>generate county centroids using st_centroid</p></li>
+<li><p>Since, we can only tessellate over a feature we need to combine or union the resulting 3,108 POINT features into a single MULTIPOINT feature</p></li>
+<li><p>Since these are point objects, the difference between union/combine is mute</p></li>
+</ol>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>counties_cent <span class="ot">&lt;-</span> counties <span class="sc">%&gt;%</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_centroid</span>() <span class="sc">%&gt;%</span></span>
@@ -179,12 +187,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Some methods generate triangular tiles across a set of defined points (e.g.&nbsp;voroni and delauny triangulation)</p>
 <p>Others generate equal area tiles over a known extent (st_make_grid)</p>
 <p>For this lab, we will create surfaces of CONUS using using 4 methods, 2 based on an extent and 2 based on point anchors:</p>
-<p>Tessellations : 1. st_voronoi: creates voroni tessellation 2. st_triangulate: triangulates set of points (not constrained)</p>
-<p>Coverage’s: - st_make_grid: Creates a square grid covering the geometry of an sf or sfc object - st_make_grid(square = FALSE): Create a hexagonal grid covering the geometry of an sf or sfc object - The side of coverage tiles can be defined by a cell resolution or a specified number of cell in the X and Y direction</p>
-<p>For this step: 1. Make a voroni tessellation over your county centroids (MULTIPOINT) 2. Make a triangulated tessellation over your county centroids (MULTIPOINT) 3. Make a gridded coverage with n = 70, over your counties object 4. Make a hexagonal coverage with n = 70, over your counties object</p>
+<p>Tessellations:</p>
+<ul>
+<li><p>st_voronoi: creates voroni tessellation</p></li>
+<li><p>st_triangulate: triangulates set of points (not constrained)</p></li>
+</ul>
+<p>Coverage’s: - st_make_grid: Creates a square grid covering the geometry of an sf or sfc object</p>
+<ul>
+<li><p>st_make_grid(square = FALSE): Create a hexagonal grid covering the geometry of an sf or sfc object</p></li>
+<li><p>The side of coverage tiles can be defined by a cell resolution or a specified number of cell in the X and Y direction</p></li>
+</ul>
+<p>For this step:</p>
+<ol type="1">
+<li><p>Make a voroni tessellation over your county centroids (MULTIPOINT)</p></li>
+<li><p>Make a triangulated tessellation over your county centroids (MULTIPOINT)</p></li>
+<li><p>Make a gridded coverage with n = 70, over your counties object</p></li>
+<li><p>Make a hexagonal coverage with n = 70, over your counties object</p></li>
+</ol>
 <p>In addition to creating these 4 coverage’s we need to add an ID to each tile.</p>
-<p>To do this: - add a new column to each tessellation that spans from 1:n(). - Remember that ALL tessellation methods return an sfc GEOMETRYCOLLECTION, and to add attribute information - like our ID - you will have to coerce the sfc list into an sf object (st_sf or st_as_sf)</p>
-<p>Last, we want to ensure that our surfaces are topologically valid/simple. - To ensure this, we can pass our surfaces through st_cast. - Remember that casting an object explicitly (e.g.&nbsp;st_cast(x, “POINT”)) changes a geometry - If no output type is specified (e.g.&nbsp;st_cast(x)) then the cast attempts to simplify the geometry. - If you don’t do this you might get unexpected “TopologyException” errors.</p>
+<p>To do this:</p>
+<ul>
+<li><p>add a new column to each tessellation that spans from 1:n().</p></li>
+<li><p>Remember that ALL tessellation methods return an sfc GEOMETRYCOLLECTION, and to add attribute information - like our ID - you will have to coerce the sfc list into an sf object (st_sf or st_as_sf)</p></li>
+</ul>
+<p>Last, we want to ensure that our surfaces are topologically valid/simple.</p>
+<ul>
+<li><p>To ensure this, we can pass our surfaces through st_cast.</p></li>
+<li><p>Remember that casting an object explicitly (e.g.&nbsp;st_cast(x, “POINT”)) changes a geometry</p></li>
+<li><p>If no output type is specified (e.g.&nbsp;st_cast(x)) then the cast attempts to simplify the geometry.</p></li>
+<li><p>If you don’t do this you might get unexpected “TopologyException” errors.</p></li>
+</ul>
 <p>#Tesselations</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>vor_counties <span class="ot">&lt;-</span> counties_cent <span class="sc">%&gt;%</span></span>
@@ -223,7 +255,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="step-1.5" class="level2">
 <h2 class="anchored" data-anchor-id="step-1.5"><em>Step 1.5</em></h2>
 <p>With a single feature boundary, we must carefully consider the complexity of the geometry. Remember, the more points our geometry contains, the more computations needed for spatial predicates our differencing. For a task like ours, we do not need a finely resolved coastal boarder.</p>
-<p>To achieve this: - Simplify your unioned border using the Visvalingam algorithm provided by rmapshaper::ms_simplify. - Choose what percentage of vertices to retain using the keep argument and work to find the highest number that provides a shape you are comfortable with for the analysis: - Once you are happy with your simplification, use the mapview::npts function to report the number of points in your original object, and the number of points in your simplified object - How many points were you able to remove? What are the consequences of doing this computationally? - Finally, use your simplified object to crop the two triangulated tessellations with st_intersection:</p>
+<p>To achieve this:</p>
+<ul>
+<li><p>Simplify your unioned border using the Visvalingam algorithm provided by rmapshaper::ms_simplify.</p></li>
+<li><p>Choose what percentage of vertices to retain using the keep argument and work to find the highest number that provides a shape you are comfortable with for the analysis:</p></li>
+<li><p>Once you are happy with your simplification, use the mapview::npts function to report the number of points in your original object, and the number of points in your simplified object</p></li>
+<li><p>How many points were you able to remove? What are the consequences of doing this computationally?</p></li>
+<li><p>Finally, use your simplified object to crop the two triangulated tessellations with st_intersection:</p></li>
+</ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>simp_counties <span class="ot">&lt;-</span> u_counties <span class="sc">%&gt;%</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ms_simplify</span>(<span class="at">keep =</span> <span class="fl">0.01</span>)</span>
@@ -247,13 +286,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 114</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>vor_conus <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(simp_counties, vor_counties)</span>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>vor_conus <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(vor_counties, simp_counties)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>tri_conus <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(simp_counties, tri_counties)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>tri_conus <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(tri_counties, simp_counties)</span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>sq_conus <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(simp_counties, sqgrid_counties)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>sq_conus <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(sqgrid_counties, simp_counties)</span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>hex_conus <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(simp_counties, hexgrid_counties)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>hex_conus <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(hexgrid_counties, simp_counties)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="step-1.6" class="level2">
@@ -325,7 +364,6 @@ You will need to paste character strings and variables together.</code></pre>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>lab3_obj <span class="ot">&lt;-</span> <span class="fu">c</span>(counties, vor_conus, tri_conus, sq_conus, hex_conus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
 </section>
@@ -347,89 +385,72 @@ the standard deviation of the features in arg1
 the total area (km2) of arg1
 Return this data.frame</code></pre>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>tessdf <span class="ot">&lt;-</span> <span class="cf">function</span>(obj, char) {</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  mean_area <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">st_area</span>(obj)) <span class="sc">%&gt;%</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_units</span>(km<span class="sc">^</span><span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">drop_units</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="at">digits =</span> <span class="dv">1</span>)</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  sdev <span class="ot">&lt;-</span> <span class="fu">sd</span>(<span class="fu">st_area</span>(obj))<span class="sc">/</span>(<span class="dv">1000000</span>)</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  tot_area <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">st_area</span>(obj)) <span class="sc">%&gt;%</span></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_units</span>(km<span class="sc">^</span><span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">drop_units</span>()</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>  df_obj <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Description'</span> <span class="ot">=</span> char,</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Elements'</span> <span class="ot">=</span> mapview<span class="sc">::</span><span class="fu">npts</span>(obj),</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Mean Area (km^2)'</span> <span class="ot">=</span> mean_area,</span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Std Dev.(km^2)'</span> <span class="ot">=</span> sdev,</span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Total Area (km^2)'</span> <span class="ot">=</span> tot_area,</span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df_obj)</span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>tessdf <span class="ot">&lt;-</span> <span class="cf">function</span>(obj, char) {</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  mean_area <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">st_area</span>(obj)) <span class="sc">%&gt;%</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_units</span>(km<span class="sc">^</span><span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">drop_units</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="at">digits =</span> <span class="dv">1</span>)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  sdev <span class="ot">&lt;-</span> <span class="fu">sd</span>(<span class="fu">st_area</span>(obj))<span class="sc">/</span>(<span class="dv">1000000</span>)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  tot_area <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">st_area</span>(obj)) <span class="sc">%&gt;%</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_units</span>(km<span class="sc">^</span><span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">drop_units</span>()</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  df_obj <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Description'</span> <span class="ot">=</span> char,</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Elements'</span> <span class="ot">=</span> mapview<span class="sc">::</span><span class="fu">npts</span>(obj),</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Mean Area (km^2)'</span> <span class="ot">=</span> mean_area,</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Std Dev. (km^2)'</span> <span class="ot">=</span> sdev,</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Total Area (km^2)'</span> <span class="ot">=</span> tot_area,</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df_obj)</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="step-2.2" class="level2">
 <h2 class="anchored" data-anchor-id="step-2.2"><em>Step 2.2</em></h2>
 <p>Use your new function to summarize each of your tesselations and the original counties.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tessdf</span>(<span class="at">obj =</span> counties, <span class="at">char =</span> <span class="st">'counties'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  Description Elements Mean Area (km^2) Std Dev.(km^2) Total Area (km^2)
-1    counties   383108           2605.1       3443.712           8096496</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tessdf</span>(<span class="at">obj =</span> vor_conus, <span class="at">char =</span> <span class="st">'voronoi'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  Description Elements Mean Area (km^2) Std Dev.(km^2) Total Area (km^2)
-1     voronoi    21641           2601.7       2908.246           8086096</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tessdf</span>(<span class="at">obj =</span> tri_conus, <span class="at">char =</span> <span class="st">'triangulations'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>     Description Elements Mean Area (km^2) Std Dev.(km^2) Total Area (km^2)
-1 triangulations    25338           1290.7       1599.315           7999856</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tessdf</span>(<span class="at">obj =</span> sq_conus, <span class="at">char =</span> <span class="st">'square grid'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  Description Elements Mean Area (km^2) Std Dev.(km^2) Total Area (km^2)
-1 square grid    16678           2433.9       486.3631           8063384</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tessdf</span>(<span class="at">obj =</span> hex_conus, <span class="at">char =</span> <span class="st">'hex grid'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  Description Elements Mean Area (km^2) Std Dev.(km^2) Total Area (km^2)
-1    hex grid    16602           3374.4       726.0456           8084951</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df_count <span class="ot">&lt;-</span> <span class="fu">tessdf</span>(<span class="at">obj =</span> counties, <span class="at">char =</span> <span class="st">'counties'</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>df_vor <span class="ot">&lt;-</span> <span class="fu">tessdf</span>(<span class="at">obj =</span> vor_conus, <span class="at">char =</span> <span class="st">'voronoi'</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>df_tri <span class="ot">&lt;-</span> <span class="fu">tessdf</span>(<span class="at">obj =</span> tri_conus, <span class="at">char =</span> <span class="st">'triangulations'</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>df_sq <span class="ot">&lt;-</span> <span class="fu">tessdf</span>(<span class="at">obj =</span> sq_conus, <span class="at">char =</span> <span class="st">'square grid'</span>)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>df_hex <span class="ot">&lt;-</span> <span class="fu">tessdf</span>(<span class="at">obj =</span> hex_conus, <span class="at">char =</span> <span class="st">'hex grid'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="step-2.3" class="level2">
 <h2 class="anchored" data-anchor-id="step-2.3"><em>Step 2.3</em></h2>
 <p>Multiple data.frame objects can bound row-wise with bind_rows into a single data.frame</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>df_total <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tessdf</span>(<span class="at">obj =</span> counties, <span class="at">char =</span> <span class="st">'counties'</span>),</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tessdf</span>(<span class="at">obj =</span> vor_conus, <span class="at">char =</span> <span class="st">'voronoi'</span>),</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tessdf</span>(<span class="at">obj =</span> tri_conus, <span class="at">char =</span> <span class="st">'triangulations'</span>),</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tessdf</span>(<span class="at">obj =</span> sq_conus, <span class="at">char =</span> <span class="st">'square grid'</span>),</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tessdf</span>(<span class="at">obj =</span> hex_conus, <span class="at">char =</span> <span class="st">'hex grid'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>df_total <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(df_count,</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>                      df_vor,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                      df_tri,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                      df_sq,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>                      df_hex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="step-2.4" class="level2">
 <h2 class="anchored" data-anchor-id="step-2.4"><em>Step 2.4</em></h2>
 <p>Once your 5 summaries are bound (2 tessellations, 2 coverage’s, and the raw counties) print the data.frame as a nice table using knitr/kableExtra.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kbl</span>(df_total) <span class="sc">%&gt;%</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kbl</span>(df_total) <span class="sc">%&gt;%</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_classic</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="lightable-minimal caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="lightable-classic caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">Description</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">Elements</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">Mean Area (km^2)</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">Std Dev.(km^2)</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Std Dev. (km^2)</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">Total Area (km^2)</th>
 </tr>
 </thead>
@@ -489,10 +510,247 @@ Return this data.frame</code></pre>
 <section id="question-3" class="level1">
 <h1>Question 3:</h1>
 <p>The data we are going to analysis in this lab is from US Army Corp of Engineers National Dam Inventory (NID). This dataset documents ~91,000 dams in the United States and a variety of attribute information including design specifications, risk level, age, and purpose.</p>
-<p>For the remainder of this lab we will analysis the distributions of these dams (Q3) and their purpose (Q4) through using a point-in-polygon analysis.</p>
+<p>For the remainder of this lab we will analyze the distributions of these dams (Q3) and their purpose (Q4) through using a point-in-polygon analysis.</p>
 <section id="step-3.1" class="level2">
 <h2 class="anchored" data-anchor-id="step-3.1"><em>Step 3.1</em></h2>
+<p>In the tradition of this class - and true to data science/GIS work - you need to find, download, and manage raw data. While the raw NID data is no longer easy to get with the transition of the USACE services to ESRI Features Services, I staged the data in the resources directory of this class. To get it, navigate to that location and download the raw file into you lab data directory.</p>
+<ul>
+<li>Return to your RStudio Project and read the data in using the readr::read_csv
+<ul>
+<li>After reading the data in, be sure to remove rows that don’t have location values (!is.na())</li>
+<li>Convert the data.frame to a sf object by defining the coordinates and CRS</li>
+<li>Transform the data to a CONUS AEA (EPSG:5070) projection - matching your tessellation</li>
+<li>Filter to include only those within your CONUS boundary</li>
+</ul></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>dams <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">'C:/Users/horre/Desktop/csu_523c/data/NID2019_U.csv'</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>usa <span class="ot">&lt;-</span> AOI<span class="sc">::</span><span class="fu">aoi_get</span>(<span class="at">state =</span> <span class="st">"conus"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_union</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="dv">5070</span>)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>dams2 <span class="ot">&lt;-</span> dams <span class="sc">%&gt;%</span> </span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(LATITUDE)) <span class="sc">%&gt;%</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"LONGITUDE"</span>, <span class="st">"LATITUDE"</span>), <span class="at">crs =</span> <span class="dv">4236</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="dv">5070</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_filter</span>(usa) <span class="sc">%&gt;%</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(RECORDID, DAM_NAME, DAM_LENGTH, DAM_HEIGHT, RIVER, PURPOSES, YEAR_COMPLETED)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
+<section id="step-3.2" class="level2">
+<h2 class="anchored" data-anchor-id="step-3.2"><em>Step 3.2</em></h2>
+<p>Following the in-class examples develop an efficient point-in-polygon function that takes:</p>
+<ul>
+<li>points as arg1,</li>
+<li>polygons as arg2,</li>
+<li>The name of the id column as arg3</li>
+</ul>
+<p>The function should make use of spatial and non-spatial joins, sf coercion and dplyr::count. The returned object should be input sf object with a column - n - counting the number of points in each tile.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>pip_dams <span class="ot">&lt;-</span> <span class="cf">function</span>(polygon, points, var){</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  coverage_join <span class="ot">&lt;-</span> <span class="fu">st_join</span>(polygon, points) <span class="sc">%&gt;%</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(<span class="fu">get</span>(var)) <span class="sc">%&gt;%</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">setNames</span>(<span class="fu">c</span>(var, <span class="st">'n'</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(polygon, <span class="at">by =</span> var) <span class="sc">%&gt;%</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_as_sf</span>()</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="step-3.3" class="level2">
+<h2 class="anchored" data-anchor-id="step-3.3"><em>Step 3.3</em></h2>
+<p>Apply your point-in-polygon function to each of your five tessellated surfaces where:</p>
+<ul>
+<li>Your points are the dams</li>
+<li>Your polygons are the respective tessellation</li>
+<li>The id column is the name of the id columns you defined.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>counties_n <span class="ot">&lt;-</span> <span class="fu">pip_dams</span>(<span class="at">polygon =</span> counties, <span class="at">points =</span> dams2, <span class="at">var =</span> <span class="st">'fip_code'</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>vor_n <span class="ot">&lt;-</span> <span class="fu">pip_dams</span>(<span class="at">polygon =</span> vor_conus, <span class="at">points =</span> dams2, <span class="at">var =</span> <span class="st">'id'</span>)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>tri_n <span class="ot">&lt;-</span> <span class="fu">pip_dams</span>(<span class="at">polygon =</span> tri_conus, <span class="at">points =</span> dams2, <span class="at">var =</span> <span class="st">'id'</span>)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>sq_n <span class="ot">&lt;-</span> <span class="fu">pip_dams</span>(<span class="at">polygon =</span> sq_conus, <span class="at">points =</span> dams2, <span class="at">var =</span> <span class="st">'id'</span>)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>hex_n <span class="ot">&lt;-</span> <span class="fu">pip_dams</span>(<span class="at">polygon =</span> hex_conus, <span class="at">points =</span> dams2, <span class="at">var =</span> <span class="st">'id'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="step-3.4" class="level2">
+<h2 class="anchored" data-anchor-id="step-3.4"><em>Step 3.4</em></h2>
+<p>Lets continue the trend of automating our repetitive tasks through function creation. This time make a new function that extends your previous plotting function.</p>
+<p>For this function:</p>
+<p>The name can be anything you chose, arg1 should take an sf object, and arg2 should take a character string that will title the plot</p>
+<p>The function should also enforce the following:</p>
+<ul>
+<li><p>the fill aesthetic is driven by the count column n</p></li>
+<li><p>the col is NA</p></li>
+<li><p>the fill is scaled to a continuous viridis color ramp</p></li>
+<li><p>theme_void</p></li>
+<li><p>a caption that reports the number of dams in arg1 (e.g.&nbsp;sum(n))</p></li>
+</ul>
+<p><em>You will need to paste character stings and variables together.</em></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>pip_plot <span class="ot">&lt;-</span> <span class="cf">function</span>(sf, char){</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data =</span> sf) <span class="sc">+</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> n), <span class="at">color =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_viridis_c</span>() <span class="sc">+</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> char,</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">caption =</span> <span class="fu">paste</span>(<span class="st">'Total dams: '</span>, <span class="fu">sum</span>(sf<span class="sc">$</span>n))) <span class="sc">+</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'bottom'</span>)</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="step-3.5" class="level2">
+<h2 class="anchored" data-anchor-id="step-3.5"><em>Step 3.5</em></h2>
+<p>Apply your plotting function to each of the 5 tessellated surfaces with Point-in-Polygon counts:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pip_plot</span>(<span class="at">sf =</span> counties_n, <span class="at">char =</span> <span class="st">'Number of dams per County'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-03_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pip_plot</span>(<span class="at">sf =</span> vor_n, <span class="at">char =</span> <span class="st">'Number of dams per Voronoi County'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-03_files/figure-html/unnamed-chunk-20-2.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pip_plot</span>(<span class="at">sf =</span> tri_n, <span class="at">char =</span> <span class="st">'Number of dams per Triangulated County'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-03_files/figure-html/unnamed-chunk-20-3.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pip_plot</span>(<span class="at">sf =</span> sq_n, <span class="at">char =</span> <span class="st">'Number of dams per Square Grid'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-03_files/figure-html/unnamed-chunk-20-4.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pip_plot</span>(<span class="at">sf =</span> hex_n, <span class="at">char =</span> <span class="st">'Number of dams per Hex Grid'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-03_files/figure-html/unnamed-chunk-20-5.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="step-3.6" class="level2">
+<h2 class="anchored" data-anchor-id="step-3.6"><em>Step 3.6</em></h2>
+<p>Comment on the influence of the tessellated surface in the visualization of point counts. How does this relate to the MAUP problem. Moving forward you will only use one tessellation, which will you chose and why? - Changing the size or area that the number of dams are counted changes the mean or count of dams in a specific region. While there are the same number of total dams in each tesselated surface model, the voronoi and triangulation models decrease the number of individual units and change the area of those. The hex and square grids decrease the number of units and make each unit the same area.</p>
+<pre><code>- I will use the Voronoi Tesselation moving forward because it there is the total area and mean area is most similar to the original counties data set and has fewer units than the triangulation and is more representative to true counties than the square or hex grid.</code></pre>
+<hr>
+</section>
+</section>
+<section id="question-4" class="level1">
+<h1>Question 4:</h1>
+<p>The NID provides a comprehensive data dictionary here. In it we find that dam purposes are designated by a character code.</p>
+<p>In the data dictionary, we see a dam can have multiple purposes.</p>
+<p>In these cases, the purpose codes are concatenated in order of decreasing importance. For example, SCR would indicate the primary purposes are Water Supply, then Flood Control, then Recreation.</p>
+<p>A standard summary indicates there are over 400 unique combinations of dam purposes.</p>
+<p>By storing dam codes as a concatenated string, there is no easy way to identify how many dams serve any one purpose… for example where are the hydro electric dams?</p>
+<p>To overcome this data structure limitation, we can identify how many dams serve each purpose by splitting the PURPOSES values (strsplit) and tabulating the unlisted results as a data.frame. Effectively this is double/triple/quadruple counting dams bases on how many purposes they serve.</p>
+<section id="step-4.1" class="level2">
+<h2 class="anchored" data-anchor-id="step-4.1"><em>Step 4.1</em></h2>
+<ul>
+<li><p>your task is to create point-in-polygon counts for at least 4 of the above dam purposes.</p></li>
+<li><p>You will use grepl to filter the complete dataset to those with your chosen purpose.</p></li>
+<li><p>Remember that grepl returns a boolean if a given pattern is matched in a string.</p></li>
+<li><p>grepl is vectorized so can be used in dplyr::filter</p></li>
+</ul>
+<p>For your analysis, choose at least four of the above codes, and describe why you chose them. Then for each of them, create a subset of dams that serve that purpose using dplyr::filter and grepl</p>
+<p><em>Reasoning</em> - I a choosing flood control (C), hydroelectric dams (H), navigation (N), and fish and wildlife dams (F). I chose these because I think they represent some common, and some unique purposes for dams, and hopefully do not overlap too much.</p>
+<p>Finally, use your point-in-polygon function to count each subset across your elected tessellation</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>pip_C <span class="ot">&lt;-</span> <span class="fu">pip_dams</span>(<span class="at">polygon =</span> vor_conus, <span class="at">points =</span> dams_C, <span class="at">var =</span> <span class="st">'id'</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>pip_H <span class="ot">&lt;-</span> <span class="fu">pip_dams</span>(<span class="at">polygon =</span> vor_conus, <span class="at">points =</span> dams_H, <span class="at">var =</span> <span class="st">'id'</span>)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>pip_N <span class="ot">&lt;-</span> <span class="fu">pip_dams</span>(<span class="at">polygon =</span> vor_conus, <span class="at">points =</span> dams_N, <span class="at">var =</span> <span class="st">'id'</span>)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>pip_F <span class="ot">&lt;-</span> <span class="fu">pip_dams</span>(<span class="at">polygon =</span> vor_conus, <span class="at">points =</span> dams_F, <span class="at">var =</span> <span class="st">'id'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="step-4.2" class="level2">
+<h2 class="anchored" data-anchor-id="step-4.2"><em>Step 4.2</em></h2>
+<ul>
+<li><p>Now use your plotting function from Q3 to map these counts.</p></li>
+<li><p>But! you will use gghighlight to only color those tiles where the count (n) is greater then the (mean + 1 standard deviation) of the set</p></li>
+<li><p>Since your plotting function returns a ggplot object already, the gghighlight call can be added “+” directly to the function.</p></li>
+<li><p>The result of this exploration is to highlight the areas of the country with the most</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pip_plot</span>(<span class="at">sf =</span> pip_C, <span class="at">char =</span> <span class="st">'Flood Control Dams Across the US'</span>) <span class="sc">+</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gghighlight</span>(n <span class="sc">&gt;</span> (<span class="fu">mean</span>(n)<span class="sc">+</span><span class="fu">sd</span>(n)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-03_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pip_plot</span>(<span class="at">sf =</span> pip_H, <span class="at">char =</span> <span class="st">'Hydroelectric Dams Across the US'</span>) <span class="sc">+</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gghighlight</span>(n <span class="sc">&gt;</span> (<span class="fu">mean</span>(n)<span class="sc">+</span><span class="fu">sd</span>(n)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-03_files/figure-html/unnamed-chunk-23-2.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pip_plot</span>(<span class="at">sf =</span> pip_N, <span class="at">char =</span> <span class="st">'Navigation Dams Across the US'</span>) <span class="sc">+</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gghighlight</span>(n <span class="sc">&gt;</span> (<span class="fu">mean</span>(n)<span class="sc">+</span><span class="fu">sd</span>(n)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-03_files/figure-html/unnamed-chunk-23-3.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pip_plot</span>(<span class="at">sf =</span> pip_F, <span class="at">char =</span> <span class="st">'Fish and Wildlife Dams Across the US'</span>) <span class="sc">+</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gghighlight</span>(n <span class="sc">&gt;</span> (<span class="fu">mean</span>(n)<span class="sc">+</span><span class="fu">sd</span>(n)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-03_files/figure-html/unnamed-chunk-23-4.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="step-4.3" class="level2">
+<h2 class="anchored" data-anchor-id="step-4.3"><em>Step 4.3</em></h2>
+<p>Comment of geographic distribution of dams you found. Does it make sense? How might the tessellation you chose impact your findings? How does the distribution of dams coincide with other geographic factors such as river systems, climate, ect?</p>
+<hr>
+</section>
+</section>
+<section id="question-5" class="level1">
+<h1>Question 5:</h1>
+<p>You have also been asked to identify the largest, at risk, flood control dams in the country</p>
+<p>You must also map the Mississippi River System - Download the shapefile and unzip it into your data directory. - Use read_sf to import this data and filter it to only include the Mississippi SYSTEM</p>
+<p>To achieve this:</p>
+<p>Create an interactive map using leaflet to show the largest (NID_STORAGE); high-hazard (HAZARD == “H”) dam in each state - The markers should be drawn as opaque, circle markers, filled red with no border, and a radius set equal to the (NID_Storage / 1,500,000)</p>
+<pre><code>- The map tiles should be selected from any of the tile providers
+
+- A popup table should be added using leafem::popup and should only include the dam name, storage, purposes, and year completed.
+
+- The Mississippi system should be added at a Polyline feature.</code></pre>
 </section>
 
 </main>

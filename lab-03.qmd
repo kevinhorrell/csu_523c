@@ -371,7 +371,7 @@ df_total <- bind_rows(df_count,
 Once your 5 summaries are bound (2 tessellations, 2 coverage’s, and the raw counties) print the data.frame as a nice table using knitr/kableExtra.
 
 ```{r}
-kbl(df_total) %>%
+kbl(df_total, caption = 'Information for Each Coverage') %>%
   kable_classic()
 ```
 
@@ -412,7 +412,7 @@ dams2 <- dams %>%
   st_as_sf(coords = c("LONGITUDE", "LATITUDE"), crs = 4236) %>% 
   st_transform(5070) %>% 
   st_filter(usa) %>%
-  select(RECORDID, DAM_NAME, DAM_LENGTH, DAM_HEIGHT)
+  select(RECORDID, DAM_NAME, DAM_LENGTH, DAM_HEIGHT, RIVER, PURPOSES, YEAR_COMPLETED)
 ```
 
 ## _Step 3.2_
@@ -486,7 +486,7 @@ pip_plot <- function(sf, char){
     geom_sf(aes(fill = n), color = NA) +
     scale_fill_viridis_c() +
     labs(title = char,
-         caption = paste('Total dams: ', sum(counties_n$n))) +
+         caption = paste('Total dams: ', sum(sf$n))) +
     theme_void() +
     theme(legend.position = 'bottom')
 
@@ -543,7 +543,37 @@ To overcome this data structure limitation, we can identify how many dams serve 
 
 For your analysis, choose at least four of the above codes, and describe why you chose them. Then for each of them, create a subset of dams that serve that purpose using dplyr::filter and grepl
 
+_Reasoning_
+  - I a choosing flood control (C), hydroelectric dams (H), navigation (N), and fish and wildlife dams (F). I chose these because I think they represent some common, and some unique purposes for dams, and hopefully do not overlap too much.
+
 Finally, use your point-in-polygon function to count each subset across your elected tessellation
+
+```{r}
+purpose <- c('C', 'H', 'N', 'F')
+
+dams3 <- dams2 %>%
+  mutate(PURPOSES = strsplit(PURPOSES, ""))
+
+dams_C <- dams3 %>%
+  filter(grepl('C', PURPOSES) == TRUE)
+
+dams_H <- dams3 %>%
+  filter(grepl('H', PURPOSES) == TRUE)
+
+dams_N <- dams3 %>%
+  filter(grepl('N', PURPOSES) == TRUE)
+
+dams_F <- dams3 %>%
+  filter(grepl('F', PURPOSES) == TRUE)
+```
+
+```{r}
+pip_C <- pip_dams(polygon = vor_conus, points = dams_C, var = 'id')
+pip_H <- pip_dams(polygon = vor_conus, points = dams_H, var = 'id')
+pip_N <- pip_dams(polygon = vor_conus, points = dams_N, var = 'id')
+pip_F <- pip_dams(polygon = vor_conus, points = dams_F, var = 'id')
+
+```
 
 
 ## _Step 4.2_
@@ -556,9 +586,26 @@ Finally, use your point-in-polygon function to count each subset across your ele
   
   - The result of this exploration is to highlight the areas of the country with the most
 
+```{r}
+pip_plot(sf = pip_C, char = 'Flood Control Dams Across the US') +
+  gghighlight(n > (mean(n)+sd(n)))
+
+pip_plot(sf = pip_H, char = 'Hydroelectric Dams Across the US') +
+  gghighlight(n > (mean(n)+sd(n)))
+
+pip_plot(sf = pip_N, char = 'Navigation Dams Across the US') +
+  gghighlight(n > (mean(n)+sd(n)))
+
+pip_plot(sf = pip_F, char = 'Fish and Wildlife Dams Across the US') +
+  gghighlight(n > (mean(n)+sd(n)))
+```
+
+
 ## _Step 4.3_
 Comment of geographic distribution of dams you found. Does it make sense? How might the tessellation you chose impact your findings? How does the distribution of dams coincide with other geographic factors such as river systems, climate, ect?
 
+_Comments_
+Flood control dams appear mostly through the center of the country, near the Mississippi River which makes sense to me. There are select other spots, but the highest concentrations lie along this basin. Hydroelectric dams occur on the West coast, and in the Northeast. This also makes sense to me. Navigation dams mostly occur east of the Mississippi as well. I guess this makes sense as most large and navigable rivers occur in this area? Fish and wildlife dams occur in the arid west where more environmental regulation is necessary to ensure environmental sustainability. There is a high concentration in Alabama it appears as well.
 
 ****
 # Question 5:
