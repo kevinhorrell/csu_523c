@@ -411,8 +411,7 @@ dams2 <- dams %>%
   filter(!is.na(LATITUDE)) %>%
   st_as_sf(coords = c("LONGITUDE", "LATITUDE"), crs = 4236) %>% 
   st_transform(5070) %>% 
-  st_filter(usa) %>%
-  select(RECORDID, DAM_NAME, DAM_LENGTH, DAM_HEIGHT, RIVER, PURPOSES, YEAR_COMPLETED)
+  st_filter(usa)
 ```
 
 ## _Step 3.2_
@@ -615,6 +614,38 @@ You have also been asked to identify the largest, at risk, flood control dams in
 You must also map the Mississippi River System
     - Download the shapefile and unzip it into your data directory.
     - Use read_sf to import this data and filter it to only include the Mississippi SYSTEM
+
+```{r}
+states <- AOI::aoi_get(state = "conus") %>%
+  st_transform(crs = 5070)
+
+ggplot(states) +
+  geom_sf()
+```
+
+```{r}
+missi <- read_sf('C:/Users/horre/Desktop/csu_523c/data/MajorRivers.shp') %>%
+  filter(SYSTEM == 'Mississippi') %>%
+  st_transform(5070)
+
+head(missi)
+plot(missi)
+
+dams_hazard <- dams3 %>%
+  filter(grepl('F', PURPOSES) == TRUE,
+         HAZARD == 'H')
+
+pip_hazard <- st_join(vor_conus, dams_hazard) %>%
+    st_as_sf()
+
+ggplot() +
+  geom_sf(data = states, fill = NA) +
+  geom_sf(data = dams_hazard, aes(cex = NID_STORAGE), color = 'red4') +
+  geom_sf(data = missi, color = 'navy', linewidth = 2) +
+  labs(title = 'Largest at risk Dam in Each State on the Mississippi River') +
+  theme_void()
+```
+
 
 To achieve this:
 
