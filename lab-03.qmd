@@ -1,6 +1,6 @@
 ---
-title: 'Lab 3: Tesselations, Point in Polygon'
-subtitle: 'National Dam Inventory'
+title: 'Lab 3: National Dam Inventory'
+subtitle: 'Tesselations, Point in Polygon'
 author:
   - name: Kevin Horrell
     email: kevin.horrell@colostate.edu
@@ -51,25 +51,27 @@ library(rmapshaper)
 library(USAboundaries)
 library(USAboundariesData)
 library(rnaturalearth)
-remotes::install_github('mikejohnson51/AOI')
 library(AOI)
 
 # Visualization
 library(gghighlight)
 library(ggrepel)
 library(knitr)
+library(kableExtra)
 ```
 
 ****
 # Question 1:
 Here we will prepare five tessellated surfaces from CONUS and write a function to plot them in a descriptive way.
 
-## Step _1.1_
+## _Step 1.1_
 First, we need a spatial file of CONUS counties. For future area calculations we want these in an equal area projection (EPSG:5070).
 
 To achieve this:
-* get an sf object of US counties (AOI::aoi_get(state = "conus", county = "all"))
-* transform the data to EPSG:5070
+
+  * get an sf object of US counties (AOI::aoi_get(state = "conus", county = "all"))
+
+  * transform the data to EPSG:5070
 
 ```{r}
 counties <- AOI::aoi_get(state = "conus", county = "all") %>%
@@ -83,13 +85,16 @@ ggplot(data = counties) +
 
 
 
-## Step 1.2
+## _Step 1.2_
 
 For triangle based tessellations we need point locations to serve as our “anchors”.
 
 To achieve this:
+
 1. generate county centroids using st_centroid
+
 2. Since, we can only tessellate over a feature we need to combine or union the resulting 3,108 POINT features into a single MULTIPOINT feature
+
 3. Since these are point objects, the difference between union/combine is mute
 
 ```{r}
@@ -99,7 +104,7 @@ counties_cent <- counties %>%
 ```
 
 
-Step 1.3
+## _Step 1.3_
 
 Tessellations/Coverage’s describe the extent of a region with geometric shapes, called tiles, with no overlaps or gaps.
 
@@ -111,32 +116,46 @@ Others generate equal area tiles over a known extent (st_make_grid)
 
 For this lab, we will create surfaces of CONUS using using 4 methods, 2 based on an extent and 2 based on point anchors:
 
-Tessellations :
-1. st_voronoi: creates voroni tessellation
-2. st_triangulate: triangulates set of points (not constrained)
+Tessellations:
+
+  - st_voronoi: creates voroni tessellation
+
+  - st_triangulate: triangulates set of points (not constrained)
 
 Coverage’s:
-- st_make_grid: Creates a square grid covering the geometry of an sf or sfc object
-- st_make_grid(square = FALSE): Create a hexagonal grid covering the geometry of an sf or sfc object
-- The side of coverage tiles can be defined by a cell resolution or a specified number of cell in the X and Y direction
+  - st_make_grid: Creates a square grid covering the geometry of an sf or sfc object
+  
+  - st_make_grid(square = FALSE): Create a hexagonal grid covering the geometry of an sf or sfc object
+
+  - The side of coverage tiles can be defined by a cell resolution or a specified number of cell in the X and Y direction
 
 For this step:
+
 1. Make a voroni tessellation over your county centroids (MULTIPOINT)
+
 2. Make a triangulated tessellation over your county centroids (MULTIPOINT)
+
 3. Make a gridded coverage with n = 70, over your counties object
+
 4. Make a hexagonal coverage with n = 70, over your counties object
 
 In addition to creating these 4 coverage’s we need to add an ID to each tile.
 
 To do this:
-- add a new column to each tessellation that spans from 1:n().
-- Remember that ALL tessellation methods return an sfc GEOMETRYCOLLECTION, and to add attribute information - like our ID - you will have to coerce the sfc list into an sf object (st_sf or st_as_sf)
+
+  - add a new column to each tessellation that spans from 1:n().
+
+  - Remember that ALL tessellation methods return an sfc GEOMETRYCOLLECTION, and to add attribute information - like our ID - you will have to coerce the sfc list into an sf object (st_sf or st_as_sf)
 
 Last, we want to ensure that our surfaces are topologically valid/simple.
-- To ensure this, we can pass our surfaces through st_cast.
-- Remember that casting an object explicitly (e.g. st_cast(x, "POINT")) changes a geometry
-- If no output type is specified (e.g. st_cast(x)) then the cast attempts to simplify the geometry.
-- If you don’t do this you might get unexpected “TopologyException” errors.
+
+  - To ensure this, we can pass our surfaces through st_cast.
+
+  - Remember that casting an object explicitly (e.g. st_cast(x, "POINT")) changes a geometry
+
+  - If no output type is specified (e.g. st_cast(x)) then the cast attempts to simplify the geometry.
+
+  - If you don’t do this you might get unexpected “TopologyException” errors.
 
 #Tesselations
 ```{r}
@@ -170,7 +189,7 @@ ggplot(data = hexgrid_counties) +
 ```
 
 
-Step 1.4
+## _Step 1.4_
 
 If you plot the above tessellations you’ll see the triangulated surfaces produce regions far beyond the boundaries of CONUS.
 
@@ -184,16 +203,21 @@ u_counties <- counties %>%
 ```
 
 
-Step 1.5
+## _Step 1.5_
 
 With a single feature boundary, we must carefully consider the complexity of the geometry. Remember, the more points our geometry contains, the more computations needed for spatial predicates our differencing. For a task like ours, we do not need a finely resolved coastal boarder.
 
 To achieve this:
-- Simplify your unioned border using the Visvalingam algorithm provided by rmapshaper::ms_simplify.
-- Choose what percentage of vertices to retain using the keep argument and work to find the highest number that provides a shape you are comfortable with for the analysis:
-- Once you are happy with your simplification, use the mapview::npts function to report the number of points in your original object, and the number of points in your simplified object
-- How many points were you able to remove? What are the consequences of doing this computationally?
-- Finally, use your simplified object to crop the two triangulated tessellations with st_intersection:
+
+  - Simplify your unioned border using the Visvalingam algorithm provided by rmapshaper::ms_simplify.
+
+  - Choose what percentage of vertices to retain using the keep argument and work to find the highest number that provides a shape you are comfortable with for the analysis:
+
+  - Once you are happy with your simplification, use the mapview::npts function to report the number of points in your original object, and the number of points in your simplified object
+
+  - How many points were you able to remove? What are the consequences of doing this computationally?
+
+  - Finally, use your simplified object to crop the two triangulated tessellations with st_intersection:
 
 ```{r}
 simp_counties <- u_counties %>%
@@ -205,35 +229,25 @@ ggplot() +
   theme_void()
 
 mapview::npts(u_counties, by_feature = FALSE)
-#11292
 mapview::npts(simp_counties, by_feature = FALSE)
-#114
 
-vor_conus <- st_intersection(simp_counties, vor_counties)
+vor_conus <- st_intersection(vor_counties, simp_counties)
 
-tri_conus <- st_intersection(simp_counties, tri_counties)
+tri_conus <- st_intersection(tri_counties, simp_counties)
 
-sq_conus <- st_intersection(simp_counties, sqgrid_counties)
+sq_conus <- st_intersection(sqgrid_counties, simp_counties)
 
-hex_conus <- st_intersection(simp_counties, hexgrid_counties)
+hex_conus <- st_intersection(hexgrid_counties, simp_counties)
 ```
 
 
-Step 1.6
+## _Step 1.6_
 
 The last step is to plot your tessellations. We don’t want to write out 5 ggplots (or mindlessly copy and paste 😄)
 
 Instead, lets make a function that takes an sf object as arg1 and a character string as arg2 and returns a ggplot object showing arg1 titled with arg2.
 
-The form of a function is:
-
-name = function(arg1, arg2) {
-  
-  ... code goes here ...
-  
-}
-
-For this function:
+*For this function:*
 The name can be anything you choose, arg1 should take an sf object, and arg2 should take a character string that will title the plot
 
 In your function, the code should follow our standard ggplot practice where your data is arg1, and your title is arg2
@@ -260,7 +274,7 @@ tessplot <- function(obj, char){
 ```
 
 
-Step 1.7
+## _Step 1.7_
 
 Use your new function to plot each of your tessellated surfaces and the original county data (5 plots in total):
 ```{r}
@@ -271,3 +285,297 @@ tessplot(sq_conus, char = 'Square Coverage of CONUS Counties')
 tessplot(hex_conus, char = 'Hex Coverage of CONUS Counties')
 ```
 
+****
+
+# Question 2:
+
+In this question, we will write out a function to summarize our tessellated surfaces. Most of this should have been done in your daily assignments.
+
+## _Step 2.1_
+
+First, we need a function that takes a sf object and a character string and returns a data.frame.
+
+*For this function:*
+
+The function name can be anything you chose, arg1 should take an sf object, and arg2 should take a character string describing the object
+
+In your function, calculate the area of arg1; convert the units to km2; and then drop the units
+
+Next, create a data.frame containing the following:
+
+    text from arg2
+    the number of features in arg1
+    the mean area of the features in arg1 (km2)
+    the standard deviation of the features in arg1
+    the total area (km2) of arg1
+    Return this data.frame
+
+```{r}
+tessdf <- function(obj, char) {
+  
+  mean_area <- mean(st_area(obj)) %>%
+    set_units(km^2) %>%
+    drop_units() %>%
+    round(digits = 1)
+  
+  sdev <- sd(st_area(obj))/(1000000)
+  
+  tot_area <- sum(st_area(obj)) %>%
+    set_units(km^2) %>%
+    drop_units()
+  
+  df_obj <- data.frame(
+    'Description' = char,
+    'Elements' = mapview::npts(obj),
+    'Mean Area (km^2)' = mean_area,
+    'Std Dev. (km^2)' = sdev,
+    'Total Area (km^2)' = tot_area,
+    check.names = FALSE
+  )
+  
+  return(df_obj)
+}
+
+```
+
+## _Step 2.2_
+Use your new function to summarize each of your tesselations and the original counties.
+
+```{r}
+df_count <- tessdf(obj = counties, char = 'counties')
+
+df_vor <- tessdf(obj = vor_conus, char = 'voronoi')
+
+df_tri <- tessdf(obj = tri_conus, char = 'triangulations')
+
+df_sq <- tessdf(obj = sq_conus, char = 'square grid')
+
+df_hex <- tessdf(obj = hex_conus, char = 'hex grid')
+```
+
+
+## _Step 2.3_
+Multiple data.frame objects can bound row-wise with bind_rows into a single data.frame
+
+
+```{r}
+df_total <- bind_rows(df_count,
+                      df_vor,
+                      df_tri,
+                      df_sq,
+                      df_hex)
+```
+
+
+## _Step 2.4_
+Once your 5 summaries are bound (2 tessellations, 2 coverage’s, and the raw counties) print the data.frame as a nice table using knitr/kableExtra.
+
+```{r}
+kbl(df_total) %>%
+  kable_classic()
+```
+
+
+## _Step 2.5_
+Comment on the traits of each tessellation. Be specific about how these traits might impact the results of a point-in-polygon analysis in the contexts of the modifiable areal unit problem and with respect computational requirements.
+
+  - The Voronoi tesselations keeps the mean area of each county the most similar to the original counties object. The square grid has the lowest standard deviation for each county and the hex grid has the fewest elements and therefore the least calculation time involved.
+  
+  - The hex grid and Voronoi tesselation retain the most total area for similarity to the original counties object.
+
+****
+
+# Question 3:
+
+The data we are going to analysis in this lab is from US Army Corp of Engineers National Dam Inventory (NID). This dataset documents ~91,000 dams in the United States and a variety of attribute information including design specifications, risk level, age, and purpose.
+
+For the remainder of this lab we will analyze the distributions of these dams (Q3) and their purpose (Q4) through using a point-in-polygon analysis.
+
+## _Step 3.1_
+In the tradition of this class - and true to data science/GIS work - you need to find, download, and manage raw data. While the raw NID data is no longer easy to get with the transition of the USACE services to ESRI Features Services, I staged the data in the resources directory of this class. To get it, navigate to that location and download the raw file into you lab data directory.
+
+  - Return to your RStudio Project and read the data in using the readr::read_csv
+      - After reading the data in, be sure to remove rows that don’t have location values (!is.na())
+      - Convert the data.frame to a sf object by defining the coordinates and CRS
+      - Transform the data to a CONUS AEA (EPSG:5070) projection - matching your tessellation
+      - Filter to include only those within your CONUS boundary
+
+```{r}
+dams <- readr::read_csv('C:/Users/horre/Desktop/csu_523c/data/NID2019_U.csv')
+
+usa <- AOI::aoi_get(state = "conus") %>% 
+  st_union() %>% 
+  st_transform(5070)
+
+dams2 <- dams %>% 
+  filter(!is.na(LATITUDE)) %>%
+  st_as_sf(coords = c("LONGITUDE", "LATITUDE"), crs = 4236) %>% 
+  st_transform(5070) %>% 
+  st_filter(usa) %>%
+  select(RECORDID, DAM_NAME, DAM_LENGTH, DAM_HEIGHT)
+```
+
+## _Step 3.2_
+Following the in-class examples develop an efficient point-in-polygon function that takes:
+
+  - points as arg1,
+  - polygons as arg2,
+  - The name of the id column as arg3
+
+The function should make use of spatial and non-spatial joins, sf coercion and dplyr::count. The returned object should be input sf object with a column - n - counting the number of points in each tile.
+
+```{r}
+pip_dams <- function(polygon, points, var){
+  
+  coverage_join <- st_join(polygon, points) %>%
+    st_drop_geometry() %>%
+    count(get(var)) %>%
+    setNames(c(var, 'n')) %>%
+    left_join(polygon, by = var) %>%
+    st_as_sf()
+  
+}
+
+```
+
+## _Step 3.3_
+
+Apply your point-in-polygon function to each of your five tessellated surfaces where:
+
+  - Your points are the dams
+  - Your polygons are the respective tessellation
+  - The id column is the name of the id columns you defined.
+
+```{r}
+counties_n <- pip_dams(polygon = counties, points = dams2, var = 'fip_code')
+
+vor_n <- pip_dams(polygon = vor_conus, points = dams2, var = 'id')
+
+tri_n <- pip_dams(polygon = tri_conus, points = dams2, var = 'id')
+
+sq_n <- pip_dams(polygon = sq_conus, points = dams2, var = 'id')
+
+hex_n <- pip_dams(polygon = hex_conus, points = dams2, var = 'id')
+```
+
+## _Step 3.4_
+Lets continue the trend of automating our repetitive tasks through function creation. This time make a new function that extends your previous plotting function.
+
+For this function:
+
+The name can be anything you chose, arg1 should take an sf object, and arg2 should take a character string that will title the plot
+
+The function should also enforce the following:
+
+  - the fill aesthetic is driven by the count column n
+  
+  - the col is NA
+  
+  - the fill is scaled to a continuous viridis color ramp
+  
+  - theme_void
+  
+  - a caption that reports the number of dams in arg1 (e.g. sum(n))
+
+  _You will need to paste character stings and variables together._
+
+```{r}
+pip_plot <- function(sf, char){
+  
+  ggplot(data = sf) +
+    geom_sf(aes(fill = n), color = NA) +
+    scale_fill_viridis_c() +
+    labs(title = char,
+         caption = paste('Total dams: ', sum(counties_n$n))) +
+    theme_void() +
+    theme(legend.position = 'bottom')
+
+}
+```
+
+
+## _Step 3.5_
+Apply your plotting function to each of the 5 tessellated surfaces with Point-in-Polygon counts:
+
+```{r}
+pip_plot(sf = counties_n, char = 'Number of dams per County')
+
+pip_plot(sf = vor_n, char = 'Number of dams per Voronoi County')
+
+pip_plot(sf = tri_n, char = 'Number of dams per Triangulated County')
+
+pip_plot(sf = sq_n, char = 'Number of dams per Square Grid')
+
+pip_plot(sf = hex_n, char = 'Number of dams per Hex Grid')
+```
+
+
+## _Step 3.6_
+Comment on the influence of the tessellated surface in the visualization of point counts. How does this relate to the MAUP problem. Moving forward you will only use one tessellation, which will you chose and why?
+    - Changing the size or area that the number of dams are counted changes the mean or count of dams in a specific region. While there are the same number of total dams in each tesselated surface model, the voronoi and triangulation models decrease the number of individual units and change the area of those. The hex and square grids decrease the number of units and make each unit the same area.
+    
+    - I will use the Voronoi Tesselation moving forward because it there is the total area and mean area is most similar to the original counties data set and has fewer units than the triangulation and is more representative to true counties than the square or hex grid.
+
+
+****
+# Question 4:
+
+The NID provides a comprehensive data dictionary here. In it we find that dam purposes are designated by a character code.
+
+In the data dictionary, we see a dam can have multiple purposes.
+
+In these cases, the purpose codes are concatenated in order of decreasing importance. For example, SCR would indicate the primary purposes are Water Supply, then Flood Control, then Recreation.
+
+A standard summary indicates there are over 400 unique combinations of dam purposes.
+
+By storing dam codes as a concatenated string, there is no easy way to identify how many dams serve any one purpose… for example where are the hydro electric dams?
+
+To overcome this data structure limitation, we can identify how many dams serve each purpose by splitting the PURPOSES values (strsplit) and tabulating the unlisted results as a data.frame. Effectively this is double/triple/quadruple counting dams bases on how many purposes they serve.
+
+## _Step 4.1_
+  - your task is to create point-in-polygon counts for at least 4 of the above dam purposes.
+
+  - You will use grepl to filter the complete dataset to those with your chosen purpose.
+
+  - Remember that grepl returns a boolean if a given pattern is matched in a string.
+
+  - grepl is vectorized so can be used in dplyr::filter
+
+For your analysis, choose at least four of the above codes, and describe why you chose them. Then for each of them, create a subset of dams that serve that purpose using dplyr::filter and grepl
+
+Finally, use your point-in-polygon function to count each subset across your elected tessellation
+
+
+## _Step 4.2_
+
+  - Now use your plotting function from Q3 to map these counts.
+  
+  - But! you will use gghighlight to only color those tiles where the count (n) is greater then the (mean + 1 standard deviation) of the set
+  
+  - Since your plotting function returns a ggplot object already, the gghighlight call can be added “+” directly to the function.
+  
+  - The result of this exploration is to highlight the areas of the country with the most
+
+## _Step 4.3_
+Comment of geographic distribution of dams you found. Does it make sense? How might the tessellation you chose impact your findings? How does the distribution of dams coincide with other geographic factors such as river systems, climate, ect?
+
+
+****
+# Question 5:
+
+You have also been asked to identify the largest, at risk, flood control dams in the country
+
+You must also map the Mississippi River System
+    - Download the shapefile and unzip it into your data directory.
+    - Use read_sf to import this data and filter it to only include the Mississippi SYSTEM
+
+To achieve this:
+
+Create an interactive map using leaflet to show the largest (NID_STORAGE); high-hazard (HAZARD == “H”) dam in each state
+    - The markers should be drawn as opaque, circle markers, filled red with no border, and a radius set equal to the (NID_Storage / 1,500,000)
+    
+    - The map tiles should be selected from any of the tile providers
+    
+    - A popup table should be added using leafem::popup and should only include the dam name, storage, purposes, and year completed.
+    
+    - The Mississippi system should be added at a Polyline feature.
