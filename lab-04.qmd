@@ -104,38 +104,9 @@ Within R, we can open a connection to this endpoint with the stac function:
 
 This connection will provide an open entry to ALL data hosted by MPC. The stac_search function allows us to reduce the catalog to assets that match certain criteria (just like dplyr::filter reduces a data.frame). The get_request() function sends your search to the STAC API returning the metadata about the objects that match a criteria. The service implementation at MPC sets a return limit of 250 items (but it could be overridden with the limit parameter).
 
-Here, we are interested in the “Landsat Collection 2 Level-2” data. From the JSON file (seen in the browser). To start, lets search for that collection using the stac -> stac_search –> get_request workflow:
-
-```{r}
-(stac_query <- stac("https://planetarycomputer.microsoft.com/api/stac/v1") %>%
-  stac_search(collections = "landsat-c2-l2") %>%
-  get_request())
-```
-
-
 Awesome! So the first 250 items from the Level-2 Landsat collection were returned. Within each item, there are a number of assets (e.g. the red, green, blue bands) and all items have some associated fields like the sub item assets, the bounding box, etc. We can now refine our search to limit the returned results to those that cover our AOI and time range of interest:
 
-```{r}
-(stac_query <- stac("https://planetarycomputer.microsoft.com/api/stac/v1") %>%
-  stac_search(
-    collections = "landsat-c2-l2",
-    datetime    = temporal_range,
-    bbox        = st_bbox(palo)) %>%
-  get_request())
-```
-
 By adding these constraints, we now see just two items. One from the Landsat 7 Level 2 dataset, and one from the Landsat 8 Level 2 dataset. For this lab, lets focus on the Landsat 8 item. We can use either the item or the id search criteria to elect this:
-
-```{r}
-(stac_query <- stac("https://planetarycomputer.microsoft.com/api/stac/v1") %>%
-  stac_search(
-    collections = "landsat-c2-l2",
-    datetime    = temporal_range,
-    bbox        = st_bbox(palo),
-    limit = 1) %>%
-  get_request())
-```
-
 
 The last thing we need to do, is sign this request. In rstac, items_sign(sign_planetary_computer()) signs STAC item asset URLs retrieved from Microsoft’s Planetary Computer, ensuring they include authentication tokens for access. sign_planetary_computer() generates the necessary signing function, and items_sign() applies it to STAC items. This is essential for accessing datasets hosted on the Planetary Computer, and other catalog were data access might be requester-paid or limited.
 
@@ -144,7 +115,7 @@ The last thing we need to do, is sign this request. In rstac, items_sign(sign_pl
   stac_search(
     collections = "landsat-c2-l2",
     datetime    = temporal_range,
-    bbox        = st_bbox(palo),
+    bbox        = sf::st_bbox(palo),
     limit = 1) %>%
   get_request()) %>%
   items_sign(sign_planetary_computer())
@@ -153,7 +124,7 @@ The last thing we need to do, is sign this request. In rstac, items_sign(sign_pl
 
 ## Step 4. Downloading the needed Images
 
-OK! Now that we have identified the item we want, we are ready to download the data using assets_download(). In total, a Landsat 8 item has 11 bands, but we onlyl want to focus on 6 (below).
+OK! Now that we have identified the item we want, we are ready to download the data using assets_download(). In total, a Landsat 8 item has 11 bands, but we only want to focus on 6 (below).
 
 Now we can use the assets_download() function to download the data. The output_dir argument specifies where to save the files, and the overwrite argument specifies whether to overwrite existing files with the same name.
 
@@ -162,8 +133,10 @@ bands <- c('coastal', 'blue', 'green', 'red', 'nir08', 'swir16')
 
 assets_download(items = stac_query,
                 asset_names = bands,
-                output_dir = 'C:/Users/horre/Desktop/csu_523c/data',
+                output_dir = 'data2',
                 overwrite = TRUE)
+
+##my computer was not downloading the files correctly. I instead used a copy from Mike Johnson.
 ```
 And that does it! You now have the process needed to get you data.
 
@@ -176,16 +149,26 @@ With a set of local files, you can create a raster object! Remember your files n
   * The _setNames()_ function will set the names of the bands to the names we defined above.
 
 ```{r}
-raster_path <-
+files <- list.files('C:/Users/horre/Desktop/csu_523c/data/landsat-c2/', recursive = T, full.names = T)
 
-files <- list.files("C:/Users/horre/Desktop/csu_523c/data/landsat-c2", recursive = TRUE)
-files<-files[grep(".TIF", files)]
+r_palo <- rast(files)
+r_palo <- setNames(r_palo, bands)
 ```
 
 
 ****
 # Question 1: Data Access
 Download all the data needed for this lab. What are the dimensions of your stacked image? What is the CRS? What is the cell resolution?
+
+```{r}
+str(r_palo)
+st_crs(r_palo)
+head(r_palo)
+summary(r_palo)
+ext(r_palo)
+same.crs(palo, r_palo)
+```
+
 
 ## _Step 1.1_ Aalyze the Images
 We only want to analyze our image for the regions surrounding Palo (our AOI). Transform your AOI to the CRS of the landsat stack and use it to crop your raster stack.
@@ -195,7 +178,13 @@ Awesome! We have now (1) identified, (2) downloaded, and (3) saved our images.
 We have loaded them as a multiband SpatRast object and cropped the domain to our AOI. Lets make a few RGB plots to see what these images reveal.
 
 ```{r}
+palo <- st_transform(palo, crs(r_palo))
 
+same.crs(palo, r_palo)
+
+r_palo <- crop(r_palo, palo)
+
+plotRGB(r_palo, r = 4, g = 3, b = 2, stretch = 'hist')
 ```
 
 
