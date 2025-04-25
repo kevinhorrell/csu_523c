@@ -211,21 +211,33 @@ For question 2, make four unique combinations:
   - Your choice
 
 ```{r}
+#RGB
 img1 <- plotRGB(r_palo, r = 4, g = 3, b = 2, stretch = 'hist')
 img1_1 <- plotRGB(r_palo, r = 4, g = 3, b = 2, stretch = 'lin')
 
+#NIR-R-G
 img2 <- plotRGB(r_palo, r = 5, g = 4, b = 3, stretch = 'hist')
 img2_2 <- plotRGB(r_palo, r = 5, g = 4, b = 3, stretch = 'lin')
 
+#NIR-SWIR1-R
+img3 <- plotRGB(r_palo, r = 5, g = 6, b = 3, stretch = 'hist')
+img3_2 <- plotRGB(r_palo, r = 5, g = 6, b = 3, stretch = 'lin')
 
+#SWIR1-NIR-R
+img4 <- plotRGB(r_palo, r = 6, g = 5, b = 4, stretch = 'hist')
+img4_2 <- plotRGB(r_palo, r = 6, g = 5, b = 4, stretch = 'lin')
 ```
 
 
 What does each image allow you to see?
 
-  * The 'hist' stretch shows the image lighter, with more contrast, or less shadow.
+  * The 'hist' stretch shows the image lighter, with more contrast, or less shadow. I like the "hist" stretch for the natural color image. I prefer the 'lin' stretch in the NIR-R-G image.
   
-  * 
+  * The NIR-R-G image highlights the vegetation in false color Red. The outline of the river can be seen well with 'red' vegetation.
+  
+  * The NIR-SWIR-R image highlights "wet" surfaces in blue. I prefer the 'hist' stretch because you can see the wetness better.
+  
+  * I chose to use SWIR-NIR-R for the final combination because the water is highlighted by the SWIR band, and vegetation shows green. The dry, non-vegetated land shows up red-brown. It's a nice contrast for water, veg, land.
 
 
 
