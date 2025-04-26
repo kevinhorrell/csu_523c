@@ -42,6 +42,7 @@ library(terra)
 library(mapview)
 library(AOI)
 library(rstac)
+library(stats)
 
 #Data Visualization
 library(gghighlight)
@@ -110,7 +111,7 @@ By adding these constraints, we now see just two items. One from the Landsat 7 L
 
 The last thing we need to do, is sign this request. In rstac, items_sign(sign_planetary_computer()) signs STAC item asset URLs retrieved from Microsoft’s Planetary Computer, ensuring they include authentication tokens for access. sign_planetary_computer() generates the necessary signing function, and items_sign() applies it to STAC items. This is essential for accessing datasets hosted on the Planetary Computer, and other catalog were data access might be requester-paid or limited.
 
-```{r}
+```{r, eval = FALSE}
 (stac_query <- stac("https://planetarycomputer.microsoft.com/api/stac/v1") %>%
   stac_search(
     collections = "landsat-c2-l2",
@@ -128,9 +129,7 @@ OK! Now that we have identified the item we want, we are ready to download the d
 
 Now we can use the assets_download() function to download the data. The output_dir argument specifies where to save the files, and the overwrite argument specifies whether to overwrite existing files with the same name.
 
-```{r}
-bands <- c('coastal', 'blue', 'green', 'red', 'nir08', 'swir16')
-
+```{r, eval = FALSE}
 assets_download(items = stac_query,
                 asset_names = bands,
                 output_dir = 'data2',
@@ -149,6 +148,8 @@ With a set of local files, you can create a raster object! Remember your files n
   * The _setNames()_ function will set the names of the bands to the names we defined above.
 
 ```{r}
+bands <- c('coastal', 'blue', 'green', 'red', 'nir08', 'swir16')
+
 files <- list.files('C:/Users/horre/Desktop/csu_523c/data/landsat-c2/', recursive = T, full.names = T)
 
 r_palo <- rast(files)
@@ -211,21 +212,33 @@ For question 2, make four unique combinations:
   - Your choice
 
 ```{r}
+#RGB
 img1 <- plotRGB(r_palo, r = 4, g = 3, b = 2, stretch = 'hist')
 img1_1 <- plotRGB(r_palo, r = 4, g = 3, b = 2, stretch = 'lin')
 
+#NIR-R-G
 img2 <- plotRGB(r_palo, r = 5, g = 4, b = 3, stretch = 'hist')
 img2_2 <- plotRGB(r_palo, r = 5, g = 4, b = 3, stretch = 'lin')
 
+#NIR-SWIR1-R
+img3 <- plotRGB(r_palo, r = 5, g = 6, b = 3, stretch = 'hist')
+img3_2 <- plotRGB(r_palo, r = 5, g = 6, b = 3, stretch = 'lin')
 
+#SWIR1-NIR-R
+img4 <- plotRGB(r_palo, r = 6, g = 5, b = 4, stretch = 'hist')
+img4_2 <- plotRGB(r_palo, r = 6, g = 5, b = 4, stretch = 'lin')
 ```
 
 
-What does each image allow you to see?
+*What does each image allow you to see?*
 
-  * The 'hist' stretch shows the image lighter, with more contrast, or less shadow.
+  * The 'hist' stretch shows the image lighter, with more contrast, or less shadow. I like the "hist" stretch for the natural color image. I prefer the 'lin' stretch in the NIR-R-G image.
   
-  * 
+  * The NIR-R-G image highlights the vegetation in false color Red. The outline of the river can be seen well with 'red' vegetation.
+  
+  * The NIR-SWIR-R image highlights "wet" surfaces in blue. I prefer the 'hist' stretch because you can see the wetness better.
+  
+  * I chose to use SWIR-NIR-R for the final combination because the water is highlighted by the SWIR band, and vegetation shows green. The dry, non-vegetated land shows up red-brown. It's a nice contrast for water, veg, land.
 
 
 
@@ -248,7 +261,30 @@ For this lab we will look at 5 unique thresholding methods for delineating surfa
   - Plot the new stack, using the following palette:
 (colorRampPalette(c('blue', 'white', 'red'))(256))
 
-Describe the 5 images. How are they similar and where do they deviate?
+```{r}
+r_palo_ndvi <- (r_palo$nir08 - r_palo$red)/(r_palo$nir08 + r_palo$red)
+r_palo_ndwi <- (r_palo$green - r_palo$nir08)/(r_palo$green + r_palo$nir08)
+r_palo_mndwi <- (r_palo$green - r_palo$swir16)/(r_palo$green + r_palo$swir16)
+r_palo_wri <- (r_palo$green + r_palo$red)/(r_palo$nir08 + r_palo$swir16)
+r_palo_swi <- 1/(sqrt((r_palo$blue)-(r_palo$swir16)))
+
+r_palo_indices <- c(r_palo_ndvi, r_palo_ndwi, r_palo_mndwi, r_palo_wri, r_palo_swi)
+indices <- c('ndvi', 'ndwi', 'mndwi', 'wri', 'swi')
+
+r_palo_indices <- setNames(r_palo_indices, indices)
+
+plot(r_palo_indices)
+
+color <- colorRampPalette(c('blue', 'white', 'red'))(256)
+
+plot(r_palo_indices, col = color)
+```
+
+
+*Describe the 5 images. How are they similar and where do they deviate?*
+
+  They all highlight the difference between the river and other features. Some indices show the river and water in blue (NDVI and SWI) while the others show the river and water features as red NDVI and NDWI help differentiate water and vegetation it looks like. The SWI takes away all features _BUT_ water. They all help to differentiate the three main surface features, water, vegetation, and dry surface.
+
 
 ## _Step 3.2_ Raster Thresholding
 
@@ -270,10 +306,41 @@ For all 5 index rasters do the following apply the appropriate threshold and the
     
   - Plot the stack so that floods are blue, and background is white.
 
+```{r}
+threshold0 <- function(x){
+  ifelse(x < 0, 1, 0)
+}
+
+threshold1 <- function(x){
+  ifelse(x > 0, 1, 0)
+}
+
+threshold11 <- function(x){
+  ifelse(x > 1, 1, 0)
+}
+
+threshold5 <- function(x){
+  ifelse(x < 5, 1, 0)
+}
+
+r_palo_ndvif <- app(r_palo_ndvi, threshold0)
+r_palo_ndwif <- app(r_palo_ndwi, threshold1)
+r_palo_mndwif <- app(r_palo_mndwi, threshold1)
+r_palo_wrif <- app(r_palo_wri, threshold11)
+r_palo_swif <- app(r_palo_swi, threshold5)
+
+r_palo_flood <- c(r_palo_ndvif, r_palo_ndwif, r_palo_mndwif, r_palo_wrif, r_palo_swif)
+r_palo_flood <- app(r_palo_flood, fun = function(x) ifelse(is.na(x), 0, x))
+
+plot(r_palo_flood, col = c('white', 'blue'))
+```
+
 
 ## _Step 3.3_
 
-Describe the differences and similarities between the maps.
+*Describe the differences and similarities between the maps.*
+
+  - They all capture a similar amount of water. It appears that MNDWI and WRI capture the most flood water based on the thresholds.
 
 ****
 # Question 4:
@@ -287,6 +354,10 @@ For this lab we will use a simple k-means algorithm to group raster cells with s
 ## _Step 4.1_
   Anytime we want to be able to produce a consistent/reproducible result from a random process in R we need to set a seed. Do so using set.seed
 
+```{r}
+set.seed(7228)
+```
+
 
 ## _Step 4.2_
 
@@ -294,8 +365,21 @@ For this lab we will use a simple k-means algorithm to group raster cells with s
 
   - Check the dimensions of the extracted values with dim
     What do the dimensions of the extracted values tell you about how the data was extracted?
+    *the data was extracted in columns and rows, a data frame and it keeps the same properties as the original raster*
 
   - Remove NA values from your extracted data with na.omit for safety
+
+```{r}
+v = values(r_palo_indices)
+class(v)
+dim(v)
+nrow(v)
+ncol(v)
+length(v)
+res(r_palo_indices)
+v <- na.omit(v)
+```
+
 
 ## _Step 4.3_
 
@@ -304,14 +388,30 @@ For this lab we will use a simple k-means algorithm to group raster cells with s
 
   - Once the kmeans algorithm runs, the output will be a list of components. One of these is cluster which provides a vector of integers from (1:k) indicating the cluster to which each row was allocated.
 
+```{r}
+head(v)
+palo_kmeans <- kmeans(v, centers = 12)
+
+palo_kmeans$cluster
+
+```
+
 
 ## _Step 4.4_
 
   - Create a new raster object by copying one of the original bands. For example:
 
   - Set the values of the copied raster to the cluster vector from the output kmeans object. For example:
+  
+  - Try a few different clusters (k) to see how the map changes.
 
-Try a few different clusters (k) to see how the map changes.
+```{r}
+clus_rast <- r_palo_indices$ndvi
+values(clus_rast) <- palo_kmeans$cluster
+
+plot(clus_rast)
+```
+
 
 ## _Step 4.5_
 Great! You now have a categorical raster with categories 1:k. The issue is we don’t know the value that corresponds to the flood water. To identify the flood category programatically, generate a table crossing the values of one of your binary flood rasters, with the values of your kmeans_raster. To do this, you will use the table function and pass it the values from a binary flood raster, and the values from your kmeans_raster. Here the following occurs:
