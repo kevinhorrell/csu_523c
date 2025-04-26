@@ -164,9 +164,10 @@ Download all the data needed for this lab. What are the dimensions of your stack
 ```{r}
 str(r_palo)
 head(r_palo)
-summary(r_palo)
 ext(r_palo)
 dim(r_palo)
+res(r_palo)
+summary(r_palo)
 st_crs(r_palo)
 same.crs(palo, r_palo)
 ```
@@ -185,8 +186,6 @@ palo <- st_transform(palo, crs(r_palo))
 same.crs(palo, r_palo)
 
 r_palo <- crop(r_palo, palo)
-
-plotRGB(r_palo, r = 4, g = 3, b = 2, stretch = 'hist')
 ```
 
 
@@ -272,8 +271,6 @@ r_palo_indices <- c(r_palo_ndvi, r_palo_ndwi, r_palo_mndwi, r_palo_wri, r_palo_s
 indices <- c('ndvi', 'ndwi', 'mndwi', 'wri', 'swi')
 
 r_palo_indices <- setNames(r_palo_indices, indices)
-
-plot(r_palo_indices)
 
 color <- colorRampPalette(c('blue', 'white', 'red'))(256)
 
@@ -365,19 +362,23 @@ set.seed(7228)
 
   - Check the dimensions of the extracted values with dim
     What do the dimensions of the extracted values tell you about how the data was extracted?
-    *the data was extracted in columns and rows, a data frame and it keeps the same properties as the original raster*
+    *the data was extracted in columns and rows, a data frame and it keeps the same properties and dimensions as the original raster*
 
   - Remove NA values from your extracted data with na.omit for safety
 
 ```{r}
-v = values(r_palo_indices)
+v <- values(r_palo_indices)
 class(v)
 dim(v)
 nrow(v)
 ncol(v)
 length(v)
 res(r_palo_indices)
+
+v <- values(r_palo_indices)
+idx <- which(!apply(is.na(v), 1, any))
 v <- na.omit(v)
+
 ```
 
 
@@ -389,27 +390,38 @@ v <- na.omit(v)
   - Once the kmeans algorithm runs, the output will be a list of components. One of these is cluster which provides a vector of integers from (1:k) indicating the cluster to which each row was allocated.
 
 ```{r}
-head(v)
-palo_kmeans <- kmeans(v, centers = 12)
+palo_kmeans12 <- kmeans(v, centers = 12, iter.max = 100)
+palo_kmeans12$cluster
 
-palo_kmeans$cluster
+palo_kmeans8 <- kmeans(v, centers = 8, iter.max = 100)
+palo_kmeans8$cluster
 
+palo_kmeans5 <- kmeans(v, centers = 5, iter.max = 100)
+palo_kmeans5$cluster
+
+palo_kmeans20 <- kmeans(v, centers = 20, iter.max = 100)
+palo_kmeans20$cluster
 ```
 
 
 ## _Step 4.4_
 
-  - Create a new raster object by copying one of the original bands. For example:
+  - Create a new raster object by copying one of the original bands.
 
-  - Set the values of the copied raster to the cluster vector from the output kmeans object. For example:
+  - Set the values of the copied raster to the cluster vector from the output kmeans object.
   
   - Try a few different clusters (k) to see how the map changes.
 
 ```{r}
-clus_rast <- r_palo_indices$ndvi
-values(clus_rast) <- palo_kmeans$cluster
+clus_rast_ndvi <- r_palo_indices$ndvi
+values(clus_rast_ndvi) <- NA
+clus_rast_ndvi[idx] <- palo_kmeans12$cluster
+plot(clus_rast_ndvi)
 
-plot(clus_rast)
+clus_rast_ndvi <- r_palo_indices$ndvi
+values(clus_rast_ndvi) <- NA
+clus_rast_ndvi[idx] <- palo_kmeans8$cluster
+plot(clus_rast_ndvi)
 ```
 
 
