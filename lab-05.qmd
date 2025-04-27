@@ -36,6 +36,7 @@ library(vip)
 library(baguette)
 
 #Data Visualization
+library(ggpubr)
 library(gghighlight)
 library(ggrepel)
 library(ggthemes)
@@ -66,18 +67,17 @@ In this lab, we will focus on predicting mean streamflow for these basins using 
 
 A notable study by Kratzert et al. (2019) demonstrated that LSTMs can outperform conceptual models in streamflow prediction. As part of this lab, we will explore how to programmatically download and load the data into R.
 
-#What's in the data?
+# What's in the data?
+
 Each record in the CAMELS dataset represents a unique river basin, identified by an outlet USGS NWIS gauge_id. The dataset contains a mix of continuous and categorical variables, including meteorological, catchment, and streamflow summaries.
 
 The data we are going to downloaded are the basin level summaries. For example, if we looked at row 1 of the data (Gage: 01013500) all of the values are the areal average for the drainage basin seen below, while the flow metrics are associated with the outlet gage (in red):
 
 ```{r}
 # Use the `findNLDI` function to get the basin and flowlines for the first gauge
-basin <- dataRetrieval::findNLDI(nwis = "01013500", 
-                                 # Navigate the "upper tributaries" of the basin
-                                 nav = "UT", 
-                                 # Return the basin and flowlines
-                                 find = c("basin", "flowlines"))
+basin <- findNLDI(nwis = "01013500",
+                  nav = "UT",
+                  find = c("basin", "flowlines"))
 
 # Plot the basin, flowlines, and gauge ...
 ggplot() + 
@@ -87,24 +87,8 @@ ggplot() +
   theme_minimal()
 ```
 
-
-****
-# Question 1: Data Access
-Download all the data needed for this lab. What are the dimensions of your stacked image? What is the CRS? What is the cell resolution?
-
-```{r}
-str(r_palo)
-head(r_palo)
-ext(r_palo)
-dim(r_palo)
-res(r_palo)
-summary(r_palo)
-st_crs(r_palo)
-same.crs(palo, r_palo)
-```
-
-****
 # Lab Goals
+****
 
 In this lab, you will:
 
@@ -116,13 +100,6 @@ In this lab, you will:
 By the end of this lab, you will have hands-on experience applying machine learning techniques to real-world data, helping to bridge the gap between statistical modeling and environmental science.
 
 ****
-# Lab Setup
-
-  1. Make a new R project where you want this work to take place.
-  2. Create a Quarto document called lab6.qmd in the project folder.
-  3. Create a data directory in your project folder.
-  4. Instantiate a git archive with usethis::use_git()
-  5. Connect it to a Github repository with usethis::use_github()
 
 # Data Download
 
@@ -137,9 +114,9 @@ Near the bottom of that page, there are many .txt files that contain the data we
 # Getting the documentation PDF
 
 We can download the documentation PDF which provides a descriptions for the various columns as many are not self-explanatory. Here we can use download.file to download the PDF to our data directory.
-```{r}
-download.file('https://gdex.ucar.edu/dataset/camels/file/camels_attributes_v2.0.pdf', 
-              '../data/camels_attributes_v2.0.pdf')
+```{r, eval = FALSE}
+download.file('https://gdex.ucar.edu/dataset/camels/file/camels_attributes_v2.0.pdf', 'C:/Users/horre/Desktop/csu_523c/data05/camels_attributes_v2.0.pdf', overwrite = TRUE)
+#this function produced a corrupt file, so I downloaded it manually.
 ```
 
 # Getting Basin characteristics
@@ -154,9 +131,9 @@ types <- c("clim", "geol", "soil", "topo", "vege", "hydro")
   b. Using glue, we can construct the needed URLs and file names for the data we want to download:
 ```{r}
 # Where the files live online ...
-remote_files  <- glue('{root}/camels_{types}.txt')
+remote_files <- glue('{root}/camels_{types}.txt')
 # where we want to download the data ...
-local_files   <- glue('data/camels_{types}.txt')
+local_files <- glue('data05/camels_{types}.txt')
 ```
   
   c. Now we can download the data: walk2 comes from the purrr package and is used to apply a function to multiple arguments in parallel (much like map2 works over paired lists). Here, we are asking walk2 to pass the first element of remote_files and the first element of local_files to the download.file function to download the data, and setting quiet = TRUE to suppress output. The process is then iterated for the second element of each vector, and so on.
@@ -167,7 +144,7 @@ walk2(remote_files, local_files, download.file, quiet = TRUE)
   d. Once downloaded, the data can be read it into R using readr::read_delim(), again instead of applying this to each file individually, we can use map to apply the function to each element of the local_files list.
 ```{r}
 # Read and merge data
-camels <- map(local_files, read_delim, show_col_types = FALSE) 
+camels <- map(local_files, read_delim, show_col_types = FALSE)
 ```
   
   e. This gives us a list of data.frames, one for each file that we want to merge into a single table. So far in class we have focused on *_join functions to merge data based on a primary and foreign key relationship.
@@ -176,14 +153,16 @@ In this current list, we have >2 tables, but, have a shared column called gauge_
 
 In this case, we are join to merge every data.frame in the list (n = 6) by the shared gauge_id column. Since we want to keep all data, we want a full join.
 ```{r}
-camels <- power_full_join(camels ,by = 'gauge_id')
+camels <- power_full_join(camels, by = 'gauge_id')
 ```
 
 ****
 # Question 1
 ## _Your Turn_
-  * Make sure all data the PDF are downloaded into your data directory
+  * Make sure all data and the PDF are downloaded into your data directory
   * From the documentation PDF, report what _zero_q_freq_ represents
+
+*zero_q_freq* is the frequency or how often there is no flow, q = 0 mm/day
   
 ## Exploratory Data Analysis
 First, lets make a map of the sites. Use the borders() ggplot function to add state boundaries to the map and initially color the points by the mean flow (q_mean) at each site.
@@ -198,9 +177,36 @@ ggplot(data = camels, aes(x = gauge_lon, y = gauge_lat)) +
 
 # Question 2
 ## _Your Turn_
-  * Make 2 maps of the sites, coloring the points by the aridty and p_mean column
+  * Make 2 maps of the sites, coloring the points by the aridity and p_mean column
   * Add clear labels, titles, and a color scale that makes sense for each parameter.
   * Ensure these render as a single image with your choice of facet_*, patchwork, or ggpubr
+
+```{r}
+aridity <- ggplot(data = camels, aes(x = gauge_lon, y = gauge_lat)) +
+  borders("state", colour = "gray50") +
+  geom_point(aes(color = aridity), size = 2) +
+  scale_color_gradient(low = "#012b90", high = "#d21404") +
+  ggthemes::theme_map() +
+  labs(title = 'Aridity for NWIS Gauges',
+       subtitle = '(PET/P)',
+       color = 'Aridity Index') +
+  theme(legend.position = 'right')
+
+p_mean <- ggplot(data = camels, aes(x = gauge_lon, y = gauge_lat)) +
+  borders("state", colour = "gray50") +
+  geom_point(aes(color = p_mean), size = 2) +
+  scale_color_gradient(low = "#DBCA69", high = "#1E4192") +
+  ggthemes::theme_map() +
+  labs(title = 'Mean Precipitaion at NWIS Gauges',
+       subtitle = '(mm/day)',
+       color = 'Mean Precip.') +
+  theme(legend.position = 'right')
+
+ggarrange(aridity, p_mean,
+          ncol = 1, nrow = 2,
+          common.legend = FALSE)
+```
+
 
 ## Model Preparation
 
