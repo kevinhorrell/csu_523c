@@ -236,7 +236,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 5      NA   NA    NA  NA    NA     NA
 6      NA   NA    NA  NA    NA     NA</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(r_palo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ext</span>(r_palo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>SpatExtent : 518085, 748515, 4506885, 4740915 (xmin, xmax, ymin, ymax)</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(r_palo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 7801 7681    6</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">res</span>(r_palo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 30 30</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(r_palo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    coastal           blue           green            red       
  Min.   : 4618   Min.   : 3016   Min.   : 5226   Min.   : 5591  
@@ -255,15 +267,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  Max.   :35186   Max.   :40776  
  NA's   :32245   NA's   :32245  </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ext</span>(r_palo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>SpatExtent : 518085, 748515, 4506885, 4740915 (xmin, xmax, ymin, ymax)</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(r_palo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 7801 7681    6</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(r_palo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(r_palo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Coordinate Reference System:
   User input: WGS 84 / UTM zone 15N 
@@ -307,7 +311,7 @@ PROJCRS["WGS 84 / UTM zone 15N",
         BBOX[0,-96,84,-90]],
     ID["EPSG",32615]]</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">same.crs</span>(palo, r_palo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">same.crs</span>(palo, r_palo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] FALSE</code></pre>
 </div>
@@ -318,22 +322,13 @@ PROJCRS["WGS 84 / UTM zone 15N",
 <p>Awesome! We have now (1) identified, (2) downloaded, and (3) saved our images.</p>
 <p>We have loaded them as a multiband SpatRast object and cropped the domain to our AOI. Lets make a few RGB plots to see what these images reveal.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>palo <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(palo, <span class="fu">crs</span>(r_palo))</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">same.crs</span>(palo, r_palo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>palo <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(palo, <span class="fu">crs</span>(r_palo))</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">same.crs</span>(palo, r_palo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>r_palo <span class="ot">&lt;-</span> <span class="fu">crop</span>(r_palo, palo)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plotRGB</span>(r_palo, <span class="at">r =</span> <span class="dv">4</span>, <span class="at">g =</span> <span class="dv">3</span>, <span class="at">b =</span> <span class="dv">2</span>, <span class="at">stretch =</span> <span class="st">'hist'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="lab-04_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
-</figure>
-</div>
-</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>r_palo <span class="ot">&lt;-</span> <span class="fu">crop</span>(r_palo, palo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
 </section>
@@ -353,8 +348,8 @@ PROJCRS["WGS 84 / UTM zone 15N",
 <li>Your choice</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#RGB</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>img1 <span class="ot">&lt;-</span> <span class="fu">plotRGB</span>(r_palo, <span class="at">r =</span> <span class="dv">4</span>, <span class="at">g =</span> <span class="dv">3</span>, <span class="at">b =</span> <span class="dv">2</span>, <span class="at">stretch =</span> <span class="st">'hist'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#RGB</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>img1 <span class="ot">&lt;-</span> <span class="fu">plotRGB</span>(r_palo, <span class="at">r =</span> <span class="dv">4</span>, <span class="at">g =</span> <span class="dv">3</span>, <span class="at">b =</span> <span class="dv">2</span>, <span class="at">stretch =</span> <span class="st">'hist'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -362,7 +357,7 @@ PROJCRS["WGS 84 / UTM zone 15N",
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>img1_1 <span class="ot">&lt;-</span> <span class="fu">plotRGB</span>(r_palo, <span class="at">r =</span> <span class="dv">4</span>, <span class="at">g =</span> <span class="dv">3</span>, <span class="at">b =</span> <span class="dv">2</span>, <span class="at">stretch =</span> <span class="st">'lin'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>img1_1 <span class="ot">&lt;-</span> <span class="fu">plotRGB</span>(r_palo, <span class="at">r =</span> <span class="dv">4</span>, <span class="at">g =</span> <span class="dv">3</span>, <span class="at">b =</span> <span class="dv">2</span>, <span class="at">stretch =</span> <span class="st">'lin'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -370,8 +365,8 @@ PROJCRS["WGS 84 / UTM zone 15N",
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#NIR-R-G</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>img2 <span class="ot">&lt;-</span> <span class="fu">plotRGB</span>(r_palo, <span class="at">r =</span> <span class="dv">5</span>, <span class="at">g =</span> <span class="dv">4</span>, <span class="at">b =</span> <span class="dv">3</span>, <span class="at">stretch =</span> <span class="st">'hist'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">#NIR-R-G</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>img2 <span class="ot">&lt;-</span> <span class="fu">plotRGB</span>(r_palo, <span class="at">r =</span> <span class="dv">5</span>, <span class="at">g =</span> <span class="dv">4</span>, <span class="at">b =</span> <span class="dv">3</span>, <span class="at">stretch =</span> <span class="st">'hist'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -379,7 +374,7 @@ PROJCRS["WGS 84 / UTM zone 15N",
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>img2_2 <span class="ot">&lt;-</span> <span class="fu">plotRGB</span>(r_palo, <span class="at">r =</span> <span class="dv">5</span>, <span class="at">g =</span> <span class="dv">4</span>, <span class="at">b =</span> <span class="dv">3</span>, <span class="at">stretch =</span> <span class="st">'lin'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>img2_2 <span class="ot">&lt;-</span> <span class="fu">plotRGB</span>(r_palo, <span class="at">r =</span> <span class="dv">5</span>, <span class="at">g =</span> <span class="dv">4</span>, <span class="at">b =</span> <span class="dv">3</span>, <span class="at">stretch =</span> <span class="st">'lin'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -387,8 +382,8 @@ PROJCRS["WGS 84 / UTM zone 15N",
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">#NIR-SWIR1-R</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>img3 <span class="ot">&lt;-</span> <span class="fu">plotRGB</span>(r_palo, <span class="at">r =</span> <span class="dv">5</span>, <span class="at">g =</span> <span class="dv">6</span>, <span class="at">b =</span> <span class="dv">3</span>, <span class="at">stretch =</span> <span class="st">'hist'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co">#NIR-SWIR1-R</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>img3 <span class="ot">&lt;-</span> <span class="fu">plotRGB</span>(r_palo, <span class="at">r =</span> <span class="dv">5</span>, <span class="at">g =</span> <span class="dv">6</span>, <span class="at">b =</span> <span class="dv">3</span>, <span class="at">stretch =</span> <span class="st">'hist'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -396,7 +391,7 @@ PROJCRS["WGS 84 / UTM zone 15N",
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>img3_2 <span class="ot">&lt;-</span> <span class="fu">plotRGB</span>(r_palo, <span class="at">r =</span> <span class="dv">5</span>, <span class="at">g =</span> <span class="dv">6</span>, <span class="at">b =</span> <span class="dv">3</span>, <span class="at">stretch =</span> <span class="st">'lin'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>img3_2 <span class="ot">&lt;-</span> <span class="fu">plotRGB</span>(r_palo, <span class="at">r =</span> <span class="dv">5</span>, <span class="at">g =</span> <span class="dv">6</span>, <span class="at">b =</span> <span class="dv">3</span>, <span class="at">stretch =</span> <span class="st">'lin'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -404,8 +399,8 @@ PROJCRS["WGS 84 / UTM zone 15N",
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co">#SWIR1-NIR-R</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>img4 <span class="ot">&lt;-</span> <span class="fu">plotRGB</span>(r_palo, <span class="at">r =</span> <span class="dv">6</span>, <span class="at">g =</span> <span class="dv">5</span>, <span class="at">b =</span> <span class="dv">4</span>, <span class="at">stretch =</span> <span class="st">'hist'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">#SWIR1-NIR-R</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>img4 <span class="ot">&lt;-</span> <span class="fu">plotRGB</span>(r_palo, <span class="at">r =</span> <span class="dv">6</span>, <span class="at">g =</span> <span class="dv">5</span>, <span class="at">b =</span> <span class="dv">4</span>, <span class="at">stretch =</span> <span class="st">'hist'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -413,7 +408,7 @@ PROJCRS["WGS 84 / UTM zone 15N",
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>img4_2 <span class="ot">&lt;-</span> <span class="fu">plotRGB</span>(r_palo, <span class="at">r =</span> <span class="dv">6</span>, <span class="at">g =</span> <span class="dv">5</span>, <span class="at">b =</span> <span class="dv">4</span>, <span class="at">stretch =</span> <span class="st">'lin'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>img4_2 <span class="ot">&lt;-</span> <span class="fu">plotRGB</span>(r_palo, <span class="at">r =</span> <span class="dv">6</span>, <span class="at">g =</span> <span class="dv">5</span>, <span class="at">b =</span> <span class="dv">4</span>, <span class="at">stretch =</span> <span class="st">'lin'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -444,32 +439,24 @@ PROJCRS["WGS 84 / UTM zone 15N",
 <li><p>Plot the new stack, using the following palette: (colorRampPalette(c(‘blue’, ‘white’, ‘red’))(256))</p></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>r_palo_ndvi <span class="ot">&lt;-</span> (r_palo<span class="sc">$</span>nir08 <span class="sc">-</span> r_palo<span class="sc">$</span>red)<span class="sc">/</span>(r_palo<span class="sc">$</span>nir08 <span class="sc">+</span> r_palo<span class="sc">$</span>red)</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>r_palo_ndwi <span class="ot">&lt;-</span> (r_palo<span class="sc">$</span>green <span class="sc">-</span> r_palo<span class="sc">$</span>nir08)<span class="sc">/</span>(r_palo<span class="sc">$</span>green <span class="sc">+</span> r_palo<span class="sc">$</span>nir08)</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>r_palo_mndwi <span class="ot">&lt;-</span> (r_palo<span class="sc">$</span>green <span class="sc">-</span> r_palo<span class="sc">$</span>swir16)<span class="sc">/</span>(r_palo<span class="sc">$</span>green <span class="sc">+</span> r_palo<span class="sc">$</span>swir16)</span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>r_palo_wri <span class="ot">&lt;-</span> (r_palo<span class="sc">$</span>green <span class="sc">+</span> r_palo<span class="sc">$</span>red)<span class="sc">/</span>(r_palo<span class="sc">$</span>nir08 <span class="sc">+</span> r_palo<span class="sc">$</span>swir16)</span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>r_palo_swi <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">/</span>(<span class="fu">sqrt</span>((r_palo<span class="sc">$</span>blue)<span class="sc">-</span>(r_palo<span class="sc">$</span>swir16)))</span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>r_palo_indices <span class="ot">&lt;-</span> <span class="fu">c</span>(r_palo_ndvi, r_palo_ndwi, r_palo_mndwi, r_palo_wri, r_palo_swi)</span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>indices <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'ndvi'</span>, <span class="st">'ndwi'</span>, <span class="st">'mndwi'</span>, <span class="st">'wri'</span>, <span class="st">'swi'</span>)</span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>r_palo_indices <span class="ot">&lt;-</span> <span class="fu">setNames</span>(r_palo_indices, indices)</span>
-<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(r_palo_indices)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>r_palo_ndvi <span class="ot">&lt;-</span> (r_palo<span class="sc">$</span>nir08 <span class="sc">-</span> r_palo<span class="sc">$</span>red)<span class="sc">/</span>(r_palo<span class="sc">$</span>nir08 <span class="sc">+</span> r_palo<span class="sc">$</span>red)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>r_palo_ndwi <span class="ot">&lt;-</span> (r_palo<span class="sc">$</span>green <span class="sc">-</span> r_palo<span class="sc">$</span>nir08)<span class="sc">/</span>(r_palo<span class="sc">$</span>green <span class="sc">+</span> r_palo<span class="sc">$</span>nir08)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>r_palo_mndwi <span class="ot">&lt;-</span> (r_palo<span class="sc">$</span>green <span class="sc">-</span> r_palo<span class="sc">$</span>swir16)<span class="sc">/</span>(r_palo<span class="sc">$</span>green <span class="sc">+</span> r_palo<span class="sc">$</span>swir16)</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>r_palo_wri <span class="ot">&lt;-</span> (r_palo<span class="sc">$</span>green <span class="sc">+</span> r_palo<span class="sc">$</span>red)<span class="sc">/</span>(r_palo<span class="sc">$</span>nir08 <span class="sc">+</span> r_palo<span class="sc">$</span>swir16)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>r_palo_swi <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">/</span>(<span class="fu">sqrt</span>((r_palo<span class="sc">$</span>blue)<span class="sc">-</span>(r_palo<span class="sc">$</span>swir16)))</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>r_palo_indices <span class="ot">&lt;-</span> <span class="fu">c</span>(r_palo_ndvi, r_palo_ndwi, r_palo_mndwi, r_palo_wri, r_palo_swi)</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>indices <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'ndvi'</span>, <span class="st">'ndwi'</span>, <span class="st">'mndwi'</span>, <span class="st">'wri'</span>, <span class="st">'swi'</span>)</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>r_palo_indices <span class="ot">&lt;-</span> <span class="fu">setNames</span>(r_palo_indices, indices)</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>color <span class="ot">&lt;-</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">'blue'</span>, <span class="st">'white'</span>, <span class="st">'red'</span>))(<span class="dv">256</span>)</span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(r_palo_indices, <span class="at">col =</span> color)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
 <p><img src="lab-04_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
-</figure>
-</div>
-</div>
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>color <span class="ot">&lt;-</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">'blue'</span>, <span class="st">'white'</span>, <span class="st">'red'</span>))(<span class="dv">256</span>)</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(r_palo_indices, <span class="at">col =</span> color)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="lab-04_files/figure-html/unnamed-chunk-12-2.png" class="img-fluid figure-img" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
@@ -491,32 +478,32 @@ PROJCRS["WGS 84 / UTM zone 15N",
 <li><p>Plot the stack so that floods are blue, and background is white.</p></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>threshold0 <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ifelse</span>(x <span class="sc">&lt;</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>threshold1 <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ifelse</span>(x <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>threshold11 <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
-<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ifelse</span>(x <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
-<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>threshold5 <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
-<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ifelse</span>(x <span class="sc">&lt;</span> <span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
-<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>r_palo_ndvif <span class="ot">&lt;-</span> <span class="fu">app</span>(r_palo_ndvi, threshold0)</span>
-<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>r_palo_ndwif <span class="ot">&lt;-</span> <span class="fu">app</span>(r_palo_ndwi, threshold1)</span>
-<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>r_palo_mndwif <span class="ot">&lt;-</span> <span class="fu">app</span>(r_palo_mndwi, threshold1)</span>
-<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>r_palo_wrif <span class="ot">&lt;-</span> <span class="fu">app</span>(r_palo_wri, threshold11)</span>
-<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>r_palo_swif <span class="ot">&lt;-</span> <span class="fu">app</span>(r_palo_swi, threshold5)</span>
-<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>r_palo_flood <span class="ot">&lt;-</span> <span class="fu">c</span>(r_palo_ndvif, r_palo_ndwif, r_palo_mndwif, r_palo_wrif, r_palo_swif)</span>
-<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a>r_palo_flood <span class="ot">&lt;-</span> <span class="fu">app</span>(r_palo_flood, <span class="at">fun =</span> <span class="cf">function</span>(x) <span class="fu">ifelse</span>(<span class="fu">is.na</span>(x), <span class="dv">0</span>, x))</span>
-<span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-26"><a href="#cb37-26" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(r_palo_flood, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">'white'</span>, <span class="st">'blue'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>threshold0 <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ifelse</span>(x <span class="sc">&lt;</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>threshold1 <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ifelse</span>(x <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>threshold11 <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ifelse</span>(x <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>threshold5 <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ifelse</span>(x <span class="sc">&lt;</span> <span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>r_palo_ndvif <span class="ot">&lt;-</span> <span class="fu">app</span>(r_palo_ndvi, threshold0)</span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>r_palo_ndwif <span class="ot">&lt;-</span> <span class="fu">app</span>(r_palo_ndwi, threshold1)</span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>r_palo_mndwif <span class="ot">&lt;-</span> <span class="fu">app</span>(r_palo_mndwi, threshold1)</span>
+<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a>r_palo_wrif <span class="ot">&lt;-</span> <span class="fu">app</span>(r_palo_wri, threshold11)</span>
+<span id="cb38-21"><a href="#cb38-21" aria-hidden="true" tabindex="-1"></a>r_palo_swif <span class="ot">&lt;-</span> <span class="fu">app</span>(r_palo_swi, threshold5)</span>
+<span id="cb38-22"><a href="#cb38-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-23"><a href="#cb38-23" aria-hidden="true" tabindex="-1"></a>r_palo_flood <span class="ot">&lt;-</span> <span class="fu">c</span>(r_palo_ndvif, r_palo_ndwif, r_palo_mndwif, r_palo_wrif, r_palo_swif)</span>
+<span id="cb38-24"><a href="#cb38-24" aria-hidden="true" tabindex="-1"></a>r_palo_flood <span class="ot">&lt;-</span> <span class="fu">app</span>(r_palo_flood, <span class="at">fun =</span> <span class="cf">function</span>(x) <span class="fu">ifelse</span>(<span class="fu">is.na</span>(x), <span class="dv">0</span>, x))</span>
+<span id="cb38-25"><a href="#cb38-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-26"><a href="#cb38-26" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(r_palo_flood, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">'white'</span>, <span class="st">'blue'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -544,43 +531,45 @@ PROJCRS["WGS 84 / UTM zone 15N",
 <h2 class="anchored" data-anchor-id="step-4.1"><em>Step 4.1</em></h2>
 <p>Anytime we want to be able to produce a consistent/reproducible result from a random process in R we need to set a seed. Do so using set.seed</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">7228</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">7228</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="step-4.2" class="level2">
 <h2 class="anchored" data-anchor-id="step-4.2"><em>Step 4.2</em></h2>
 <ul>
 <li><p>Extract the values from your 6-band raster stack with values</p></li>
-<li><p>Check the dimensions of the extracted values with dim What do the dimensions of the extracted values tell you about how the data was extracted? <em>the data was extracted in columns and rows, a data frame and it keeps the same properties as the original raster</em></p></li>
+<li><p>Check the dimensions of the extracted values with dim What do the dimensions of the extracted values tell you about how the data was extracted? <em>the data was extracted in columns and rows, a data frame and it keeps the same properties and dimensions as the original raster</em></p></li>
 <li><p>Remove NA values from your extracted data with na.omit for safety</p></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>v <span class="ot">=</span> <span class="fu">values</span>(r_palo_indices)</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">values</span>(r_palo_indices)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "matrix" "array" </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 12192     5</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 12192</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ncol</span>(v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ncol</span>(v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 5</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 60960</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">res</span>(r_palo_indices)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">res</span>(r_palo_indices)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 30 30</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">values</span>(r_palo_indices)</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>idx <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="sc">!</span><span class="fu">apply</span>(<span class="fu">is.na</span>(v), <span class="dv">1</span>, any))</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="step-4.3" class="level2">
@@ -590,28 +579,17 @@ PROJCRS["WGS 84 / UTM zone 15N",
 <li><p>Once the kmeans algorithm runs, the output will be a list of components. One of these is cluster which provides a vector of integers from (1:k) indicating the cluster to which each row was allocated.</p></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>palo_kmeans12 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(v, <span class="at">centers =</span> <span class="dv">12</span>, <span class="at">iter.max =</span> <span class="dv">100</span>)</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>palo_kmeans12<span class="sc">$</span>cluster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>            ndvi         ndwi      mndwi      wri        swi
-[1,] -0.04586189 0.0250763062 0.06272880 1.114282 0.04327423
-[2,] -0.02287789 0.0058630394 0.04961762 1.074361 0.05822225
-[3,] -0.01783044 0.0002927229 0.04119439 1.060104 0.07161149
-[4,] -0.03222809 0.0132622854 0.05006749 1.085293 0.05634362
-[5,] -0.03105806 0.0139748806 0.05652494 1.090779 0.04981355
-[6,] -0.03452678 0.0152698864 0.04693317 1.084579 0.05822225</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>palo_kmeans <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(v, <span class="at">centers =</span> <span class="dv">12</span>)</span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>palo_kmeans<span class="sc">$</span>cluster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  [1]  2  4  4 12 12 12 12  2  2  2  4  9  9  9  2 12  4  2  2  5  3  3  5  9  2
+<pre><code>  [1]  2  4  4 12 12 12 12  2  2  2  4  9  9  9  2 12  4  2  2  5  3  3 10  9  2
  [26]  2  3  3  3 11  8  2  2  2  3  3  3  3  5 12  2  2  2  5  3  3  3  3  3  2
- [51]  2  2  2  3  3  3  3  3  3  2  2  2  2 11  9  4  4  2  2  2  2 12  9  4  5
- [76]  6  8  2  2  2  2 12  3  9  6  6  4  4  4  5  2  2  2  2  4  4  9  9  9  5
+ [51]  2  2  2  3  3  3  3  3  3  2  2  2  2 11  9  4  6  2  2  2  2 12  9  4  5
+ [76]  6  8  2  2  2  2 12  3  9  2  6  4  4  4  5  2  2  2  2  4  4  9  9  9  5
 [101]  9  9  2  2 12  2  9  2  2  2  2  5  9  9  6  6  5  4 12  6  4  2  6 11  2
 [126]  2  2  2  9  2  2  2  2  9  9  2  2  2  2 10  6  9  9  2  2  2  2  4  9  9
 [151]  9 11  2  2  2  2  6  9  9  9 11 11  2  2  2  2  8  9  9  9  9  2  2  2 12
-[176]  9  9  6  5  2  2  2  2  2  2 10  2  2  2 12  4 11 12  2  2  2  2  5 12  2
+[176]  9  9  6  5  2  2  2  2  2  2 10  2  2  2 12  6 11 12  2  2  2  2  5 12  2
 [201]  2  2  2 12  2  2  2  2  2 12  2  2  2  2  2  9  8  9  2  2  2  2 10  5  6
 [226] 12  2  2  2  2 12  8  6  5  2  2  2  2  2  7  9  5  2  2  2  2 12  7 12  2
 [251]  2  2  2 10 10  6  2  2  2  2  4 12 11  6  2  2  2  2 12  4  9  2  6  6  6
@@ -623,7 +601,7 @@ PROJCRS["WGS 84 / UTM zone 15N",
 [401]  9 10  9  9  9 11  2  2  2 12  5  2 12  5  1  2  2  2  2 12 10  2 12 10 11
 [426] 11  2  2  2  2  6  5  6  6  6  6  6  2  9  9  6  6  6  6  4  6  2  2  2  2
 [451]  4  9  6  9  9  9  9  9  9  9  9  9  9  9  9  4  6  2  2  2  2  2  5  6  6
-[476]  4  5  4  2  2  9  9  9  9  6  2  2  2  2 10  4  4 11 10  6 12  9  9  9  6
+[476]  4  5 12  2  2  9  9  9  9  6  2  2  2  2 10  4  4 11 10  6 12  9  9  9  6
 [501]  5  2  2  2  2 12 12  2  2  2  4  4  6  9  9  9 12  2  2  2  2 12  4 12  2
 [526] 10  6  2  2  2  2 10  8  8 11  2  2  2  2  8  2  2  2  2  2  2  2  2  2  2
 [551] 12  1  7  2  2  2  8  2  2  2 12  9  6  5  2  2  2 12 10  2  2  2 12  2  2
@@ -631,33 +609,139 @@ PROJCRS["WGS 84 / UTM zone 15N",
 [601]  2 10  7 12  2  2  2  2  2  2  2  2  9  9  6  7  2  2  2  2  2  2  2  2  2
 [626]  2  2  2  2  8 12  4 12  9  2  2  2  2  2  2  2  2  9 10 12 11  2  2  2  2
 [651]  2  2  2  2  2  2 12 12 11 12  9  9  2  2  2  2  2  2  2 11  2  5  5 12  2
-[676]  2  2  2  2  2 11 12 12  2  2  2 11 12  1  2  2  5  2  8  2  4  5  2  2  5
-[701] 12  4 12  4  5 11  6  9  6  7 12  2  4  2  6  5 11  2  2  4  2  9  6 10  2
+[676]  2  2  2  2  2 11 12 12  2  2  2 11 12  1  2  2  5  2  8  2  3  5  2  2  5
+[701] 12  4  4  4  5 11  6  9  6  7 12  2  4  2  6  5 11  2  2  4  2  9  6 10  2
 [726]  2  2  7  6  9  2  2 12  2  2  2  2  6  6  6  2  2 10  2  2  2  2  2  2  6
-[751]  6  6  2  2  5  2  2  2  2  2  2 12  9  6  2  2  6  2  2  2  6 10  5  9 11
+[751]  6  6  2  2  5  2  2  2  2  2  2 12  9  6  2  2  6  2  2  2  6 10 10  9 11
 [776]  6  2 10  4  2  2 11  9  6  6  2  2  4  9  5  6  4  6  2  2  4  2  2  2  2
 [801]  2  2  2  2  2  6  2  2  2  2 10 12  2  2  2  2 12  2 12 10  2  2 12  2  2
 [826] 12  2  6  2  4  2  9  4  2  2 12 12  2  2  2  5  2  9  2  2  2 10  4  9  2
 [851]  2  2  2  2  2  2  2  5  2  2  2  2  2  2 10  2  9 12  6</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>palo_kmeans8 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(v, <span class="at">centers =</span> <span class="dv">8</span>, <span class="at">iter.max =</span> <span class="dv">100</span>)</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>palo_kmeans8<span class="sc">$</span>cluster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  [1] 7 5 2 5 5 5 5 7 7 7 2 1 1 1 7 5 5 7 7 2 5 5 8 1 7 7 5 1 5 4 8 7 7 7 5 1 1
+ [38] 5 2 5 7 7 7 2 5 5 5 1 5 7 7 7 7 1 1 5 5 5 1 7 7 7 7 4 1 5 5 7 7 7 7 7 1 5
+ [75] 2 7 8 7 7 7 7 5 5 1 7 5 5 2 5 2 7 7 7 7 5 2 1 1 1 2 1 1 7 7 5 7 1 7 7 7 7
+[112] 2 1 1 1 5 2 5 5 5 5 7 7 4 7 7 7 7 1 7 7 7 7 1 1 7 7 7 7 2 1 1 1 7 7 7 7 5
+[149] 1 1 1 4 7 7 7 7 1 1 1 1 4 4 7 7 7 7 8 1 1 1 1 7 7 7 5 1 1 5 2 7 7 7 7 7 7
+[186] 8 7 7 7 5 5 4 5 7 7 7 7 2 5 7 7 7 7 5 7 7 7 7 7 5 7 7 7 7 7 1 8 1 7 7 7 7
+[223] 2 2 1 5 7 7 7 7 5 8 7 2 7 7 7 7 7 3 1 2 7 7 7 7 7 3 5 7 7 7 7 8 8 7 7 7 7
+[260] 7 2 7 4 7 7 7 7 7 5 5 1 7 7 7 1 2 5 7 7 7 2 5 7 7 1 5 7 7 7 7 3 4 1 1 5 2
+[297] 5 7 7 7 7 5 2 3 5 7 7 7 7 5 8 5 7 7 7 7 7 2 1 2 5 5 5 7 7 7 7 7 7 8 2 7 7
+[334] 7 7 7 7 7 8 7 7 7 7 7 7 5 5 7 7 7 7 7 5 5 7 7 7 7 7 5 2 7 7 7 7 7 5 7 7 7
+[371] 7 7 6 5 7 7 7 7 5 2 7 7 7 7 5 1 5 1 7 7 5 1 1 1 2 5 1 1 1 3 1 2 1 1 1 4 7
+[408] 7 7 5 2 7 5 2 6 7 7 7 7 5 2 7 7 2 4 4 7 7 7 7 5 2 5 1 1 5 7 7 1 1 1 5 5 1
+[445] 5 7 7 7 7 7 5 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 5 7 7 7 7 7 2 5 5 5 2 5 7 7 1
+[482] 1 1 1 7 7 7 7 7 2 5 5 4 2 7 5 1 1 1 7 2 7 7 7 7 7 5 7 7 7 5 5 7 1 1 1 5 7
+[519] 7 7 7 5 2 5 7 2 5 7 7 7 7 8 8 8 4 7 7 7 7 8 7 7 7 7 7 7 7 7 7 7 5 6 3 7 7
+[556] 7 8 7 7 7 5 1 5 2 7 7 7 5 2 7 7 7 7 7 7 7 7 7 7 7 7 7 2 7 7 7 7 7 1 1 5 5
+[593] 7 7 7 7 7 7 7 7 7 8 3 5 7 7 7 7 7 7 7 7 7 1 5 3 7 7 7 7 7 7 7 7 7 7 7 7 7
+[630] 8 5 5 5 1 7 7 7 7 7 7 7 7 1 8 5 4 7 7 7 7 7 7 7 7 7 7 5 5 4 5 1 7 7 7 7 7
+[667] 7 7 7 4 7 2 2 5 7 7 7 7 7 7 4 5 5 7 7 7 4 5 6 7 7 2 7 8 7 5 2 7 7 2 5 5 5
+[704] 5 2 4 1 1 1 3 5 7 2 7 7 2 4 7 7 5 1 1 5 8 7 7 7 3 7 1 1 7 5 7 7 7 7 7 7 7
+[741] 7 7 2 7 7 7 7 7 7 5 7 7 7 7 2 7 7 7 7 7 7 5 1 7 7 7 7 7 7 7 7 2 2 1 4 7 7
+[778] 2 5 7 7 4 1 7 5 7 7 2 1 2 7 5 7 7 7 5 7 7 7 7 7 7 7 7 7 1 7 7 7 7 2 5 7 7
+[815] 7 7 5 7 5 2 7 7 5 7 7 7 7 5 7 5 7 1 5 7 7 7 5 7 7 7 2 7 1 7 7 7 2 5 1 7 7
+[852] 7 7 7 7 7 7 2 7 7 7 7 7 7 2 7 1 5 7</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>palo_kmeans5 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(v, <span class="at">centers =</span> <span class="dv">5</span>, <span class="at">iter.max =</span> <span class="dv">100</span>)</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>palo_kmeans5<span class="sc">$</span>cluster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  [1] 4 5 5 5 4 5 4 4 4 4 5 2 2 2 4 5 5 4 4 5 2 5 1 2 4 4 5 2 2 1 1 4 4 4 5 2 2
+ [38] 2 5 5 4 4 4 5 5 2 2 2 5 4 4 4 4 2 2 2 2 4 2 4 4 4 4 1 2 5 5 4 4 4 4 4 2 5
+ [75] 5 4 1 4 4 4 4 5 2 2 4 4 5 5 5 1 4 4 4 4 5 5 2 2 2 5 2 2 4 4 5 4 2 4 4 4 4
+[112] 1 2 2 2 4 5 5 5 4 5 4 4 1 4 4 4 4 2 4 4 4 4 2 2 4 4 4 4 5 2 2 2 4 4 4 4 5
+[149] 2 2 2 1 4 4 4 4 2 2 2 2 1 1 4 4 4 4 1 2 2 2 2 4 4 4 5 2 2 4 5 4 4 4 4 4 4
+[186] 5 4 4 4 5 5 1 5 4 4 4 4 5 5 4 4 4 4 5 4 4 4 4 4 4 4 4 4 4 4 2 1 2 4 4 4 4
+[223] 5 5 2 5 4 4 4 4 4 1 4 5 4 4 4 4 4 1 2 5 4 4 4 4 4 3 4 4 4 4 4 1 5 4 4 4 4
+[260] 4 5 4 1 4 4 4 4 4 5 5 2 4 4 4 2 5 4 4 4 4 5 5 4 4 2 5 4 4 4 4 1 1 2 2 5 5
+[297] 4 4 4 4 4 4 5 3 4 4 4 4 4 4 1 4 4 4 4 4 4 5 2 5 4 4 2 4 4 4 4 4 4 5 5 4 4
+[334] 4 4 4 4 4 1 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 5 4 4 4 4 4 5 4 4 4
+[371] 4 4 3 5 4 4 4 4 5 5 4 4 4 4 5 2 2 2 4 4 4 2 2 2 5 4 2 2 2 1 2 5 2 2 2 1 4
+[408] 4 4 4 5 4 5 5 3 2 4 4 4 5 5 4 4 5 1 1 4 4 4 4 4 5 5 2 2 2 4 4 2 2 2 4 4 2
+[445] 5 4 4 4 4 4 5 2 2 2 2 2 2 2 2 2 2 2 2 2 2 5 4 4 4 4 4 4 5 2 4 5 5 5 4 4 2
+[482] 2 2 2 4 4 4 4 4 5 5 5 1 5 4 5 2 2 2 4 5 4 4 4 4 4 5 4 4 4 5 5 4 2 2 2 5 4
+[519] 4 4 4 5 5 5 4 5 4 4 4 4 4 1 1 1 1 4 4 4 4 1 4 4 4 4 4 4 4 4 4 4 5 3 3 4 4
+[556] 4 1 4 4 4 5 2 5 5 4 4 4 5 5 4 4 4 4 4 4 4 4 4 4 4 4 4 5 4 4 4 4 4 2 2 5 5
+[593] 4 4 4 4 4 4 4 4 4 5 3 4 4 4 4 4 4 4 4 4 2 2 4 1 4 4 4 4 4 4 4 4 4 4 4 4 4
+[630] 1 5 5 4 2 4 4 4 4 4 4 4 4 2 5 5 1 4 4 4 4 4 4 4 4 4 4 4 4 1 5 2 4 4 4 4 4
+[667] 4 4 4 1 4 5 1 4 4 4 4 4 4 4 1 4 5 4 4 4 1 4 3 4 4 1 4 1 4 5 5 4 4 1 5 5 5
+[704] 5 5 1 2 2 2 3 5 4 5 4 4 1 1 4 4 5 2 2 5 1 4 4 4 3 4 2 2 4 4 4 4 4 4 4 4 4
+[741] 4 4 5 4 4 4 4 4 4 4 4 4 4 4 5 4 4 4 4 4 4 4 2 4 4 4 4 4 4 4 4 5 5 2 1 4 4
+[778] 5 5 4 4 1 2 4 4 4 4 5 2 5 4 5 4 4 4 5 4 4 4 4 4 4 4 4 4 2 4 4 4 4 5 4 4 4
+[815] 4 4 5 4 5 5 4 4 4 4 4 4 4 4 4 5 4 2 5 4 4 4 5 4 4 4 5 4 2 4 4 4 5 5 2 4 4
+[852] 4 4 4 4 4 4 5 4 4 4 4 4 4 5 4 2 5 4</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>palo_kmeans20 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(v, <span class="at">centers =</span> <span class="dv">20</span>, <span class="at">iter.max =</span> <span class="dv">100</span>)</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>palo_kmeans20<span class="sc">$</span>cluster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  [1]  2 17 20 16 16 16 17 15  8 15 20  2 12 12  2 16 20  8  8 10  6  6 13 12  8
+ [26]  8  6  6  6 14  4  8  8  2  6  6  6  6 10 20  8  8  5 10  1  6  6  6  1 15
+ [51]  8  8 15  6  6  6  6  6  6 15  8  8 15 14  9  1  1  8  8  8  8 15 19  1 10
+ [76] 18  4  8  8  8 15 17  1  7 18 16  1 20 20 10  8  8  8 15 20  1 12 12 19 10
+[101] 12 19  5  5 16 18  2  5  8  8 15 10  7 19  9 18 10  1 16 16 17 15 18 14  5
+[126]  8  8 15  7  8  8  8 15 12 12  5  8  8 15 20  9 12 12  8  8  8  8 20 12 12
+[151] 12 14  8  8  8  8  9 12 12 12 14 14  8  8  8 15  4 19 12 12 12  8  8  8 17
+[176]  7 19 16 10  8  8  5  8  8  8 13  8  8  8 17  1 14 17  8  8  8  8 10 17  2
+[201]  8  8  8 17 15  2  8  8  8 16  8  2  8  8 15  9  4  2  2  2  8  8 13 10  9
+[226] 17  2  8  8  8 17  4 18 10  8  8  8  8  8 11 19 10  8  8  8  8 15 11 17  8
+[251]  8  8  5 13 13 18 15  5  8  5 20 15 14 18  5  5  5 15 17  1 19 18 18 18  9
+[276] 10 16  5  5 15 10  1 18 18 18  1  5  5  5 15 11 14  7 19 17 10 16  5  8  5
+[301] 15 16 10 11 16  5  5  5 15 16  4 16  5  5  5  5 15 10  9 10 16 16 18  8  5
+[326]  5  5  5  5 13 10  5  5  5  5  5 15 15 13  5  5  5  5  5 15 16 16  5  5  5
+[351]  5 15 16 16  5  5  5 18  5 16 20  5  5  5  5 18  1  5  5  5  5  5  3 17  5
+[376]  5  5  5 17 10  5  5  5  5 16  9  9  9 18  5 16  9  9 19 20 17  9  9  9 11
+[401]  7 20  9  7 19 14  5  8  8 15 10 18 17 10  3 19  5  8  5 17 13 15 15 13 14
+[426] 14  5  5  8 15  1 10 16 18  9  9 18  5 19  9  9 16 16  9  1 18  5  5  8  5
+[451]  1  7 19  9 19 19 12 12 12 12 12 19 19 19 19 20 16 18  5  8  8 15 10  9 18
+[476] 17 10 16  5  5 12 19 19 19 18  5  5  8  8 13 17  1 14 13 18 17 19 12 12 18
+[501] 10 18  5  8  8 15 17  5  8  8 20 20 18 19 12 12 17  5  5  8  8 17 20 17 15
+[526] 13 18  5  8  8  8 13  4  4 14  5  8  8 15  4  5  5  8 15  2  8  5  5  5  5
+[551] 17  3 11  5  8 15  4  5  8  8 17 19  1 10  5  8  8 17 13  5  8  2 15  8  8
+[576]  2 18  5  2  8  5 15 20  5  8  8  5  5  2 12 17 16  2  8  8  8  8  8  5  8
+[601] 15 13 11 16  8  2  8  8  8  8  8  8  2 12 16 11  5  2  2  2  8  8  8  8  8
+[626]  8  8  8 15  4 16  1 16 12  2  8  8  8  8  8  8  2  2 13 17 14 15  8  8  8
+[651]  8  8  8  8  8  2 16 16 14 17 12  2  2  2  8  8  8  8  8 14  5 10 10 17  2
+[676]  2  2  8  8  8 14 16 17  2  8  8 14 16  3  2  8 10 15  4  8  1 10 18  5 10
+[701] 17  1 20  1 10 14  9  9 18 11 17 15 20  5 18 10 14  5  2  1 19 19  1 13  5
+[726]  2  8 11 18 19 19  2 16  8  8  2  8 18 18 18  5  5 20  5  5  8  8  8  5 16
+[751] 18 18  5  5 10  8  2  5  5  8  2 17 19 18  5  2 18  5  2  2 18 20 13 12 14
+[776] 18  5 13 20  5  5 14 19 18 16  5  5 20  7 10 18  1 18  5  8  1  5  5  2 15
+[801]  8  5  5  5  5  9  5  5  5  5 20 17  5 15  5  8 17  8 17 13  8 15 15  8 15
+[826] 15  5 18 15  1  5  2 20  5  5 15 17  2  5  5 20  8  2  8  5  5 13  1 12  5
+[851]  5  5 15  2  2  2  8 10  5  2  5  5  2  2 20  2 12 17 18</code></pre>
 </div>
 </div>
 </section>
 <section id="step-4.4" class="level2">
 <h2 class="anchored" data-anchor-id="step-4.4"><em>Step 4.4</em></h2>
 <ul>
-<li><p>Create a new raster object by copying one of the original bands. For example:</p></li>
-<li><p>Set the values of the copied raster to the cluster vector from the output kmeans object. For example:</p></li>
+<li><p>Create a new raster object by copying one of the original bands.</p></li>
+<li><p>Set the values of the copied raster to the cluster vector from the output kmeans object.</p></li>
 <li><p>Try a few different clusters (k) to see how the map changes.</p></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>clus_rast <span class="ot">&lt;-</span> r_palo_indices<span class="sc">$</span>ndvi</span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">values</span>(clus_rast) <span class="ot">&lt;-</span> palo_kmeans<span class="sc">$</span>cluster</span>
-<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(clus_rast)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>clus_rast_ndvi <span class="ot">&lt;-</span> r_palo_indices<span class="sc">$</span>ndvi</span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a><span class="fu">values</span>(clus_rast_ndvi) <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>clus_rast_ndvi[idx] <span class="ot">&lt;-</span> palo_kmeans12<span class="sc">$</span>cluster</span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(clus_rast_ndvi)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
 <p><img src="lab-04_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>clus_rast_ndvi <span class="ot">&lt;-</span> r_palo_indices<span class="sc">$</span>ndvi</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a><span class="fu">values</span>(clus_rast_ndvi) <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>clus_rast_ndvi[idx] <span class="ot">&lt;-</span> palo_kmeans8<span class="sc">$</span>cluster</span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(clus_rast_ndvi)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-04_files/figure-html/unnamed-chunk-17-2.png" class="img-fluid figure-img" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
@@ -683,19 +767,19 @@ PROJCRS["WGS 84 / UTM zone 15N",
 <li>First we will calculate the total area of the flooded cells in each image. You can use global to determine the sum of each layer. Since flooded cells have a value of 1, the sum of an entire band is equivalent to the number of flooded cells. You can then use the resolution of the cell to convert counts to a flooded area.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co">#print these values</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="co">#print these values</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li>Second we can visualize the uncertainty in our classifications by summing the entire stack using app. The higher the count in each pixel, the more certain we can be about its flooded state. For example, if a cell has a value of 6, it indicates that every method identified the cell as flooded, if it has a value of 2 then we know that two of the methods identified the cell as flooded.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co">#plot your flood map using the blues9 color palette</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="co">#plot your flood map using the blues9 color palette</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li>Third once you have a summed raster layer, copy it as a new layer, and set all 0 values to NA. Then map the raster with mapview. Zoom and pan around the interactive map noting that a pixel level is displayed in the upper right hand corner.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Why are some of the cell values not an even number?</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Why are some of the cell values not an even number?</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Congratulations! You have successfully carried out a complete flood analysis from data acquisition through evaluation. This kind of work goes on regularly and is part of a couple national efforts (NOAA, USGS, FirstStreet, FEMA) to generate flood inundation libraries that contribute to better extraction and classification of realtime flood events, resource allocation during events, and damage assessments post events.</p>
 <p>Here we used Landsat imagery but the same process could be implemented on drone footage, MODIS data, or other private satellite imagery.</p>

@@ -65,7 +65,7 @@ rec <- recipe(logC ~ ., data = s_train) %>%
 # Define Models (typically 3-5 are used to check)
 
 lm_mod <- linear_reg() %>%
-  set_enging('lm') %>%
+  set_engine('lm') %>%
   set_mode('regression')
 
 rf_mod <- rand_forest() %>%
@@ -73,11 +73,11 @@ rf_mod <- rand_forest() %>%
   set_mode('regression')
 
 boost_mod <- boost_tree() %>%
-  set_enging('xgboost') %>%
+  set_engine('xgboost') %>%
   set_mode('regression')
 
 neural_mod <- mlp() %>%
-  set_enging('nnet') %>%
+  set_engine('nnet') %>%
   set_mode('regression')
 
 # Workflow Set

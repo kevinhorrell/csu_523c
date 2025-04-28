@@ -355,7 +355,7 @@ Ok so now we have our trained model lm_base and want to validate it on the test 
 
 We have to be careful about how we do this with the base R approach:
 **INCORRECT PREDICTIONS**
-```{r}
+```{r, eval = FALSE}
 nrow(camels_test)
 nrow(camels_train)
 broom::augment(lm_base, data = camels_test)
