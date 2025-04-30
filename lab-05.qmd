@@ -912,13 +912,15 @@ ggarrange(mod2, mod3, mod4, mod5,
 ------------------------------------------------------------------------
 
 Borrowing from the workflow presented above, build your own complete ML
-pipeline to predict mean streamflow using the CAMELS dataset. You can
-experiment with different predictors and preprocessing steps to see how
+pipeline to predict mean stream flow using the CAMELS dataset. You can
+experiment with different predictors and pre-processing steps to see how
 they impact model performance. A successful model will have a R-squared
 value \> 0.9. To get started, you can use the following steps as a
 template:
 
-a.  Data Spliting (15) - Set a seed for reproducible Create an initial split with 75% used for training and 25% for testing Extract your training and testing sets Build a 10-fold CV dataset as well
+a.  Data Splitting (15) - Set a seed for reproducibility. Create an
+    initial split with 75% used for training and 25% for testing Extract
+    your training and testing sets Build a 10-fold CV dataset as well.
 
 ```{r}
 set.seed(8)
@@ -929,7 +931,11 @@ camels_test2 <- testing(camels_split2)
 camels_cv2 <- vfold_cv(camels_train2, v = 10)
 ```
 
-b.  Recipe (15) - Define a formula you want to use to predict logQmean Describe in words why you are choosing the formula you are. Consult the downloaded PDF for the data to help you make this decision. Build a recipe that you feel handles the predictors chosen well
+b.  Recipe (15) - Define a formula you want to use to predict
+    **logQmean**. Describe in words why you are choosing this specific
+    formula. Consult the downloaded PDF for the data to help you make
+    this decision. Build a recipe that you feel handles the predictors
+    chosen.
 
 ```{r}
 #Check some variable relationships:
@@ -945,14 +951,14 @@ camels_cor2 <- camels %>%
   cor()
 camels_cor2
 
-
+##recipe for the model
 rec2 <- recipe(logQmean ~ p_mean + pet_mean + baseflow_index + zero_q_freq, data = camels_train2) %>%
   step_log(p_mean, pet_mean) %>%
   step_naomit(all_predictors(), all_outcomes())
 ```
 
-
-c.  Define 3 models (25) - Random forest, boosted model, neural network, and a linear model for comparison.
+c.  Define 3 models (25) - Random forest, boosted model, neural network,
+    and a linear model for comparison.
 
 ```{r}
 lm_wf2 <- workflow() %>%
@@ -1009,26 +1015,21 @@ dim(neural_data2)
 metrics(neural_data2, truth = logQmean, estimate = .pred)
 ```
 
-d.  workflowset () - With your preprocessing steps and models defined, you can now build a workflow_set object to fit and evaluate your models. This will allow you to compare the performance of different models on the same data.
+d.  workflowset () - With your preprocessing steps and models defined,
+    you can now build a workflow_set object to fit and evaluate your
+    models. This will allow you to compare the performance of different
+    models on the same data.
 
 ```{r}
 wf_final <- workflow_set(list(rec2), list(lm_model, rf_model, boost_model, neural_model)) %>%
   workflow_map('fit_resamples', resamples = camels_cv2)
 ```
 
-
-```         
-Create a workflow object
-Add the recipe
-Add the model(s)
-Fit the model to the resamples
-```
-
 e.  Evaluation
+
 ```{r}
 autoplot(wf_final)
 ```
-
 
 f.  Tune the best model
 
