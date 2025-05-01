@@ -931,56 +931,32 @@ camels_test2 <- testing(camels_split2)
 camels_cv2 <- vfold_cv(camels_train2, v = 10)
 ```
 
-b.  Recipe (15) - Define a formula you want to use to predict
-    **logQmean**. Describe in words why you are choosing this specific
-    formula. Consult the downloaded PDF for the data to help you make
-    this decision. Build a recipe that you feel handles the predictors
-    chosen.
+b.  Recipe (15) - Define a formula you want to use to predict **logQmean**. Describe in words why you are choosing this specific formula. Consult the downloaded PDF for the data to help you make this decision. Build a recipe that you feel handles the predictors chosen.
 
 ```{r}
 #Check some variable relationships:
-ggplot(camels, aes(x = p_mean, y = baseflow_index)) +
+ggplot(camels, aes(x = p_mean, y = area_geospa_fabric)) +
   geom_point(aes(color = q_mean)) +
   geom_smooth(method = "lm") +
   scale_color_viridis_c() +
+  scale_x_log10() +
+  scale_y_log10()+
   theme_linedraw()
 
 camels_cor2 <- camels %>%
-  select(where(is.numeric)) %>%
+  select(p_mean, q_mean, pet_mean, baseflow_index, zero_q_freq, area_geospa_fabric) %>%
   drop_na() %>%
   cor()
 camels_cor2
 
 ##recipe for the model
-rec2 <- recipe(logQmean ~ p_mean + pet_mean + baseflow_index + zero_q_freq, data = camels_train2) %>%
+rec2 <- recipe(logQmean ~ p_mean + pet_mean + baseflow_index + zero_q_freq + area_geospa_fabric + high_prec_dur + low_prec_dur + runoff_ratio + high_q_dur + low_q_dur + frac_forest + max_water_content, data = camels_train2) %>%
   step_log(p_mean, pet_mean) %>%
   step_naomit(all_predictors(), all_outcomes())
 ```
 
 c.  Define 3 models (25) - Random forest, boosted model, neural network,
     and a linear model for comparison.
-
-```{r}
-lm_wf2 <- workflow() %>%
-  add_recipe(rec2) %>%
-  add_model(lm_model) %>%
-  fit(data = camels_train2)
-
-summary(extract_fit_engine(lm_wf2))$coefficients
-
-lm_data2 <- augment(lm_wf2, new_data = camels_test2)
-dim(lm_data2)
-
-metrics(lm_data2, truth = logQmean, estimate = .pred)
-
-ggplot(lm_data2, aes(x = logQmean, y = .pred)) +
-  geom_point() +
-  geom_abline() +
-  theme_linedraw() +
-  labs(title = "Linear Model: Workflow",
-       x = "Observed Log Mean Flow",
-       y = "Predicted Log Mean Flow")
-```
 
 ```{r}
 #Use models, just change the workflows:
@@ -1015,13 +991,35 @@ dim(neural_data2)
 metrics(neural_data2, truth = logQmean, estimate = .pred)
 ```
 
+```{r}
+lm_wf2 <- workflow() %>%
+  add_recipe(rec2) %>%
+  add_model(lm_model) %>%
+  fit(data = camels_train2)
+
+summary(extract_fit_engine(lm_wf2))$coefficients
+
+lm_data2 <- augment(lm_wf2, new_data = camels_test2)
+dim(lm_data2)
+
+metrics(lm_data2, truth = logQmean, estimate = .pred)
+
+ggplot(lm_data2, aes(x = logQmean, y = .pred)) +
+  geom_point() +
+  geom_abline() +
+  theme_linedraw() +
+  labs(title = "Linear Model: Workflow",
+       x = "Observed Log Mean Flow",
+       y = "Predicted Log Mean Flow")
+```
+
 d.  workflowset () - With your preprocessing steps and models defined,
     you can now build a workflow_set object to fit and evaluate your
     models. This will allow you to compare the performance of different
     models on the same data.
 
 ```{r}
-wf_final <- workflow_set(list(rec2), list(lm_model, rf_model, boost_model, neural_model)) %>%
+wf_final <- workflow_set(list(rec2), list(rf_model, boost_model, neural_model)) %>%
   workflow_map('fit_resamples', resamples = camels_cv2)
 ```
 
@@ -1029,6 +1027,7 @@ e.  Evaluation
 
 ```{r}
 autoplot(wf_final)
+rank_results(wf_final, rank_metric = 'rsq', select_best = TRUE)
 ```
 
 f.  Tune the best model
@@ -1044,6 +1043,20 @@ g.  Look at VIP
     your final model Describe what you think of the results and if they
     make sense If the model you elect cant provide VIP, instead discuss
     the pros and cons of a less interpretable model
+    
+```{r}
+boost_fin <- boost_tree() %>%
+  set_engine("xgboost") %>%
+  set_mode("regression")
+
+final_b <- workflow() %>%
+  add_recipe(rec2) %>% 
+  add_model(boost_fin) %>% 
+  fit(data = camels_train2)
+
+vip::vip(final_b)
+```
+
 
 h.  Extact and Evaluate
 

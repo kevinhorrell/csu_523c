@@ -60,7 +60,7 @@ rec <- recipe(logC ~ ., data = s_train) %>%
   step_rm(season_cases, state) %>%
   step_dummy(all_nominal_predictors()) %>%
   step_scale(all_nominal_predictors()) %>%
-  ste_center(all_nominal_predictors())
+  step_center(all_nominal_predictors())
 
 # Define Models (typically 3-5 are used to check)
 
@@ -69,7 +69,7 @@ lm_mod <- linear_reg() %>%
   set_mode('regression')
 
 rf_mod <- rand_forest() %>%
-  set_enging('ranger', importance = 'impurity') %>%
+  set_engine('ranger', importance = 'impurity') %>%
   set_mode('regression')
 
 boost_mod <- boost_tree() %>%
@@ -83,7 +83,7 @@ neural_mod <- mlp() %>%
 # Workflow Set
 
 wf <- workflow_set(list(rec), list(lm_mod, rf_mod, boost_mod, neural_mod)) %>%
-  workflow_map(wf, "fit_resamples", resamples = s_folds)
+  workflow_map("fit_resamples", resamples = s_folds)
 
 
 # Select Models
@@ -102,7 +102,7 @@ vip::vip(fit)
 #Metrics/Predictions
 #use testing data finally - first time model has seen this data
 predictions <- augment(fit, new_data = s_testing)
-metrics(preditions, truth = logC, estimate = .pred)
+metrics(predictions, truth = logC, estimate = .pred)
 
 #Plots
 ggplot(predictions, aes(x = logC, y = .pred)) +
