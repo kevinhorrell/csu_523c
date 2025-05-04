@@ -968,7 +968,7 @@ rf_wf2 <- workflow() %>%
 
 rf_data2 <- augment(rf_wf2, new_data = camels_test2)
 dim(rf_data2)
-metrics(rf_data2, truth = logQmean, estimate = .pred)
+met_rf <- as_tibble(metrics(rf_data2, truth = logQmean, estimate = .pred))
 
 #XGBoost
 boost_wf2 <- workflow() %>%
@@ -978,7 +978,7 @@ boost_wf2 <- workflow() %>%
 
 boost_data2 <- augment(boost_wf2, new_data = camels_test2)
 dim(boost_data2)
-metrics(boost_data2, truth = logQmean, estimate = .pred)
+met_boost <- as_tibble(metrics(boost_data2, truth = logQmean, estimate = .pred))
 
 #Neural Network
 neural_wf2 <- workflow() %>%
@@ -988,10 +988,12 @@ neural_wf2 <- workflow() %>%
 
 neural_data2 <- augment(neural_wf2, new_data = camels_test2)
 dim(neural_data2)
-metrics(neural_data2, truth = logQmean, estimate = .pred)
+met_neural <- as_tibble(metrics(neural_data2, truth = logQmean, estimate = .pred))
+
+flextable(bind_rows(met_rf, met_boost, met_neural))
 ```
 
-```{r}
+```{r, eval = F}
 lm_wf2 <- workflow() %>%
   add_recipe(rec2) %>%
   add_model(lm_model) %>%
@@ -1030,12 +1032,63 @@ autoplot(wf_final)
 rank_results(wf_final, rank_metric = 'rsq', select_best = TRUE)
 ```
 
-f.  Tune the best model
+f.  Tune the best model - Use the tune_grid function to tune at least one of the model hyperparameters. Use show_best to find the best hyperparameter values for the metric of your choice. Use a workflow to fit your final, tuned model.
 
-    Use the tune_grid function to tune at least one of the model
-    hyperparameters Use show_best to find the best hyperparameter values
-    for the metric of your choic Use a workflow to fit your final,
-    tuned, model
+```{r}
+boost_tune <- boost_tree(trees = tune(), learn_rate = tune(), min_n = tune()) %>%
+  set_engine("xgboost") %>%
+  set_mode("regression")
+
+boost_flow <- workflow(rec2, boost_tune)
+
+boost_param <- boost_flow %>%
+  extract_parameter_set_dials() %>%
+  update(trees = trees(c(1L, 1000L)),
+         learn_rate = learn_rate(c(-5, -1)),
+         min_n = min_n(c(2L, 20L)))
+
+set.seed(22)
+
+grid <- boost_param %>%
+  grid_space_filling(size = 25)
+
+grid %>%
+  ggplot(aes(trees, learn_rate, min_n)) +
+  geom_point(size = 4) +
+  scale_y_log10()
+
+set.seed(927)
+ctrl <- control_grid(save_pred = TRUE)
+
+boost_res <- boost_flow %>%
+  tune_grid(
+    resamples = camels_cv2,
+    grid = 25,
+    param_info = boost_param,
+    control = ctrl,
+    metrics = metric_set(mae))
+
+boost_res
+autoplot(boost_res)
+collect_metrics(boost_res)
+show_best(boost_res, metric = 'mae')
+
+best_boost <- select_best(boost_res, metric = 'mae')
+best_boost
+```
+
+```{r}
+#Final Workflow with tuned Parameters
+boost_fin <- boost_tree(trees = (542), min_n = (8), learn_rate = (0.0215)) %>%
+  set_engine("xgboost") %>%
+  set_mode("regression")
+
+final_b <- workflow() %>%
+  add_recipe(rec2) %>% 
+  add_model(boost_fin) %>% 
+  fit(data = camels_train2)
+```
+
 
 g.  Look at VIP
 
@@ -1045,15 +1098,6 @@ g.  Look at VIP
     the pros and cons of a less interpretable model
     
 ```{r}
-boost_fin <- boost_tree() %>%
-  set_engine("xgboost") %>%
-  set_mode("regression")
-
-final_b <- workflow() %>%
-  add_recipe(rec2) %>% 
-  add_model(boost_fin) %>% 
-  fit(data = camels_train2)
-
 vip::vip(final_b)
 ```
 
@@ -1064,3 +1108,19 @@ h.  Extact and Evaluate
     evaluate the model performance on the test data Create a plot of the
     observed vs predicted values with clear title, axis labels, and a
     compelling color scale Describe what you think of the results!
+
+```{r}
+boost_pred <- augment(final_b, new_data = camels_test2)
+
+metrics(boost_pred, truth = logQmean, estimate = .pred)
+
+ggplot(boost_pred, aes(x = logQmean, y = .pred)) +
+  geom_point() +
+  geom_abline() +
+  geom_smooth(method = "lm", col = 'red', lty = 2, se = FALSE) +
+  theme_linedraw() + 
+  labs(title = "Boosted and Tuned Model: Observed vs Predicted",
+       x = "Observed Log Mean Flow",
+       y = "Predicted Log Mean Flow")
+```
+
