@@ -68,6 +68,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="lab-05_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="lab-05_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="lab-05_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="lab-05_files/libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
+
+<script src="lab-05_files/libs/tabwid-1.1.3/tabwid.js"></script>
+
 
 
 </head>
@@ -1038,120 +1042,72 @@ area_geospa_fabric         1.00000000</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 168  60</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(rf_data2, <span class="at">truth =</span> logQmean, <span class="at">estimate =</span> .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-  .metric .estimator .estimate
-  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 rmse    standard       0.206
-2 rsq     standard       0.977
-3 mae     standard       0.121</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="co">#XGBoost</span></span>
-<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>boost_wf2 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(rec2) <span class="sc">%&gt;%</span></span>
-<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(boost_model) <span class="sc">%&gt;%</span></span>
-<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> camels_train2)</span>
-<span id="cb73-6"><a href="#cb73-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb73-7"><a href="#cb73-7" aria-hidden="true" tabindex="-1"></a>boost_data2 <span class="ot">&lt;-</span> <span class="fu">augment</span>(boost_wf2, <span class="at">new_data =</span> camels_test2)</span>
-<span id="cb73-8"><a href="#cb73-8" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(boost_data2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>met_rf <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(<span class="fu">metrics</span>(rf_data2, <span class="at">truth =</span> logQmean, <span class="at">estimate =</span> .pred))</span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a><span class="co">#XGBoost</span></span>
+<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>boost_wf2 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb71-5"><a href="#cb71-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(rec2) <span class="sc">%&gt;%</span></span>
+<span id="cb71-6"><a href="#cb71-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(boost_model) <span class="sc">%&gt;%</span></span>
+<span id="cb71-7"><a href="#cb71-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> camels_train2)</span>
+<span id="cb71-8"><a href="#cb71-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-9"><a href="#cb71-9" aria-hidden="true" tabindex="-1"></a>boost_data2 <span class="ot">&lt;-</span> <span class="fu">augment</span>(boost_wf2, <span class="at">new_data =</span> camels_test2)</span>
+<span id="cb71-10"><a href="#cb71-10" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(boost_data2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 168  60</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(boost_data2, <span class="at">truth =</span> logQmean, <span class="at">estimate =</span> .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-  .metric .estimator .estimate
-  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 rmse    standard      0.102 
-2 rsq     standard      0.993 
-3 mae     standard      0.0661</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Neural Network</span></span>
-<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>neural_wf2 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(rec2) <span class="sc">%&gt;%</span></span>
-<span id="cb77-4"><a href="#cb77-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(neural_model) <span class="sc">%&gt;%</span></span>
-<span id="cb77-5"><a href="#cb77-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> camels_train2)</span>
-<span id="cb77-6"><a href="#cb77-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb77-7"><a href="#cb77-7" aria-hidden="true" tabindex="-1"></a>neural_data2 <span class="ot">&lt;-</span> <span class="fu">augment</span>(neural_wf2, <span class="at">new_data =</span> camels_test2)</span>
-<span id="cb77-8"><a href="#cb77-8" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(neural_data2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>met_boost <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(<span class="fu">metrics</span>(boost_data2, <span class="at">truth =</span> logQmean, <span class="at">estimate =</span> .pred))</span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Neural Network</span></span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>neural_wf2 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(rec2) <span class="sc">%&gt;%</span></span>
+<span id="cb73-6"><a href="#cb73-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(neural_model) <span class="sc">%&gt;%</span></span>
+<span id="cb73-7"><a href="#cb73-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> camels_train2)</span>
+<span id="cb73-8"><a href="#cb73-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-9"><a href="#cb73-9" aria-hidden="true" tabindex="-1"></a>neural_data2 <span class="ot">&lt;-</span> <span class="fu">augment</span>(neural_wf2, <span class="at">new_data =</span> camels_test2)</span>
+<span id="cb73-10"><a href="#cb73-10" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(neural_data2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 168  61</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(neural_data2, <span class="at">truth =</span> logQmean, <span class="at">estimate =</span> .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-  .metric .estimator .estimate
-  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 rmse    standard       0.256
-2 rsq     standard       0.961
-3 mae     standard       0.142</code></pre>
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>met_neural <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(<span class="fu">metrics</span>(neural_data2, <span class="at">truth =</span> logQmean, <span class="at">estimate =</span> .pred))</span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a><span class="fu">flextable</span>(<span class="fu">bind_rows</span>(met_rf, met_boost, met_neural))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-ce6156be{}.cl-ce55f77e{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-ce5af012{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-ce5af026{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-ce5b2fbe{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ce5b2fdc{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ce5b2fe6{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ce5b2ff0{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ce5b2ff1{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ce5b3004{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-ce6156be"><thead><tr style="overflow-wrap:break-word;"><th class="cl-ce5b2fbe"><p class="cl-ce5af012"><span class="cl-ce55f77e">.metric</span></p></th><th class="cl-ce5b2fbe"><p class="cl-ce5af012"><span class="cl-ce55f77e">.estimator</span></p></th><th class="cl-ce5b2fdc"><p class="cl-ce5af026"><span class="cl-ce55f77e">.estimate</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-ce5b2fe6"><p class="cl-ce5af012"><span class="cl-ce55f77e">rmse</span></p></td><td class="cl-ce5b2fe6"><p class="cl-ce5af012"><span class="cl-ce55f77e">standard</span></p></td><td class="cl-ce5b2ff0"><p class="cl-ce5af026"><span class="cl-ce55f77e">0.20561808</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-ce5b2fe6"><p class="cl-ce5af012"><span class="cl-ce55f77e">rsq</span></p></td><td class="cl-ce5b2fe6"><p class="cl-ce5af012"><span class="cl-ce55f77e">standard</span></p></td><td class="cl-ce5b2ff0"><p class="cl-ce5af026"><span class="cl-ce55f77e">0.97650161</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-ce5b2fe6"><p class="cl-ce5af012"><span class="cl-ce55f77e">mae</span></p></td><td class="cl-ce5b2fe6"><p class="cl-ce5af012"><span class="cl-ce55f77e">standard</span></p></td><td class="cl-ce5b2ff0"><p class="cl-ce5af026"><span class="cl-ce55f77e">0.12149201</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-ce5b2fe6"><p class="cl-ce5af012"><span class="cl-ce55f77e">rmse</span></p></td><td class="cl-ce5b2fe6"><p class="cl-ce5af012"><span class="cl-ce55f77e">standard</span></p></td><td class="cl-ce5b2ff0"><p class="cl-ce5af026"><span class="cl-ce55f77e">0.10247577</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-ce5b2fe6"><p class="cl-ce5af012"><span class="cl-ce55f77e">rsq</span></p></td><td class="cl-ce5b2fe6"><p class="cl-ce5af012"><span class="cl-ce55f77e">standard</span></p></td><td class="cl-ce5b2ff0"><p class="cl-ce5af026"><span class="cl-ce55f77e">0.99298096</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-ce5b2fe6"><p class="cl-ce5af012"><span class="cl-ce55f77e">mae</span></p></td><td class="cl-ce5b2fe6"><p class="cl-ce5af012"><span class="cl-ce55f77e">standard</span></p></td><td class="cl-ce5b2ff0"><p class="cl-ce5af026"><span class="cl-ce55f77e">0.06607639</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-ce5b2fe6"><p class="cl-ce5af012"><span class="cl-ce55f77e">rmse</span></p></td><td class="cl-ce5b2fe6"><p class="cl-ce5af012"><span class="cl-ce55f77e">standard</span></p></td><td class="cl-ce5b2ff0"><p class="cl-ce5af026"><span class="cl-ce55f77e">0.25550179</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-ce5b2fe6"><p class="cl-ce5af012"><span class="cl-ce55f77e">rsq</span></p></td><td class="cl-ce5b2fe6"><p class="cl-ce5af012"><span class="cl-ce55f77e">standard</span></p></td><td class="cl-ce5b2ff0"><p class="cl-ce5af026"><span class="cl-ce55f77e">0.96135580</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-ce5b2ff1"><p class="cl-ce5af012"><span class="cl-ce55f77e">mae</span></p></td><td class="cl-ce5b2ff1"><p class="cl-ce5af012"><span class="cl-ce55f77e">standard</span></p></td><td class="cl-ce5b3004"><p class="cl-ce5af026"><span class="cl-ce55f77e">0.14166394</span></p></td></tr></tbody></table></div>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>lm_wf2 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(rec2) <span class="sc">%&gt;%</span></span>
-<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lm_model) <span class="sc">%&gt;%</span></span>
-<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> camels_train2)</span>
-<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">extract_fit_engine</span>(lm_wf2))<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>                        Estimate   Std. Error       t value     Pr(&gt;|t|)
-(Intercept)        -1.956761e+00 1.851220e-01 -10.570120315 1.169250e-23
-p_mean              1.197766e+00 6.182064e-02  19.374862161 1.770514e-62
-pet_mean            1.843107e-01 9.125015e-02   2.019840136 4.394483e-02
-baseflow_index      2.431129e-02 1.137916e-01   0.213647429 8.309111e-01
-zero_q_freq        -9.350245e-01 1.719602e-01  -5.437448223 8.549942e-08
-area_geospa_fabric -5.309123e-05 7.955718e-06  -6.673342003 6.792991e-11
-high_prec_dur      -5.136599e-01 1.254003e-01  -4.096163154 4.915801e-05
-low_prec_dur        1.698680e-02 8.026655e-03   2.116298413 3.482408e-02
-runoff_ratio        2.479112e+00 1.143087e-01  21.687864461 1.419232e-73
-high_q_dur          8.673050e-03 2.263239e-03   3.832139981 1.435975e-04
-low_q_dur          -5.165135e-03 1.088821e-03  -4.743789187 2.756943e-06
-frac_forest         1.996998e-01 5.528644e-02   3.612094347 3.351301e-04
-max_water_content   3.535798e-04 1.171125e-01   0.003019148 9.975923e-01</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>lm_data2 <span class="ot">&lt;-</span> <span class="fu">augment</span>(lm_wf2, <span class="at">new_data =</span> camels_test2)</span>
-<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(lm_data2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 168  61</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(lm_data2, <span class="at">truth =</span> logQmean, <span class="at">estimate =</span> .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-  .metric .estimator .estimate
-  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 rmse    standard       0.371
-2 rsq     standard       0.914
-3 mae     standard       0.224</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(lm_data2, <span class="fu">aes</span>(<span class="at">x =</span> logQmean, <span class="at">y =</span> .pred)) <span class="sc">+</span></span>
-<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>() <span class="sc">+</span></span>
-<span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_linedraw</span>() <span class="sc">+</span></span>
-<span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Linear Model: Workflow"</span>,</span>
-<span id="cb87-6"><a href="#cb87-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Observed Log Mean Flow"</span>,</span>
-<span id="cb87-7"><a href="#cb87-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Predicted Log Mean Flow"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="lab-05_files/figure-html/unnamed-chunk-47-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
-</figure>
-</div>
-</div>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>lm_wf2 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(rec2) <span class="sc">%&gt;%</span></span>
+<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lm_model) <span class="sc">%&gt;%</span></span>
+<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> camels_train2)</span>
+<span id="cb76-5"><a href="#cb76-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb76-6"><a href="#cb76-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">extract_fit_engine</span>(lm_wf2))<span class="sc">$</span>coefficients</span>
+<span id="cb76-7"><a href="#cb76-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb76-8"><a href="#cb76-8" aria-hidden="true" tabindex="-1"></a>lm_data2 <span class="ot">&lt;-</span> <span class="fu">augment</span>(lm_wf2, <span class="at">new_data =</span> camels_test2)</span>
+<span id="cb76-9"><a href="#cb76-9" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(lm_data2)</span>
+<span id="cb76-10"><a href="#cb76-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb76-11"><a href="#cb76-11" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(lm_data2, <span class="at">truth =</span> logQmean, <span class="at">estimate =</span> .pred)</span>
+<span id="cb76-12"><a href="#cb76-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb76-13"><a href="#cb76-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(lm_data2, <span class="fu">aes</span>(<span class="at">x =</span> logQmean, <span class="at">y =</span> .pred)) <span class="sc">+</span></span>
+<span id="cb76-14"><a href="#cb76-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb76-15"><a href="#cb76-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>() <span class="sc">+</span></span>
+<span id="cb76-16"><a href="#cb76-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_linedraw</span>() <span class="sc">+</span></span>
+<span id="cb76-17"><a href="#cb76-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Linear Model: Workflow"</span>,</span>
+<span id="cb76-18"><a href="#cb76-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Observed Log Mean Flow"</span>,</span>
+<span id="cb76-19"><a href="#cb76-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Predicted Log Mean Flow"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ol start="4" type="a">
 <li>workflowset () - With your preprocessing steps and models defined, you can now build a workflow_set object to fit and evaluate your models. This will allow you to compare the performance of different models on the same data.</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>wf_final <span class="ot">&lt;-</span> <span class="fu">workflow_set</span>(<span class="fu">list</span>(rec2), <span class="fu">list</span>(rf_model, boost_model, neural_model)) <span class="sc">%&gt;%</span></span>
-<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">workflow_map</span>(<span class="st">'fit_resamples'</span>, <span class="at">resamples =</span> camels_cv2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>wf_final <span class="ot">&lt;-</span> <span class="fu">workflow_set</span>(<span class="fu">list</span>(rec2), <span class="fu">list</span>(rf_model, boost_model, neural_model)) <span class="sc">%&gt;%</span></span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">workflow_map</span>(<span class="st">'fit_resamples'</span>, <span class="at">resamples =</span> camels_cv2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ol start="5" type="a">
 <li>Evaluation</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(wf_final)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(wf_final)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1159,7 +1115,7 @@ max_water_content   3.535798e-04 1.171125e-01   0.003019148 9.975923e-01</code><
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rank_results</span>(wf_final, <span class="at">rank_metric =</span> <span class="st">'rsq'</span>, <span class="at">select_best =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rank_results</span>(wf_final, <span class="at">rank_metric =</span> <span class="st">'rsq'</span>, <span class="at">select_best =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 9
   wflow_id          .config .metric  mean std_err     n preprocessor model  rank
@@ -1173,26 +1129,132 @@ max_water_content   3.535798e-04 1.171125e-01   0.003019148 9.975923e-01</code><
 </div>
 </div>
 <ol start="6" type="a">
-<li><p>Tune the best model</p>
-<p>Use the tune_grid function to tune at least one of the model hyperparameters Use show_best to find the best hyperparameter values for the metric of your choic Use a workflow to fit your final, tuned, model</p></li>
-<li><p>Look at VIP</p>
-<p>Use the vip::vip package to visualize the variable importance of your final model Describe what you think of the results and if they make sense If the model you elect cant provide VIP, instead discuss the pros and cons of a less interpretable model</p></li>
+<li>Tune the best model - Use the tune_grid function to tune at least one of the model hyperparameters. Use show_best to find the best hyperparameter values for the metric of your choice. Use a workflow to fit your final, tuned model.</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>boost_fin <span class="ot">&lt;-</span> <span class="fu">boost_tree</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"xgboost"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
-<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a>final_b <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb92-6"><a href="#cb92-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(rec2) <span class="sc">%&gt;%</span> </span>
-<span id="cb92-7"><a href="#cb92-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(boost_fin) <span class="sc">%&gt;%</span> </span>
-<span id="cb92-8"><a href="#cb92-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> camels_train2)</span>
-<span id="cb92-9"><a href="#cb92-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb92-10"><a href="#cb92-10" aria-hidden="true" tabindex="-1"></a>vip<span class="sc">::</span><span class="fu">vip</span>(final_b)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>boost_tune <span class="ot">&lt;-</span> <span class="fu">boost_tree</span>(<span class="at">trees =</span> <span class="fu">tune</span>(), <span class="at">learn_rate =</span> <span class="fu">tune</span>(), <span class="at">min_n =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"xgboost"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
+<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a>boost_flow <span class="ot">&lt;-</span> <span class="fu">workflow</span>(rec2, boost_tune)</span>
+<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-7"><a href="#cb81-7" aria-hidden="true" tabindex="-1"></a>boost_param <span class="ot">&lt;-</span> boost_flow <span class="sc">%&gt;%</span></span>
+<span id="cb81-8"><a href="#cb81-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_parameter_set_dials</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb81-9"><a href="#cb81-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update</span>(<span class="at">trees =</span> <span class="fu">trees</span>(<span class="fu">c</span>(<span class="dv">1</span>L, <span class="dv">1000</span>L)),</span>
+<span id="cb81-10"><a href="#cb81-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">learn_rate =</span> <span class="fu">learn_rate</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="sc">-</span><span class="dv">1</span>)),</span>
+<span id="cb81-11"><a href="#cb81-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">min_n =</span> <span class="fu">min_n</span>(<span class="fu">c</span>(<span class="dv">2</span>L, <span class="dv">20</span>L)))</span>
+<span id="cb81-12"><a href="#cb81-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-13"><a href="#cb81-13" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">22</span>)</span>
+<span id="cb81-14"><a href="#cb81-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-15"><a href="#cb81-15" aria-hidden="true" tabindex="-1"></a>grid <span class="ot">&lt;-</span> boost_param <span class="sc">%&gt;%</span></span>
+<span id="cb81-16"><a href="#cb81-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid_space_filling</span>(<span class="at">size =</span> <span class="dv">25</span>)</span>
+<span id="cb81-17"><a href="#cb81-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-18"><a href="#cb81-18" aria-hidden="true" tabindex="-1"></a>grid <span class="sc">%&gt;%</span></span>
+<span id="cb81-19"><a href="#cb81-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(trees, learn_rate, min_n)) <span class="sc">+</span></span>
+<span id="cb81-20"><a href="#cb81-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb81-21"><a href="#cb81-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
 <p><img src="lab-05_files/figure-html/unnamed-chunk-50-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">927</span>)</span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">control_grid</span>(<span class="at">save_pred =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb82-4"><a href="#cb82-4" aria-hidden="true" tabindex="-1"></a>boost_res <span class="ot">&lt;-</span> boost_flow <span class="sc">%&gt;%</span></span>
+<span id="cb82-5"><a href="#cb82-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tune_grid</span>(</span>
+<span id="cb82-6"><a href="#cb82-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">resamples =</span> camels_cv2,</span>
+<span id="cb82-7"><a href="#cb82-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">grid =</span> <span class="dv">25</span>,</span>
+<span id="cb82-8"><a href="#cb82-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">param_info =</span> boost_param,</span>
+<span id="cb82-9"><a href="#cb82-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">control =</span> ctrl,</span>
+<span id="cb82-10"><a href="#cb82-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">metric_set</span>(mae))</span>
+<span id="cb82-11"><a href="#cb82-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb82-12"><a href="#cb82-12" aria-hidden="true" tabindex="-1"></a>boost_res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Tuning results
+# 10-fold cross-validation 
+# A tibble: 10 × 5
+   splits           id     .metrics          .notes           .predictions
+   &lt;list&gt;           &lt;chr&gt;  &lt;list&gt;            &lt;list&gt;           &lt;list&gt;      
+ 1 &lt;split [452/51]&gt; Fold01 &lt;tibble [25 × 7]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 2 &lt;split [452/51]&gt; Fold02 &lt;tibble [25 × 7]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 3 &lt;split [452/51]&gt; Fold03 &lt;tibble [25 × 7]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 4 &lt;split [453/50]&gt; Fold04 &lt;tibble [25 × 7]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 5 &lt;split [453/50]&gt; Fold05 &lt;tibble [25 × 7]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 6 &lt;split [453/50]&gt; Fold06 &lt;tibble [25 × 7]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 7 &lt;split [453/50]&gt; Fold07 &lt;tibble [25 × 7]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 8 &lt;split [453/50]&gt; Fold08 &lt;tibble [25 × 7]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 9 &lt;split [453/50]&gt; Fold09 &lt;tibble [25 × 7]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+10 &lt;split [453/50]&gt; Fold10 &lt;tibble [25 × 7]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(boost_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-05_files/figure-html/unnamed-chunk-50-2.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(boost_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 25 × 9
+   trees min_n learn_rate .metric .estimator   mean     n std_err .config       
+   &lt;int&gt; &lt;int&gt;      &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;         
+ 1   458     2  0.0001    mae     standard   0.842     10 0.0374  Preprocessor1…
+ 2   417     2  0.00681   mae     standard   0.0896    10 0.00629 Preprocessor1…
+ 3   125     3  0.000147  mae     standard   0.864     10 0.0383  Preprocessor1…
+ 4   833     3  0.00147   mae     standard   0.288     10 0.0134  Preprocessor1…
+ 5   791     4  0.0000316 mae     standard   0.859     10 0.0381  Preprocessor1…
+ 6   708     4  0.0464    mae     standard   0.0584    10 0.00500 Preprocessor1…
+ 7    84     5  0.00464   mae     standard   0.610     10 0.0267  Preprocessor1…
+ 8   250     5  0.1       mae     standard   0.0609    10 0.00592 Preprocessor1…
+ 9   292     6  0.0000147 mae     standard   0.876     10 0.0388  Preprocessor1…
+10   583     6  0.000464  mae     standard   0.682     10 0.0301  Preprocessor1…
+# ℹ 15 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show_best</span>(boost_res, <span class="at">metric =</span> <span class="st">'mae'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 9
+  trees min_n learn_rate .metric .estimator   mean     n std_err .config        
+  &lt;int&gt; &lt;int&gt;      &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;          
+1   542     8     0.0215 mae     standard   0.0562    10 0.00542 Preprocessor1_…
+2   958     7     0.01   mae     standard   0.0570    10 0.00531 Preprocessor1_…
+3   708     4     0.0464 mae     standard   0.0584    10 0.00500 Preprocessor1_…
+4   250     5     0.1    mae     standard   0.0609    10 0.00592 Preprocessor1_…
+5   334    17     0.0316 mae     standard   0.0673    10 0.00575 Preprocessor1_…</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>best_boost <span class="ot">&lt;-</span> <span class="fu">select_best</span>(boost_res, <span class="at">metric =</span> <span class="st">'mae'</span>)</span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>best_boost</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 4
+  trees min_n learn_rate .config              
+  &lt;int&gt; &lt;int&gt;      &lt;dbl&gt; &lt;chr&gt;                
+1   542     8     0.0215 Preprocessor1_Model13</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Final Workflow with tuned Parameters</span></span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>boost_fin <span class="ot">&lt;-</span> <span class="fu">boost_tree</span>(<span class="at">trees =</span> (<span class="dv">542</span>), <span class="at">min_n =</span> (<span class="dv">8</span>), <span class="at">learn_rate =</span> (<span class="fl">0.0215</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"xgboost"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
+<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb91-6"><a href="#cb91-6" aria-hidden="true" tabindex="-1"></a>final_b <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb91-7"><a href="#cb91-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(rec2) <span class="sc">%&gt;%</span> </span>
+<span id="cb91-8"><a href="#cb91-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(boost_fin) <span class="sc">%&gt;%</span> </span>
+<span id="cb91-9"><a href="#cb91-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> camels_train2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol start="7" type="a">
+<li><p>Look at VIP</p>
+<p>Use the vip::vip package to visualize the variable importance of your final model Describe what you think of the results and if they make sense If the model you elect cant provide VIP, instead discuss the pros and cons of a less interpretable model</p></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>vip<span class="sc">::</span><span class="fu">vip</span>(final_b)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-05_files/figure-html/unnamed-chunk-52-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
@@ -1201,6 +1263,34 @@ max_water_content   3.535798e-04 1.171125e-01   0.003019148 9.975923e-01</code><
 <li><p>Extact and Evaluate</p>
 <p>Use augment to make predictions on the test data Use metrics to evaluate the model performance on the test data Create a plot of the observed vs predicted values with clear title, axis labels, and a compelling color scale Describe what you think of the results!</p></li>
 </ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>boost_pred <span class="ot">&lt;-</span> <span class="fu">augment</span>(final_b, <span class="at">new_data =</span> camels_test2)</span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(boost_pred, <span class="at">truth =</span> logQmean, <span class="at">estimate =</span> .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 rmse    standard      0.116 
+2 rsq     standard      0.991 
+3 mae     standard      0.0578</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(boost_pred, <span class="fu">aes</span>(<span class="at">x =</span> logQmean, <span class="at">y =</span> .pred)) <span class="sc">+</span></span>
+<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>() <span class="sc">+</span></span>
+<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">col =</span> <span class="st">'red'</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb95-5"><a href="#cb95-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_linedraw</span>() <span class="sc">+</span> </span>
+<span id="cb95-6"><a href="#cb95-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Boosted and Tuned Model: Observed vs Predicted"</span>,</span>
+<span id="cb95-7"><a href="#cb95-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Observed Log Mean Flow"</span>,</span>
+<span id="cb95-8"><a href="#cb95-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Predicted Log Mean Flow"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-05_files/figure-html/unnamed-chunk-53-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 
 </main>
