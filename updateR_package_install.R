@@ -24,3 +24,31 @@ library(gghighlight)
 library(ggrepel)
 install.packages('ggthemes')
 library(ggthemes)
+
+##Time Series
+remotes::install_github("mikejohnson51/climateR")
+#Modeltime Dependencies
+install.packages("RcppParallel")
+install.packages("reactR")
+install.packages("bigD")
+install.packages("bitops")
+install.packages("juicyjuice")
+install.packages("markdown")
+install.packages("snakecase")
+install.packages("dygraphs")
+install.packages("extraDistr")
+
+install.packages("StanHeaders")
+install.packages("rstantools")
+install.packages("rstan")
+
+install.packages("reactable")
+install.packages("gt")
+install.packages("janitor")
+
+# Then parallel computing packages
+install.packages("doParallel")
+
+# Finally the forecasting packages
+install.packages("prophet")
+install.packages("modeltime")
