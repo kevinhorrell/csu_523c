@@ -135,43 +135,61 @@ In this lab, the above data sets are used to analyze patterns in stream flow and
 
 #### 1. Convert to tsibble
 
-First, use `as_tsibble()` to convert `historic` data.frame into a `tsibble` object. This will allow you to use the `feast` functions for analysis.
-
 ```{r}
+historic <- as_tsibble(historic)
+head(historic)
 
 ```
 
 
 #### 2. Plotting the time series
 
-Use `ggplot` to make plot focusing on Flow through time. Animate this
-plot with plotly!
+```{r}
+ggplotly(
+ggplot(data = historic, aes(x = Date, y = Flow)) +
+  geom_point(color = '#324227', size = 1) +
+  geom_line(color = '#a3bd90') +
+  theme_minimal() +
+  labs(title = 'Poudre River Monthly Flow',
+       y = 'Flow (cfs)')
+)
+```
 
-#### 3. Subseries
 
-Next, we are going to use the `gg_subseries()` function to visualize the
-seasonal patterns in the data. This function will create a subseries
-plot, which shows the seasonal patterns in the data by plotting each
-“season” as a separate plot
+#### 3. Subseries Plotting
 
-Remember, season does not necessarily mean “winter, spring, summer,
-fall”. In this case, we are looking at monthly data, so the seasons are
-defined as the months of the year.
+Next, we are going to use the `gg_subseries()` function to visualize the seasonal patterns in the data. This function will create a sub-series plot, which shows the seasonal patterns in the data by plotting each “season” as a separate plot
 
-Describe what you see in the plot. How are “seasons” defined in this
-plot? What do you think the “subseries” represent?
+```{r}
+ggplotly(
+gg_subseries(historic, y = Flow, period = '1y') +
+  labs(title = 'Monthly Streamflow Patterns', y = 'Streamflow (cfs)', x = 'Year') +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+)
+```
+
+Describe what you see in the plot. How are “seasons” defined in this plot? What do you think the “subseries” represent?
+*The 'seasons' here are defined as months. So, over the 11 years shown, we can see that streamflow peaks in May and June each year. There is an outlier in September of 2013 when Colorado received a large amount of precipitation and many of the front range streams flooded due to that event.*
 
 #### 4. Decomposition
 
-Next, use the `model(STL(...))` pattern to decompose the time series
-data into its components of trend, seasonality, and residuals. Chose a
-window that you feel is most appropriate to this data and explain your
-choice. Use the `components()` function to extract the components of the
-time series and `autoplot` to visualize the components.
+The `model(STL(...))` pattern is used to decompose the time series data into its components of trend, seasonality, and residuals. Choose a window that you feel is most appropriate to this data and explain your choice. Use the `components()` function to extract the components of the time series and `autoplot` to visualize the components.
 
-Describe what you see and if it matches your understanding of the Poudre
-System / Western water trends. How do the components change over time?
-What do you think the trend and seasonal components represent?
+```{r}
+historic_decomp <- historic %>%
+  model(STL(Flow ~ season(period = 12, window = 11))) %>%
+  components()
+
+ggplotly(
+autoplot(historic_decomp) +
+  labs(title = 'STL Decomposition of Flow on the Poudre', y = 'Flow (cfs)') +
+  theme_minimal()
+)
+```
+
+Describe what you see and if it matches your understanding of the Poudre System / Western water trends. How do the components change over time? What do you think the trend and seasonal components represent?
+*The overall trend shows a decrease in streamflow from 2015 to 2024. This is likely due to a particularly wet year and 11 years may not be enough time to see a decline in overall streamflow. The season shows a clear high flow period each year which aligns with snowmelt in the Poudre. This is typical of many mountain to plains streams where flow is dependent on snowpack and peaks with seasonal snow melt. The residuals show a some variability from year to year which is expected based on the variability of precipitation from year to year and annual or semi-annual precipitation and climate patterns (like the El Nino Southern Oscillation patterns).*
 
 ## Modeltime Prediction
 
