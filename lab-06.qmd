@@ -195,111 +195,54 @@ Describe what you see and if it matches your understanding of the Poudre System 
 
 #### Data Prep
 
-Now we are going to use the `modeltime` package to predict future
-streamflow using the climate data. We will use the `modeltime` package
-to create a time series model. First, we need to prep the data. In this
-case we want both the histroic and future data to be in the same format
-where the date column is a `Date` object (name it date for ease) and the
-other columns are numeric. In both cases each need to be a tibble:
+Now we are going to use the `modeltime` package to predict future streamflow using the climate data. We will use the  `modeltime` package to create a time series model. First, we need to prep the data. In this case we want both the histroic and future data to be in the same format where the date column is a `Date` object (name it date for ease) and the other columns are numeric. In both cases each need to be a tibble:
 
-We will use the `time_series_split()` function to split the data into
-training and testing sets. The training set will be used to train the
-model and the testing set will be used to test the model. Rememer in
-this case we are using a time series split, so the training set will be
-defined by a period rather then a perent of hold out data. In this case
-we will use a 24 month period testing set (`assess`). Make sure to set a
-seed and extract the trainign and testing data.frames with `training()`
-and `testing()`.
+We will use the `time_series_split()` function to split the data into training and testing sets. The training set will be used to train the model and the testing set will be used to test the model. Rememer in this case we are using a time series split, so the training set will be defined by a period rather then a perent of hold out data. In this case we will use a 24 month period testing set (`assess`). Make sure to set a seed and extract the trainign and testing data.frames with `training()` and `testing()`.
 
 #### Model Definition
 
-Chose at least three models to test - with one being arima and one being
-prophet. Store these models (specification + engine) in a list.
+Chose at least three models to test - with one being arima and one being prophet. Store these models (specification + engine) in a list.
 
 #### Model Fitting
 
-Next, we will use the `fit()` function to fit the models to the training
-data. We will use the `map()` function from the `purrr` package to
-iterate over the list of models and fit each model to the training data.
-The `fit()` function takes a formula, a model specification, and a
-data.frame as arguments. Here you can build any formula you see fit.
-What components of the date object do you want to use (e.g. month?
-season?). What climate variables do you want to use?
+Next, we will use the `fit()` function to fit the models to the training data. We will use the `map()` function from the `purrr` package to iterate over the list of models and fit each model to the training data. The `fit()` function takes a formula, a model specification, and a data.frame as arguments. Here you can build any formula you see fit. What components of the date object do you want to use (e.g. month? season?). What climate variables do you want to use?
 
-The only requirement is that the response variable is `Flow` and the
-date variable is included as a predictor.
+The only requirement is that the response variable is `Flow` and the date variable is included as a predictor.
 
-Once the models are fitted, we will use the `as_modeltime_table()`
-function to convert the list of fit models into a modeltime table. This
-will allow us to use the `modeltime` package to make predictions.
+Once the models are fitted, we will use the `as_modeltime_table()` function to convert the list of fit models into a modeltime table. This will allow us to use the `modeltime` package to make predictions.
 
 #### Model Calibration
 
-Next, we will use the `modeltime_calibrate()` function to calibrate the
-models. This function takes a modeltime table and a data.frame of
-testing data as arguments. The function will return a modeltime table
-with the calibrated models.
+Next, we will use the `modeltime_calibrate()` function to calibrate the models. This function takes a modeltime table and a data.frame of testing data as arguments. The function will return a modeltime table with the calibrated models.
 
-The results of the calibration can be passed to `modeltime_accuracy()`
-to assess the accuracy of the models.
+The results of the calibration can be passed to `modeltime_accuracy()` to assess the accuracy of the models.
 
-Calibrate the models using the testing data and assess the accuracy of
-the models describing what you see!
+Calibrate the models using the testing data and assess the accuracy of the models describing what you see!
 
 #### Forecasting
 
-With a calibrated model set in place, we can now make predictions using
-the `modeltime_forecast()`. Becasue we are using exogenous data, we need
-to pass the actual data to the function. This is because the model needs
-to know what the actual values are in order to make predictions.
+With a calibrated model set in place, we can now make predictions using the `modeltime_forecast()`. Becasue we are using exogenous data, we need to pass the actual data to the function. This is because the model needs to know what the actual values are in order to make predictions.
 
-As a first step, lets use the calibrated models to make predictions on
-the testing data. Here you will need to specifcy the `actual_data`
-(historic data tibble) and the `new_data` (testing).
+As a first step, lets use the calibrated models to make predictions on the testing data. Here you will need to specifcy the `actual_data` (historic data tibble) and the `new_data` (testing).
 
-The outputs can be passed to the `plot_modeltime_forecast()` function to
-visualize the predictions.
+The outputs can be passed to the `plot_modeltime_forecast()` function to visualize the predictions.
 
 #### Refitting the Model
 
-Now that we have a calibrated model set, we can refit the models to the
-full dataset. This is important because the models are only as good as
-the data they are trained on. By refitting the models to the full
-dataset, we can improve the accuracy of the predictions.
+Now that we have a calibrated model set, we can refit the models to the full dataset. This is important because the models are only as good as the data they are trained on. By refitting the models to the full dataset, we can improve the accuracy of the predictions.
 
-To do this, we will use the `modeltime_refit()` function. This function
-takes a calibrataion table and the full historic tibble as the `data`
-argument. The function will return a modeltime table with the refitted
-models. Like before, the accuracy of the models can be assessed using
-the `modeltime_accuracy()` function.
+To do this, we will use the `modeltime_refit()` function. This function takes a calibrataion table and the full historic tibble as the `data` argument. The function will return a modeltime table with the refitted models. Like before, the accuracy of the models can be assessed using the `modeltime_accuracy()` function.
 
 #### Looking into the future
 
-Now we are at the end! We can use the refitted models to make
-predictions on the future data. This is where we will use the `future`
-tibble we created earlier as the `new_data`. The `actual_data` argument
-will be the historic data tibble.
+Now we are at the end! We can use the refitted models to make predictions on the future data. This is where we will use the `future` tibble we created earlier as the `new_data`. The `actual_data` argument will be the historic data tibble.
 
-Using your refitted models, the `modeltime_forecast()` function will
-return a modeltime table with the predictions that can be passed to the
-`plot_modeltime_forecast()` function to visualize the predictions.
+Using your refitted models, the `modeltime_forecast()` function will return a modeltime table with the predictions that can be passed to the `plot_modeltime_forecast()` function to visualize the predictions.
 
 #### Wrap up
 
-Looking at your predictions what do you think? How do the models
-compare? What do you think the future streamflow will be? What are the
-limitations of this analysis? What are the assumptions of the models?
+Looking at your predictions what do you think? How do the models compare? What do you think the future streamflow will be? What are the limitations of this analysis? What are the assumptions of the models?
 
-Perhaps you see negative values in the predictions; perhaps you dont see
-strong agreement between the furture starting points around Jan 2024;
-perhaps you see other patterns that seem systemic and questionablly
-wrong. At this stage that is quite alright. In this simple lab, we did
-not worry about issue like cross validation, featrue engineering, or
-hyperparameter tuning. These are all important steps in the modeling
-process and should be considered in a real world application.
+Perhaps you see negative values in the predictions; perhaps you dont see strong agreement between the furture starting points around Jan 2024; perhaps you see other patterns that seem systemic and questionablly wrong. At this stage that is quite alright. In this simple lab, we did not worry about issue like cross validation, featrue engineering, or hyperparameter tuning. These are all important steps in the modeling process and should be considered in a real world application.
 
-If interested, the processes learned in tidymodels are directly
-applicable here and you can take this model as far as you like adding
-new data, correcting non-normal data, and implemeting a resampling
-approach to improve the model. That said, you now have a string
-introdcutory grasp on what the world of timeseries is about.
+If interested, the processes learned in tidymodels are directly applicable here and you can take this model as far as you like adding new data, correcting non-normal data, and implemeting a resampling approach to improve the model. That said, you now have a string introdcutory grasp on what the world of timeseries is about.
