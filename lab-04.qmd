@@ -17,7 +17,7 @@ editor:
   markdown: 
     wrap: 72
 ---
-
+![Flooding](data/flood1.jpg)
 ```{r, include = F}
 knitr::opts_chunk$set(comment = "", 
                       cache = FALSE, 
@@ -30,12 +30,11 @@ On September 26, 2016 at 11:47 a.m. U.S. Central Daylight Time (16:47 UTC) the C
 
 The water level continued to rise until it peaked at ~22 feet on September 27. This event had only been exceeded once, in June 2008, when thousands of people were encouraged to evacuate from Cedar Rapids, the second-most-populous city in Iowa.
 
-In this lab we are interested in the impacts in Palo Iowa because it is up stream of Cedar Rapids, contains a large amount of farm land, and does not have a forecast location to provide warning.
+In this exercise, I am interested in the impacts of flooding in Palo, Iowa because it is upstream of Cedar Rapids, contains a large amount of farm land, and does not have a forecast location to provide any warning.
 
-We will use the *terra* and *rstac* packages - along with our understanding of raster data and categorization - to create flood images using multi-band Landsat Imagery, thresholding, and classification methods.
+I use the *terra* and *rstac* packages - along with an understanding of raster data and categorization - to create flood images using multi-band Landsat Imagery, thresholding, and classification methods.
 
 # Libraries
-
 ```{r}
 #Data Manipulation
 library(tidyverse)
@@ -67,7 +66,7 @@ Almost all remote sensing / image analysis begins with the same basic steps:
 ****
 ## Step 1: AOI Identification
 
-First we need to identify an AOI. We want to be able to extract the flood extents for Palo, Iowa and its surroundings. To do this we will use the geocoding capabilities within the AOI package.
+Extract the flood extents for Palo, Iowa and its surroundings. To do this, use the geocoding capabilities within the AOI package.
 
 This region defines the AOI for this analysis.
 ```{r}
@@ -77,7 +76,7 @@ palo <- AOI::geocode('Palo, Iowa', bbox = TRUE)
 
 ## Step 2: Temporal Identification
 
-The flood event occurred on September 26, 2016. A primary challenge with remote sensing is the fact that all satellite imagery is not available at all times. In this case Landsat 8 has an 8 day revisit time. To ensure we capture an image within the date of the flood, lets set our time range to the period between September 24th - 29th of 2016. We will define this duration in the form YYYY-MM-DD/YYYY-MM-DD.
+The flood event occurred on September 26, 2016. A primary challenge with remote sensing is the fact that all satellite imagery is not available at all times. In this case Landsat 8 has an 8 day revisit time. To ensure an image within the date of the flood is captured, set the time range to the period between September 24th - 29th of 2016. Use the form YYYY-MM-DD/YYYY-MM-DD.
 
 ```{r}
 temporal_range <- "2016-09-24/2016-09-29"
@@ -96,22 +95,16 @@ STAC is a specification for describing geospatial data in a consistent way, maki
 
   * *Asset:* An asset is a specific file or data product associated with an item. For example, a single satellite image may have multiple assets, such as different bands or processing levels. Assets are typically stored in a cloud storage system and can be accessed via URLs.
 
-For this project we are going to use a STAC catalog to identify the data available for our analysis. We want data from the Landsat 8 collection which is served by the USGS (via AWS), Google, and Microsoft Planetary Computer (MPC). MPC is the one that provides free access so we will use that data store.
+For this project I use a STAC catalog to identify the data available for the analysis. I want data from the Landsat 8 collection which is served by the USGS (via AWS), Google, and Microsoft Planetary Computer (MPC). MPC is a free and open access source.
 
 
-Within R, we can open a connection to this endpoint with the stac function:
+Open a connection to this endpoint with the stac function:
 
 ```{r}
 (stac_query <- stac('https://planetarycomputer.microsoft.com/api/stac/v1'))
 ```
 
 This connection will provide an open entry to ALL data hosted by MPC. The stac_search function allows us to reduce the catalog to assets that match certain criteria (just like dplyr::filter reduces a data.frame). The get_request() function sends your search to the STAC API returning the metadata about the objects that match a criteria. The service implementation at MPC sets a return limit of 250 items (but it could be overridden with the limit parameter).
-
-Awesome! So the first 250 items from the Level-2 Landsat collection were returned. Within each item, there are a number of assets (e.g. the red, green, blue bands) and all items have some associated fields like the sub item assets, the bounding box, etc. We can now refine our search to limit the returned results to those that cover our AOI and time range of interest:
-
-By adding these constraints, we now see just two items. One from the Landsat 7 Level 2 dataset, and one from the Landsat 8 Level 2 dataset. For this lab, lets focus on the Landsat 8 item. We can use either the item or the id search criteria to elect this:
-
-The last thing we need to do, is sign this request. In rstac, items_sign(sign_planetary_computer()) signs STAC item asset URLs retrieved from Microsoft’s Planetary Computer, ensuring they include authentication tokens for access. sign_planetary_computer() generates the necessary signing function, and items_sign() applies it to STAC items. This is essential for accessing datasets hosted on the Planetary Computer, and other catalog were data access might be requester-paid or limited.
 
 ```{r, eval = FALSE}
 (stac_query <- stac("https://planetarycomputer.microsoft.com/api/stac/v1") %>%
@@ -124,26 +117,22 @@ The last thing we need to do, is sign this request. In rstac, items_sign(sign_pl
   items_sign(sign_planetary_computer())
 ```
 
-
 ## Step 4. Downloading the needed Images
 
-OK! Now that we have identified the item we want, we are ready to download the data using assets_download(). In total, a Landsat 8 item has 11 bands, but we only want to focus on 6 (below).
-
-Now we can use the assets_download() function to download the data. The output_dir argument specifies where to save the files, and the overwrite argument specifies whether to overwrite existing files with the same name.
+After identifying the item(s) we want, it is ready to download using assets_download(). In total, a Landsat 8 item has 11 bands, but I only want to focus on 6.
 
 ```{r, eval = FALSE}
 assets_download(items = stac_query,
                 asset_names = bands,
-                output_dir = 'data2',
+                output_dir = 'data',
                 overwrite = TRUE)
 
 ##my computer was not downloading the files correctly. I instead used a copy from Mike Johnson.
 ```
-And that does it! You now have the process needed to get you data.
 
-With a set of local files, you can create a raster object! Remember your files need to be in the order of the bands (double check step 2).
+With a set of local files, a raster object can be created! The files need to be in the order of the bands.
 
-  * list.files() can search a directory for a pattern and return a list of files. The recursive argument will search all sub-directories. The full.names argument will return the full path to the files.
+  * The _list.files()_ can search a directory for a pattern and return a list of files. The recursive argument will search all sub-directories. The full.names argument will return the full path to the files.
 
   * The _rast()_ function will read the files into a raster object.
 
@@ -157,9 +146,8 @@ files <- list.files('C:/Users/horre/Desktop/csu_523c/data/landsat-c2/', recursiv
 r_palo <- rast(files)
 r_palo <- setNames(r_palo, bands)
 ```
-
-
 ****
+
 # Question 1: Data Access
 Download all the data needed for this lab. What are the dimensions of your stacked image? What is the CRS? What is the cell resolution?
 
@@ -174,13 +162,12 @@ st_crs(r_palo)
 same.crs(palo, r_palo)
 ```
 
+dimensions: 7801 x 7681 x 6
+CRS: WGS 84/ UTM zone 15N
+Cell Resolution: 30m x 30m
 
 ## _Step 1.1_ Aalyze the Images
-We only want to analyze our image for the regions surrounding Palo (our AOI). Transform your AOI to the CRS of the landsat stack and use it to crop your raster stack.
-
-Awesome! We have now (1) identified, (2) downloaded, and (3) saved our images.
-
-We have loaded them as a multiband SpatRast object and cropped the domain to our AOI. Lets make a few RGB plots to see what these images reveal.
+Only analyze the image for the regions surrounding Palo (our AOI). Transform the AOI to the CRS of the landsat stack and use it to crop the raster stack.
 
 ```{r}
 palo <- st_transform(palo, crs(r_palo))
@@ -190,16 +177,18 @@ same.crs(palo, r_palo)
 r_palo <- crop(r_palo, palo)
 ```
 
+Awesome! I have now (1) identified, (2) downloaded, and (3) saved the images.
 
+I have loaded them as a multiband SpatRast object and cropped the domain to the AOI. Now make a few RGB plots to see what these images reveal.
 ****
 
 # Question 2: Data Visualization
 
-Standard cameras replicate whats seen with the human eye, by capturing light in the red, green and blue wavelengths and applying red, green ,and blue filters (channels) to generate a natural looking RGB image.
+Standard cameras replicate what's seen with the human eye, by capturing light in the red, green and blue wavelengths and applying red, green ,and blue filters (channels) to generate a natural looking RGB image.
 
-With a multispectral Landsat 8 image, we have more information to work with and different wavelengths/combinations can help isolate particular features.
+With a multi-spectral Landsat 8 image, there is more information to work with and different wavelengths/combinations can help isolate particular features.
 
-For example, the Near Infrared (NIR) wavelength is commonly used to analysis vegetation health because vegetation reflects strongly in this portion of the electromagnetic spectrum. Alternatively, the Shortwave Infrared (SWIR) bands are useful for discerning what is wet and dry.
+For example, the Near Infrared (NIR) wavelength is commonly used to analyze vegetation health because vegetation reflects strongly in this portion of the electromagnetic spectrum. Alternatively, the Shortwave Infrared (SWIR) bands are useful for discerning what is wet and dry.
 
 When working with Landsat imagery, a logical first step is to load an image into an image analysis program (like ENVI) to visualize whats in the scene. We can do the same thing with R using the plotRGB function and selecting which band should populate each channel.
 
@@ -207,10 +196,10 @@ Stretching is a common technique used to enhance the contrast of an image by adj
 
 For question 2, make four unique combinations:
 
-  - R-G-B (natural color)
-  - NIR-R-G (fa) (color infared)
-  - NIR-SWIR1-R (false color water focus)
-  - Your choice
+    1. R-G-B (natural color)
+    2. NIR-R-G (fa) (color infared)
+    3. NIR-SWIR1-R (false color water focus)
+    4. SWIR1-NIR-R
 
 ```{r}
 #RGB
@@ -239,17 +228,16 @@ img4_2 <- plotRGB(r_palo, r = 6, g = 5, b = 4, stretch = 'lin')
   
   * The NIR-SWIR-R image highlights "wet" surfaces in blue. I prefer the 'hist' stretch because you can see the wetness better.
   
-  * I chose to use SWIR-NIR-R for the final combination because the water is highlighted by the SWIR band, and vegetation shows green. The dry, non-vegetated land shows up red-brown. It's a nice contrast for water, veg, land.
-
-
-
+  * I chose to use SWIR-NIR-R for the final combination because the water is highlighted by the SWIR band, and vegetation shows green. The dry, non-vegetated land shows up red-brown. It's a nice contrast for water, veg, and land.
 ****
 
 # Question 3: Indices and Thresholds
 
 Accurate assessment of surface water features (like flooding) have been made possible by remote sensing technology. Index methods are commonly used for surface water estimation using a threshold value.
 
-For this lab we will look at 5 unique thresholding methods for delineating surface water features from different combinations of Landsat bands listed below:
+For this lab, look at 5 unique thresholding methods for delineating surface water features from different combinations of the Landsat bands listed below:
+
+![](data/bands1.png)
 
 ## _Step 3.1_ Raster Algebra
 
@@ -259,8 +247,7 @@ For this lab we will look at 5 unique thresholding methods for delineating surfa
 
   - Set the names of your new stack to useful values
 
-  - Plot the new stack, using the following palette:
-(colorRampPalette(c('blue', 'white', 'red'))(256))
+  - Plot the new stack, using the following palette: (colorRampPalette(c('blue', 'white', 'red'))(256))
 
 ```{r}
 r_palo_ndvi <- (r_palo$nir08 - r_palo$red)/(r_palo$nir08 + r_palo$red)
@@ -287,11 +274,9 @@ plot(r_palo_indices, col = color)
 
 ## _Step 3.2_ Raster Thresholding
 
-Here we will extract the flood extents from each of the above rasters using the thresholds defined in the above table.
+Extract the flood extents from each of the above rasters using the thresholds defined in the index table above.
 
-For this, we will use the app function and apply a custom formula for each calculated field from step 1 that applies the threshold in a way that flooded cells are 1 and non-flooded cells are 0.
-
-An example of this, applied to the ndvi raster is shown below:
+Use the *app* function and apply a custom formula for each calculated field from step 1 that applies the threshold in a way that flooded cells are 1 and non-flooded cells are 0.
 
 The app function applies a function to each cell of the raster, and the ifelse function is used to set the values based on the threshold.
 
@@ -348,10 +333,10 @@ An alternative way to identify similar features in a continuous field is through
 
 Unsupervised classification finds statistically significant groupings within the data. In these clustering algorithms, the user specifies the number of classes and the categorization is created based on the patterns in the data.
 
-For this lab we will use a simple k-means algorithm to group raster cells with similar spectral properties.
+Use a simple k-means algorithm to group raster cells with similar spectral properties.
 
 ## _Step 4.1_
-  Anytime we want to be able to produce a consistent/reproducible result from a random process in R we need to set a seed. Do so using set.seed
+  To produce a consistent/reproducible result from a random process in R, set a seed. Do so using set.seed.
 
 ```{r}
 set.seed(7228)
@@ -360,10 +345,10 @@ set.seed(7228)
 
 ## _Step 4.2_
 
-  - Extract the values from your 6-band raster stack with values
+  - Extract the values from the 6-band raster stack with values
 
-  - Check the dimensions of the extracted values with dim
-    What do the dimensions of the extracted values tell you about how the data was extracted?
+  - Check the dimensions of the extracted values with dim. What do the dimensions of the extracted values tell you about how the data was extracted?
+  
     *the data was extracted in columns and rows, a data frame and it keeps the same properties and dimensions as the original raster*
 
   - Remove NA values from your extracted data with na.omit for safety
@@ -385,7 +370,6 @@ v <- na.omit(v)
 
 
 ## _Step 4.3_
-
 
   - Use the kmeans clustering algorithm from the stats package to cluster the extracted raster data to a specified number of clusters k (centers). Start with 12.
 
