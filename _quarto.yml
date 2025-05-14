@@ -4,6 +4,10 @@ project:
 
 website: 
   title: "ESS 523c Labs"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
 
 format:
   html:

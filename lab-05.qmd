@@ -49,70 +49,37 @@ library(flextable)
 
 # Introduction
 
-In this lab, we will explore predictive modeling in hydrology using the
-tidymodels framework and the CAMELS (Catchment Attributes and
-Meteorology for Large-sample Studies) dataset.
+In this lab, I will explore predictive modeling in hydrology using the tidymodels framework and the CAMELS (Catchment Attributes and Meteorology for Large-sample Studies) dataset.
 
 # What is tidymodels?
 
-tidymodels is an R framework designed for machine learning and
-statistical modeling. Built on the principles of the tidyverse,
-tidymodels provides a consistent and modular approach to tasks like data
-preprocessing, model training, evaluation, and validation. By leveraging
-the strengths of packages such as recipes, parsnip, and yardstick,
-tidymodels streamlines the modeling workflow, making it easier to
-experiment with different models while maintaining reproducibility and
-interpretability.
+\tidymodels is an R framework designed for machine learning and statistical modeling. Built on the principles of the tidyverse, tidymodels provides a consistent and modular approach to tasks like data preprocessing, model training, evaluation, and validation. By leveraging the strengths of packages such as recipes, parsnip, and yardstick,
+tidymodels streamlines the modeling workflow, making it easier to experiment with different models while maintaining reproducibility and interpretability.
 
 # What is the CAMELS dataset?
 
-The CAMELS dataset is a widely used resource in hydrology and
-environmental science, providing data on over 500 self-draining river
-basins across the United States. It includes meteorological forcings,
-streamflow observations, and catchment attributes such as land cover,
-topography, and soil properties. This dataset is particularly valuable
-for large-sample hydrology studies, enabling researchers to develop and
-test models across diverse climatic and physiographic conditions.
+The CAMELS dataset is a widely used resource in hydrology and environmental science, providing data on over 500 self-draining river basins across the United States. It includes meteorological forcings, streamflow observations, and catchment attributes such as land cover, topography, and soil properties. This dataset is particularly valuable for large-sample hydrology studies, enabling researchers to develop and test models across diverse climatic and physiographic conditions.
 
-In this lab, we will focus on predicting mean streamflow for these
-basins using their associated characteristics. CAMELS has been
-instrumental in various hydrologic and machine learning applications,
-including:
+In this lab, we will focus on predicting mean streamflow for these basins using their associated characteristics. CAMELS has been instrumental in various hydrologic and machine learning applications, including:
 
--   Calibrating Hydrologic Models – Used for parameter tuning in models
-    like SAC-SMA, VIC, and HBV, improving regional and large-sample
-    studies.
+-   Calibrating Hydrologic Models – Used for parameter tuning in models like SAC-SMA, VIC, and HBV, improving regional and large-sample studies.
 
--   Training Machine Learning Models – Supports deep learning (e.g.,
-    LSTMs) and regression-based streamflow predictions, often
-    outperforming traditional methods.
+-   Training Machine Learning Models – Supports deep learning (e.g. LSTMs) and regression-based streamflow predictions, often outperforming traditional methods.
 
--   Understanding Model Behavior – Assists in assessing model
-    generalization, uncertainty analysis, and the role of catchment
-    attributes.
+-   Understanding Model Behavior – Assists in assessing model generalization, uncertainty analysis, and the role of catchment attributes.
 
--   Benchmarking & Regionalization – Facilitates large-scale model
-    comparisons and parameter transfer to ungauged basins.
+-   Benchmarking & Regionalization – Facilitates large-scale model comparisons and parameter transfer to ungauged basins.
 
--   Hybrid Modeling – Enhances physics-based models with machine
-    learning for bias correction and improved hydrologic simulations.
+-   Hybrid Modeling – Enhances physics-based models with machine learning for bias correction and improved hydrologic simulations.
 
-A notable study by Kratzert et al. (2019) demonstrated that LSTMs can
-outperform conceptual models in streamflow prediction. As part of this
-lab, we will explore how to programmatically download and load the data
-into R.
+A notable study by Kratzert et al. (2019) demonstrated that LSTMs can outperform conceptual models in streamflow prediction. As part of this lab, we will explore how to programmatically download and load the data into R.
 
 # What's in the data?
 
-Each record in the CAMELS dataset represents a unique river basin,
-identified by an outlet USGS NWIS gauge_id. The dataset contains a mix
-of continuous and categorical variables, including meteorological,
-catchment, and streamflow summaries.
+Each record in the CAMELS dataset represents a unique river basin, identified by an outlet USGS NWIS gauge_id. The dataset contains a mix of continuous and categorical variables, including meteorological, catchment, and streamflow summaries.
 
-The data we are going to downloaded are the basin level summaries. For
-example, if we looked at row 1 of the data (Gage: 01013500) all of the
-values are the areal average for the drainage basin seen below, while
-the flow metrics are associated with the outlet gage (in red):
+The data downloaded are the basin level summaries. For example, looking at row 1 of the data (Gage: 01013500) all of the
+values are the areal average for the drainage basin seen below, while the flow metrics are associated with the outlet gage (in red):
 
 ```{r}
 # Use the `findNLDI` function to get the basin and flowlines for the first gauge
@@ -120,7 +87,7 @@ basin <- findNLDI(nwis = "01013500",
                   nav = "UT",
                   find = c("basin", "flowlines"))
 
-# Plot the basin, flowlines, and gauge ...
+# Plot the basin, flowlines, and gauge
 ggplot() + 
   geom_sf(data = basin$basin, fill = "lightblue") + 
   geom_sf(data = basin$UT_flowlines, color = "blue") + 
@@ -132,13 +99,10 @@ ggplot() +
 
 ------------------------------------------------------------------------
 
-In this lab, you will:
-
--   Learn how to programmatically download and access data.
--   Practice using tidymodels for predictive modeling.
--   Train and evaluate models to predict mean stream flow across the
-    country.
--   Interpret and compare model performance using workflows.
+1.  Learn how to programmatically download and access data.
+2.  Practice using tidymodels for predictive modeling.
+3.  Train and evaluate models to predict mean stream flow across the country.
+4.  Interpret and compare model performance using workflows.
 
 By the end of this lab, you will have hands-on experience applying
 machine learning techniques to real-world data, helping to bridge the
@@ -164,9 +128,7 @@ and the PDF.
 
 # Getting the documentation PDF
 
-We can download the documentation PDF which provides a descriptions for
-the various columns as many are not self-explanatory. Here we can use
-download.file to download the PDF to our data directory.
+Download the documentation PDF which provides a descriptions for the various columns as many are not self-explanatory. Use download.file to download the PDF to our data directory.
 
 ```{r, eval = FALSE}
 download.file('https://gdex.ucar.edu/dataset/camels/file/camels_attributes_v2.0.pdf', 'C:/Users/horre/Desktop/csu_523c/data05/camels_attributes_v2.0.pdf', overwrite = TRUE)
@@ -175,19 +137,15 @@ download.file('https://gdex.ucar.edu/dataset/camels/file/camels_attributes_v2.0.
 
 # Getting Basin characteristics
 
-Now we want to download the .txt files that store the actual data
-documented in the PDF. Doing this file by file (like we did with the
-PDF) is possible, but lets look at a better/easier way…
+Download the .txt files that store the actual data documented in the PDF.
 
-a.  Let's create a vector storing the data types/file names we want to
-    download:
+a.  Create a vector storing the data types/file names to download:
 
 ```{r}
 types <- c("clim", "geol", "soil", "topo", "vege", "hydro")
 ```
 
-b.  Using glue, we can construct the needed URLs and file names for the
-    data we want to download:
+b.  Use glue to construct the needed URLs and file names for the data to download:
 
 ```{r}
 # Where the files live online ...
@@ -245,8 +203,6 @@ camels <- power_full_join(camels, by = 'gauge_id')
 
 # Question 1
 
-## *Your Turn*
-
 -   Make sure all data and the PDF are downloaded into your data
     directory
 -   From the documentation PDF, report what *zero_q_freq* represents
@@ -269,8 +225,6 @@ ggplot(data = camels, aes(x = gauge_lon, y = gauge_lat)) +
 ```
 
 # Question 2
-
-## *Your Turn*
 
 -   Make 2 maps of the sites, coloring the points by the aridity and
     p_mean column
@@ -307,15 +261,15 @@ ggarrange(aridity, p_mean,
 
 ## Model Preparation
 
-As an initial analysis, lets look at the relationship between aridity,
-rainfall and mean flow. First, lets check the correlation between these
-three variables. Drop NAs and only view the 3 columns of interest.
+Look at the relationship between aridity, rainfall and mean flow. Check the correlation between these three variables. Drop NAs and only view the 3 columns of interest.
 
 ```{r}
 camels_cor <- camels %>%
   select(aridity, p_mean, q_mean) %>% 
   drop_na() %>% 
   cor()
+
+camels_cor
 ```
 
 As expected, there is a strong correlation between rainfall and mean
@@ -325,13 +279,7 @@ flow using aridity and rainfall.
 
 ## Visual EDA
 
-a.  Lets start by looking that the 3 dimensions (variables) of this
-    data. We’ll start with a XY plot of aridity and rainfall. We are
-    going to use the scale_color_viridis_c() function to color the
-    points by the q_mean column. This scale functions maps the color of
-    the points to the values in the q_mean column along the viridis
-    continuous (c) palette. Because a scale_color\_\* function is
-    applied, it maps to the known color aesthetic in the plot.
+a.  Start by looking that the 3 dimensions (variables) of this data. Start with a XY plot of aridity and rainfall. Use the scale_color_viridis_c() function to color the points by the q_mean column. This scale function maps the color of the points to the values in the q_mean column along the viridis continuous (c) palette. Because a scale_color\_\* function is applied, it maps to the known color aesthetic in the plot.
 
 ```{r}
 ggplot(camels, aes(x = aridity, y = p_mean)) +
@@ -347,12 +295,9 @@ ggplot(camels, aes(x = aridity, y = p_mean)) +
   ylim(0, 10)
 ```
 
-Ok! so it looks like there is a relationship between rainfall, aridity,
-and runoff but it looks like an exponential decay function and is
-certainly not linear.
+It looks like there is a relationship between rainfall, aridity, and runoff but it looks like an exponential decay function and is not linear.
 
-To test a transformation, we can log transform the x and y axes using
-the scale_x_log10() and scale_y_log10() functions:
+To test a transformation, log transform the x and y axes using the scale_x_log10() and scale_y_log10() functions:
 
 ```{r}
 ggplot(camels, aes(x = aridity, y = p_mean)) +
@@ -369,17 +314,9 @@ ggplot(camels, aes(x = aridity, y = p_mean)) +
        color = "Mean Flow (mm/day)")
 ```
 
-Great! We can see a log-log relationship between aridity and rainfall
-provides a more linear relationship. This is a common relationship in
-hydrology and is often used to estimate rainfall in ungauged basins.
-However, once the data is transformed, the lack of spread in the
-streamflow data is quite evident with high mean flow values being
-compressed to the low end of aridity/high end of rainfall.
+Great! There is a log-log relationship between aridity and rainfall and it provides a more linear relationship. This is a common relationship in hydrology and is often used to estimate rainfall in ungauged basins. However, once the data is transformed, the lack of spread in the streamflow data is quite evident with high mean flow values being compressed to the low end of aridity/high end of rainfall.
 
-To address this, we can visualize how a log transform may benifit the
-q_mean data as well. Since the data is represented by color, rather then
-an axis, we can use the trans (transform) argument in the
-scale_color_viridis_c() function to log transform the color scale.
+To address this, visualize how a log transform may benefit the q_mean data as well. Since the data is represented by color, rather then an axis, use the trans (transform) argument in the scale_color_viridis_c() function to log transform the color scale.
 
 ```{r}
 ggplot(camels, aes(x = aridity, y = p_mean)) +
@@ -400,33 +337,24 @@ ggplot(camels, aes(x = aridity, y = p_mean)) +
        color = "Mean Flow") 
 ```
 
-Excellent! Treating these three right skewed variables as log
-transformed, we can see a more evenly spread relationship between
-aridity, rainfall, and mean flow. This is a good sign for building a
-model to predict mean flow using aridity and rainfall. \*\*\*\*
+Excellent! Treating these three right skewed variables as log transformed, an evenly spread relationship between aridity, rainfall, and mean flow can be seen. This is a good sign for building a model to predict mean flow using aridity and rainfall.
+****
 
 # Model Building
 
-## Lets start by splitting the data
+## Start by splitting the data
 
 ------------------------------------------------------------------------
 
-First, we set a seed for reproduceabilty, then transform the q_mean
-column to a log scale. Remember it is error prone to apply
-transformations to the outcome variable within a recipe, so, we’ll do it
-a priori.
+Set a seed for reproduceabilty, then transform the q_mean column to a log scale. It is error prone to apply transformations to the outcome variable within a recipe, so, we’ll do it a priori.
 
-Once set, we can split the data into a training and testing set. We are
-going to use 80% of the data for training and 20% for testing with no
-stratification.
+Once set, split the data into a training and testing set. Use 80% of the data for training and 20% for testing with no stratification.
 
-Additionally, we are going to create a 10-fold cross validation dataset
-to help us evaluate multi-model setups.
+Additionally, create a 10-fold cross validation dataset so as to evaluate multi-model setups.
 
 ```{r}
 set.seed(9257)
-# Bad form to perform simple transformations on the outcome variable within a 
-# recipe. So, we'll do it here.
+# Bad form to perform simple transformations on the outcome variable within a recipe. So, we'll do it here.
 camels_mod <- camels %>% 
   mutate(logQmean = log(q_mean))
 
@@ -604,8 +532,6 @@ summary(lm_base)$coefficients
 
 ## Making Predictions
 
-------------------------------------------------------------------------
-
 Now that lm_wf is a workflow, data is not embedded in the model, we can
 use augment with the new_data argument to make predictions on the test
 data.
@@ -755,7 +681,7 @@ the predictors and the outcome :)
 
 ------------------------------------------------------------------------
 
-```{r}
+```{r, eval = F}
 rf_fin <- rand_forest() %>%
   set_engine("ranger", importance = "impurity") %>%
   set_mode("regression")
@@ -787,7 +713,7 @@ predicted values, color-coded by aridity. The plot includes a 1:1
 reference line (geom_abline()) to indicate perfect predictions and uses
 the viridis color scale to improve readability.
 
-```{r}
+```{r, eval = F}
 # VIP
 vip::vip(final)
 ```
@@ -796,7 +722,7 @@ vip::vip(final)
 This makes sense because streams are driven by precipitation (and
 groundwater).**
 
-```{r}
+```{r, eval = F}
 ## Prediction
 rf_data <- augment(final, new_data = camels_test)
 
@@ -804,7 +730,7 @@ rf_data <- augment(final, new_data = camels_test)
 metrics(rf_data, truth = logQmean, estimate = .pred)
 ```
 
-```{r}
+```{r, eval = F}
 ggplot(rf_data, aes(x = logQmean, y = .pred, colour = aridity)) +
   scale_color_viridis_c() +
   geom_point() +
@@ -1123,4 +1049,3 @@ ggplot(boost_pred, aes(x = logQmean, y = .pred)) +
        x = "Observed Log Mean Flow",
        y = "Predicted Log Mean Flow")
 ```
-
