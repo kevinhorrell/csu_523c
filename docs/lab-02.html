@@ -2,13 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.6.42">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Kevin Horrell">
 
-<title>Lab 2: Distances and Projections</title>
+<title>Lab 2: Distances and Projections – ESS 523c Labs</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -58,19 +58,53 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="lab-02_files/libs/clipboard/clipboard.min.js"></script>
-<script src="lab-02_files/libs/quarto-html/quarto.js"></script>
-<script src="lab-02_files/libs/quarto-html/popper.min.js"></script>
-<script src="lab-02_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="lab-02_files/libs/quarto-html/anchor.min.js"></script>
-<link href="lab-02_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="lab-02_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="lab-02_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="lab-02_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="lab-02_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
-<link href="lab-02_files/libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-b53751a350365c71b6c909e95f209ed1.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-d13ac4e80c000af260af3917723b819e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-175319157c5a1d45805a17fae5d1b6b1.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="site_libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
 
-<script src="lab-02_files/libs/tabwid-1.1.3/tabwid.js"></script>
+<script src="site_libs/tabwid-1.1.3/tabwid.js"></script>
 
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
@@ -103,23 +137,66 @@ window.Quarto = {
 };
 </script>
 
+<link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="fullcontent">
+<body>
 
-<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
-<main class="content" id="quarto-document-content">
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#libraries" id="toc-libraries" class="nav-link active" data-scroll-target="#libraries">Libraries</a></li>
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background">Background</a></li>
+  <li><a href="#question-1" id="toc-question-1" class="nav-link" data-scroll-target="#question-1">Question 1:</a>
+  <ul class="collapse">
+  <li><a href="#define-a-projection" id="toc-define-a-projection" class="nav-link" data-scroll-target="#define-a-projection"><em>1.1</em> Define a Projection</a></li>
+  <li><a href="#get-usa-state-boundaries" id="toc-get-usa-state-boundaries" class="nav-link" data-scroll-target="#get-usa-state-boundaries"><em>1.2</em> - Get USA state boundaries</a></li>
+  <li><a href="#get-country-boundaries-for-mexico-the-united-states-of-america-and-canada" id="toc-get-country-boundaries-for-mexico-the-united-states-of-america-and-canada" class="nav-link" data-scroll-target="#get-country-boundaries-for-mexico-the-united-states-of-america-and-canada"><em>1.3</em> - Get country boundaries for Mexico, the United States of America, and Canada</a></li>
+  <li><a href="#get-city-locations-from-the-csv-file" id="toc-get-city-locations-from-the-csv-file" class="nav-link" data-scroll-target="#get-city-locations-from-the-csv-file"><em>1.4</em> - Get city locations from the CSV file</a></li>
+  </ul></li>
+  <li><a href="#question-2" id="toc-question-2" class="nav-link" data-scroll-target="#question-2">Question 2:</a>
+  <ul class="collapse">
+  <li><a href="#distance-to-usa-border-coastline-or-national-km" id="toc-distance-to-usa-border-coastline-or-national-km" class="nav-link" data-scroll-target="#distance-to-usa-border-coastline-or-national-km"><em>2.1</em> - Distance to USA Border (coastline or national) (km)</a></li>
+  <li><a href="#distance-to-states-km" id="toc-distance-to-states-km" class="nav-link" data-scroll-target="#distance-to-states-km"><em>2.2</em> - Distance to States (km)</a></li>
+  <li><a href="#distance-to-mexico-km" id="toc-distance-to-mexico-km" class="nav-link" data-scroll-target="#distance-to-mexico-km"><em>2.3</em> - Distance to Mexico (km)</a></li>
+  <li><a href="#distance-to-canada-km" id="toc-distance-to-canada-km" class="nav-link" data-scroll-target="#distance-to-canada-km"><em>2.4</em> - Distance to Canada (km)</a></li>
+  </ul></li>
+  <li><a href="#question-3" id="toc-question-3" class="nav-link" data-scroll-target="#question-3">Question 3:</a>
+  <ul class="collapse">
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data"><em>3.1</em> Data</a></li>
+  <li><a href="#city-distance-from-the-border" id="toc-city-distance-from-the-border" class="nav-link" data-scroll-target="#city-distance-from-the-border"><em>3.2</em> City Distance from the Border</a></li>
+  <li><a href="#city-distance-from-nearest-state" id="toc-city-distance-from-nearest-state" class="nav-link" data-scroll-target="#city-distance-from-nearest-state"><em>3.3</em> City Distance from Nearest State</a></li>
+  <li><a href="#equidistance-boundary-from-mexico-and-canada" id="toc-equidistance-boundary-from-mexico-and-canada" class="nav-link" data-scroll-target="#equidistance-boundary-from-mexico-and-canada"><em>3.4</em> Equidistance boundary from Mexico and Canada</a></li>
+  </ul></li>
+  <li><a href="#question-4" id="toc-question-4" class="nav-link" data-scroll-target="#question-4">Question 4:</a>
+  <ul class="collapse">
+  <li><a href="#real-world-application" id="toc-real-world-application" class="nav-link" data-scroll-target="#real-world-application">Real World Application</a></li>
+  <li><a href="#quantifing-border-zone" id="toc-quantifing-border-zone" class="nav-link" data-scroll-target="#quantifing-border-zone"><em>4.1</em> Quantifing Border Zone</a></li>
+  <li><a href="#mapping-border-zone" id="toc-mapping-border-zone" class="nav-link" data-scroll-target="#mapping-border-zone"><em>4.2</em> Mapping Border Zone</a></li>
+  <li><a href="#instead-of-labeling-the-10-most-populous-cities-label-the-most-populous-city-in-each-state-within-the-danger-zone." id="toc-instead-of-labeling-the-10-most-populous-cities-label-the-most-populous-city-in-each-state-within-the-danger-zone." class="nav-link" data-scroll-target="#instead-of-labeling-the-10-most-populous-cities-label-the-most-populous-city-in-each-state-within-the-danger-zone."><em>4.3</em> : Instead of labeling the 10 most populous cities, label the most populous city in each state within the Danger Zone.</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content column-page-left" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Lab 2: Distances and Projections</h1>
-<p class="subtitle lead">Ecosystem Science and Sustainability 523c</p>
+<p class="subtitle lead">Populations Across Space</p>
 </div>
 
 
 
-<div class="quarto-title-meta">
+<div class="quarto-title-meta column-page-left">
 
     <div>
     <div class="quarto-title-meta-heading">Author</div>
@@ -137,8 +214,14 @@ window.Quarto = {
 </header>
 
 
-<p>In this lab we will explore the properties of <code>sf</code>, <code>sfc</code>, and <code>sfg</code> features &amp; objects; how they are stored; and issues related to distance calculation and coordinate transformation.</p>
-<p>We will continue to build on our data wrangling and data visualization skills; as well as document preparation via Quarto and GitHub.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="data/us_cities1.jpg" class="img-fluid figure-img"></p>
+<figcaption>Cities Data</figcaption>
+</figure>
+</div>
+<p>In this lab I explored the properties of <code>sf</code>, <code>sfc</code>, and <code>sfg</code> features &amp; objects; how they are stored; and issues related to distance calculation and coordinate transformation.</p>
+<p>I continue to build on my data wrangling and visualization skills; as well as document preparation via Quarto and GitHub.</p>
 <hr>
 <section id="libraries" class="level1">
 <h1>Libraries</h1>
@@ -169,12 +252,11 @@ window.Quarto = {
 <li><strong>Calculating</strong> distances (Q2)</li>
 <li><strong>Building</strong> maps using ggplot (Q3)</li>
 </ol>
-<p>Hints and Tricks for this lab are available <a href="lab2-hints.qmd">here</a></p>
 <hr>
 </section>
 <section id="question-1" class="level1">
 <h1>Question 1:</h1>
-<p>For this lab we need three (3) datasets.</p>
+<p>For this lab three (3) datasets are needed.</p>
 <ol type="1">
 <li>Spatial boundaries of continental USA states (1.1)</li>
 <li>Boundaries of Canada, Mexico and the United States (1.2)</li>
@@ -182,7 +264,7 @@ window.Quarto = {
 </ol>
 <section id="define-a-projection" class="level3">
 <h3 class="anchored" data-anchor-id="define-a-projection"><em>1.1</em> Define a Projection</h3>
-<p>For this lab we want to calculate distances between features, therefore we need a projection that preserves distance at the scale of CONUS. For this, we will use the North America Equidistant Conic:</p>
+<p>For this lab I want to calculate distances between features, therefore I need a projection that preserves distance at the scale of CONUS. For this, I will use the North America Equidistant Conic:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>eqdc <span class="ot">&lt;-</span> <span class="st">'+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -203,348 +285,139 @@ window.Quarto = {
 </section>
 <section id="get-usa-state-boundaries" class="level3">
 <h3 class="anchored" data-anchor-id="get-usa-state-boundaries"><em>1.2</em> - Get USA state boundaries</h3>
-<p>In R, USA boundaries are stored in the <code>USAboundaries</code> package. In case this package and data are <strong>not</strong> installed:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(remotes)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(USAboundaries)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(USAboundariesData)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Once installed:</p>
+<p>In R, USA boundaries are stored in the <code>USAboundaries</code> package.</p>
 <ul>
-<li>USA state boundaries can be accessed with <code>USAboundaries::us_states(resolution = "low")</code>. Given the precision needed for this analysis we are ok with the low resolution.</li>
-<li>Make sure you only have the states in the continental United States (CONUS) (<strong>Hint</strong> use <code>filter</code>)</li>
+<li>USA state boundaries can be accessed with <code>USAboundaries::us_states(resolution = "low")</code>. Given the precision needed for this analysis, low resolution is sufficient.</li>
+<li>Make sure only the states in the continental United States (CONUS) are selected</li>
 <li>Make sure the data is in a projected coordinate system suitable for distance measurements at the national scale (<code>eqdc</code>).</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>state_boundary <span class="ot">&lt;-</span> <span class="fu">us_states</span>(<span class="at">resolution =</span> <span class="st">'low'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>state_abbr <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">'PR'</span>, <span class="st">'HI'</span>, <span class="st">'AK'</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(eqdc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>state_boundary <span class="ot">&lt;-</span> <span class="fu">us_states</span>(<span class="at">resolution =</span> <span class="st">'low'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>state_abbr <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">'PR'</span>, <span class="st">'HI'</span>, <span class="st">'AK'</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(eqdc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(state_boundary)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> state_boundary) <span class="sc">+</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>() <span class="sc">+</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(state_boundary)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> state_boundary) <span class="sc">+</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>() <span class="sc">+</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
 </section>
 <section id="get-country-boundaries-for-mexico-the-united-states-of-america-and-canada" class="level3">
 <h3 class="anchored" data-anchor-id="get-country-boundaries-for-mexico-the-united-states-of-america-and-canada"><em>1.3</em> - Get country boundaries for Mexico, the United States of America, and Canada</h3>
-<p>In R, country boundaries are stored in the <code>rnaturalearth</code> package. - World boundaries can be accessed with <code>rnaturalearth::countries110</code>. - Make sure the data is in simple features (<code>sf</code>) format (<strong>Hint</strong> use the <code>st_as_sf</code> variable). - Make sure you only have the countries you want (<strong>Hint</strong> <code>filter</code> on the <code>admin</code> variable) - Make sure the data is in a projected coordinate system suitable for distance measurements at the national scale (<code>eqdc</code>).</p>
+<p>In R, country boundaries are stored in the <code>rnaturalearth</code> package. - World boundaries can be accessed with <code>rnaturalearth::countries110</code>. - Make sure the data is in simple features (<code>sf</code>) format - Make sure to only have the countries wanted - Make sure the data is in a projected coordinate system suitable for distance measurements at the national scale (<code>eqdc</code>).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rnaturalearth<span class="sc">::</span>countries110<span class="sc">$</span>ADMIN</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  [1] "Fiji"                               
-  [2] "United Republic of Tanzania"        
-  [3] "Western Sahara"                     
-  [4] "Canada"                             
-  [5] "United States of America"           
-  [6] "Kazakhstan"                         
-  [7] "Uzbekistan"                         
-  [8] "Papua New Guinea"                   
-  [9] "Indonesia"                          
- [10] "Argentina"                          
- [11] "Chile"                              
- [12] "Democratic Republic of the Congo"   
- [13] "Somalia"                            
- [14] "Kenya"                              
- [15] "Sudan"                              
- [16] "Chad"                               
- [17] "Haiti"                              
- [18] "Dominican Republic"                 
- [19] "Russia"                             
- [20] "The Bahamas"                        
- [21] "Falkland Islands"                   
- [22] "Norway"                             
- [23] "Greenland"                          
- [24] "French Southern and Antarctic Lands"
- [25] "East Timor"                         
- [26] "South Africa"                       
- [27] "Lesotho"                            
- [28] "Mexico"                             
- [29] "Uruguay"                            
- [30] "Brazil"                             
- [31] "Bolivia"                            
- [32] "Peru"                               
- [33] "Colombia"                           
- [34] "Panama"                             
- [35] "Costa Rica"                         
- [36] "Nicaragua"                          
- [37] "Honduras"                           
- [38] "El Salvador"                        
- [39] "Guatemala"                          
- [40] "Belize"                             
- [41] "Venezuela"                          
- [42] "Guyana"                             
- [43] "Suriname"                           
- [44] "France"                             
- [45] "Ecuador"                            
- [46] "Puerto Rico"                        
- [47] "Jamaica"                            
- [48] "Cuba"                               
- [49] "Zimbabwe"                           
- [50] "Botswana"                           
- [51] "Namibia"                            
- [52] "Senegal"                            
- [53] "Mali"                               
- [54] "Mauritania"                         
- [55] "Benin"                              
- [56] "Niger"                              
- [57] "Nigeria"                            
- [58] "Cameroon"                           
- [59] "Togo"                               
- [60] "Ghana"                              
- [61] "Ivory Coast"                        
- [62] "Guinea"                             
- [63] "Guinea-Bissau"                      
- [64] "Liberia"                            
- [65] "Sierra Leone"                       
- [66] "Burkina Faso"                       
- [67] "Central African Republic"           
- [68] "Republic of the Congo"              
- [69] "Gabon"                              
- [70] "Equatorial Guinea"                  
- [71] "Zambia"                             
- [72] "Malawi"                             
- [73] "Mozambique"                         
- [74] "eSwatini"                           
- [75] "Angola"                             
- [76] "Burundi"                            
- [77] "Israel"                             
- [78] "Lebanon"                            
- [79] "Madagascar"                         
- [80] "Palestine"                          
- [81] "Gambia"                             
- [82] "Tunisia"                            
- [83] "Algeria"                            
- [84] "Jordan"                             
- [85] "United Arab Emirates"               
- [86] "Qatar"                              
- [87] "Kuwait"                             
- [88] "Iraq"                               
- [89] "Oman"                               
- [90] "Vanuatu"                            
- [91] "Cambodia"                           
- [92] "Thailand"                           
- [93] "Laos"                               
- [94] "Myanmar"                            
- [95] "Vietnam"                            
- [96] "North Korea"                        
- [97] "South Korea"                        
- [98] "Mongolia"                           
- [99] "India"                              
-[100] "Bangladesh"                         
-[101] "Bhutan"                             
-[102] "Nepal"                              
-[103] "Pakistan"                           
-[104] "Afghanistan"                        
-[105] "Tajikistan"                         
-[106] "Kyrgyzstan"                         
-[107] "Turkmenistan"                       
-[108] "Iran"                               
-[109] "Syria"                              
-[110] "Armenia"                            
-[111] "Sweden"                             
-[112] "Belarus"                            
-[113] "Ukraine"                            
-[114] "Poland"                             
-[115] "Austria"                            
-[116] "Hungary"                            
-[117] "Moldova"                            
-[118] "Romania"                            
-[119] "Lithuania"                          
-[120] "Latvia"                             
-[121] "Estonia"                            
-[122] "Germany"                            
-[123] "Bulgaria"                           
-[124] "Greece"                             
-[125] "Turkey"                             
-[126] "Albania"                            
-[127] "Croatia"                            
-[128] "Switzerland"                        
-[129] "Luxembourg"                         
-[130] "Belgium"                            
-[131] "Netherlands"                        
-[132] "Portugal"                           
-[133] "Spain"                              
-[134] "Ireland"                            
-[135] "New Caledonia"                      
-[136] "Solomon Islands"                    
-[137] "New Zealand"                        
-[138] "Australia"                          
-[139] "Sri Lanka"                          
-[140] "China"                              
-[141] "Taiwan"                             
-[142] "Italy"                              
-[143] "Denmark"                            
-[144] "United Kingdom"                     
-[145] "Iceland"                            
-[146] "Azerbaijan"                         
-[147] "Georgia"                            
-[148] "Philippines"                        
-[149] "Malaysia"                           
-[150] "Brunei"                             
-[151] "Slovenia"                           
-[152] "Finland"                            
-[153] "Slovakia"                           
-[154] "Czechia"                            
-[155] "Eritrea"                            
-[156] "Japan"                              
-[157] "Paraguay"                           
-[158] "Yemen"                              
-[159] "Saudi Arabia"                       
-[160] "Antarctica"                         
-[161] "Northern Cyprus"                    
-[162] "Cyprus"                             
-[163] "Morocco"                            
-[164] "Egypt"                              
-[165] "Libya"                              
-[166] "Ethiopia"                           
-[167] "Djibouti"                           
-[168] "Somaliland"                         
-[169] "Uganda"                             
-[170] "Rwanda"                             
-[171] "Bosnia and Herzegovina"             
-[172] "North Macedonia"                    
-[173] "Republic of Serbia"                 
-[174] "Montenegro"                         
-[175] "Kosovo"                             
-[176] "Trinidad and Tobago"                
-[177] "South Sudan"                        </code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>na_boundaries <span class="ot">&lt;-</span> rnaturalearth<span class="sc">::</span>countries110 <span class="sc">%&gt;%</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ADMIN <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">'United States of America'</span>, <span class="st">'Canada'</span>, <span class="st">'Mexico'</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(eqdc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>na_boundaries <span class="ot">&lt;-</span> rnaturalearth<span class="sc">::</span>countries110 <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ADMIN <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">'United States of America'</span>, <span class="st">'Canada'</span>, <span class="st">'Mexico'</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(eqdc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(na_boundaries)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> na_boundaries) <span class="sc">+</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>() <span class="sc">+</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(na_boundaries)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> na_boundaries) <span class="sc">+</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>() <span class="sc">+</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
 </section>
 <section id="get-city-locations-from-the-csv-file" class="level3">
 <h3 class="anchored" data-anchor-id="get-city-locations-from-the-csv-file"><em>1.4</em> - Get city locations from the CSV file</h3>
-<p>The process of finding, downloading and accessing data is the first step of every analysis. Here we will go through these steps (minus finding the data).</p>
-<p>First go to this <a href="https://simplemaps.com/data/us-cities">site</a> and download the appropriate (free) dataset into the data directory of this project.</p>
-<p>Once downloaded, read it into your working session using <code>readr::read_csv()</code> and explore the dataset until you are comfortable with the information it contains.</p>
-<p>While this data has everything we want, it is not yet spatial. Convert the <code>data.frame</code> to a spatial object using <code>st_as_sf</code> and prescribing the coordinate variables and CRS (<strong>Hint</strong> what projection are the raw coordinates in?)</p>
-<p>Finally, remove cities in states not wanted and make sure the data is in a projected coordinate system suitable for distance measurements at the national scale:</p>
-<p>Congratulations! You now have three real-world, large datasets ready for analysis.</p>
+<p>The process of finding, downloading and accessing data is the first step of every analysis.</p>
+<p>Data was accessed at this (free) <a href="https://simplemaps.com/data/us-cities">site</a> and downloaded as a dataset into the data directory of this project.</p>
+<p>Once downloaded, read it into my working session using and explored the dataset until comfortable with the information it contained.</p>
+<p>The data has everything but it is not spatial. Convert the <code>data.frame</code> to a spatial object using <code>st_as_sf</code> and prescribing the coordinate variables and CRS.</p>
+<p>Finally, remove cities in states not wanted and make sure the data is in a projected coordinate system suitable for distance measurements at the national scale.</p>
+<p>Congratulations! here are three real-world, large datasets ready for analysis.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>us_cities <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">'data/uscities.csv'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">'lng'</span>, <span class="st">'lat'</span>), <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(eqdc) <span class="sc">%&gt;%</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>state_id <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">'PR'</span>, <span class="st">'HI'</span>, <span class="st">'AK'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>us_cities <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">'data/uscities.csv'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">'lng'</span>, <span class="st">'lat'</span>), <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(eqdc) <span class="sc">%&gt;%</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>state_id <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">'PR'</span>, <span class="st">'HI'</span>, <span class="st">'AK'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(us_cities)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> us_cities) <span class="sc">+</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>() <span class="sc">+</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(us_cities)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> us_cities) <span class="sc">+</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>() <span class="sc">+</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<hr>
 </section>
 </section>
 <section id="question-2" class="level1">
 <h1>Question 2:</h1>
-<p>Here we will focus on calculating the distance of each USA city to (1) the national border (2) the nearest state border (3) the Mexican border and (4) the Canadian border. You will need to manipulate you existing spatial geometries to do this using either <code>st_union</code> or <code>st_combine</code> depending on the situation. In all cases, since we are after distances to borders, we will need to cast (<code>st_cast</code>) our <code>MULTIPOLYGON</code> geometries to <code>MULTILINESTRING</code> geometries. To perform these distance calculations we will use <code>st_distance</code>().</p>
+<p>Here I focus on calculating the distance of each USA city to (1) the national border (2) the nearest state border (3) the Mexican border and (4) the Canadian border. The existing spatial geometries are manipulated to do this.</p>
 <section id="distance-to-usa-border-coastline-or-national-km" class="level3">
 <h3 class="anchored" data-anchor-id="distance-to-usa-border-coastline-or-national-km"><em>2.1</em> - Distance to USA Border (coastline or national) (km)</h3>
-<p>For <strong>2.1</strong> we are interested in calculating the distance of each USA city to the USA border (coastline or national border). To do this we need all states to act as single unit. Convert the USA state boundaries to a <code>MULTILINESTRING</code> geometry in which the state boundaries are <strong>resolved</strong>. Please do this starting with the states object and <em>NOT</em> with a filtered country object. In addition to storing this distance data as part of the cities <code>data.frame</code>, produce a table (<code>flextable</code>) documenting the five cities farthest from an international border. Include only the city name, state, and distance.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>state_boundary_u <span class="ot">&lt;-</span> state_boundary <span class="sc">%&gt;%</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_union</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_cast</span>(<span class="at">to =</span> <span class="st">'MULTILINESTRING'</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> state_boundary_u, <span class="fu">aes</span>()) <span class="sc">+</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>state_boundary_u <span class="ot">&lt;-</span> state_boundary <span class="sc">%&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_union</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_cast</span>(<span class="at">to =</span> <span class="st">'MULTILINESTRING'</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>us_cities_distance <span class="ot">&lt;-</span> us_cities <span class="sc">%&gt;%</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_usa =</span> <span class="fu">st_distance</span>(us_cities, state_boundary_u)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_usa =</span> units<span class="sc">::</span><span class="fu">set_units</span>(distance_usa, km)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">'city_ascii'</span>, <span class="st">'source'</span>, <span class="st">'military'</span>, <span class="st">'incorporated'</span>, <span class="st">'timezone'</span>, <span class="st">'ranking'</span>, <span class="st">'zips'</span>, <span class="st">'id'</span>))</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="fu">slice_max</span>(us_cities_distance, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> distance_usa) <span class="sc">%&gt;%</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(city, state_name, distance_usa) <span class="sc">%&gt;%</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">"5 Cities Furthest from a Coastal or International Border"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_zebra</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="lab-02_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="960"></p>
-</figure>
+<div class="tabwid"><style>.cl-1381efa4{}.cl-13780318{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-1378034a{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-137c36ae{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-137c36c2{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-137c5b0c{width:0.75in;background-color:rgba(207, 207, 207, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-137c5b16{width:0.75in;background-color:rgba(207, 207, 207, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-137c5b17{width:0.75in;background-color:rgba(239, 239, 239, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-137c5b20{width:0.75in;background-color:rgba(239, 239, 239, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-137c5b21{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-137c5b2a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-1381efa4"><thead><tr style="overflow-wrap:break-word;"><th class="cl-137c5b0c"><p class="cl-137c36ae"><span class="cl-13780318">city</span></p></th><th class="cl-137c5b0c"><p class="cl-137c36ae"><span class="cl-13780318">state_name</span></p></th><th class="cl-137c5b16"><p class="cl-137c36c2"><span class="cl-13780318">distance_usa</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-137c5b17"><p class="cl-137c36ae"><span class="cl-1378034a">Ludell</span></p></td><td class="cl-137c5b17"><p class="cl-137c36ae"><span class="cl-1378034a">Kansas</span></p></td><td class="cl-137c5b20"><p class="cl-137c36c2"><span class="cl-1378034a">1,012.508 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-137c5b21"><p class="cl-137c36ae"><span class="cl-1378034a">Dresden</span></p></td><td class="cl-137c5b21"><p class="cl-137c36ae"><span class="cl-1378034a">Kansas</span></p></td><td class="cl-137c5b2a"><p class="cl-137c36c2"><span class="cl-1378034a">1,012.398 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-137c5b17"><p class="cl-137c36ae"><span class="cl-1378034a">Herndon</span></p></td><td class="cl-137c5b17"><p class="cl-137c36ae"><span class="cl-1378034a">Kansas</span></p></td><td class="cl-137c5b20"><p class="cl-137c36c2"><span class="cl-1378034a">1,007.763 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-137c5b21"><p class="cl-137c36ae"><span class="cl-1378034a">Hill City</span></p></td><td class="cl-137c5b21"><p class="cl-137c36ae"><span class="cl-1378034a">Kansas</span></p></td><td class="cl-137c5b2a"><p class="cl-137c36c2"><span class="cl-1378034a">1,005.140 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-137c5b17"><p class="cl-137c36ae"><span class="cl-1378034a">Atwood</span></p></td><td class="cl-137c5b17"><p class="cl-137c36ae"><span class="cl-1378034a">Kansas</span></p></td><td class="cl-137c5b20"><p class="cl-137c36c2"><span class="cl-1378034a">1,004.734 [km]</span></p></td></tr></tbody></table></div>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>us_cities_distance <span class="ot">&lt;-</span> us_cities <span class="sc">%&gt;%</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_usa =</span> <span class="fu">st_distance</span>(us_cities, state_boundary_u)) <span class="sc">%&gt;%</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_usa =</span> units<span class="sc">::</span><span class="fu">set_units</span>(distance_usa, km)) <span class="sc">%&gt;%</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">'city_ascii'</span>, <span class="st">'source'</span>, <span class="st">'military'</span>, <span class="st">'incorporated'</span>, <span class="st">'timezone'</span>, <span class="st">'ranking'</span>, <span class="st">'zips'</span>, <span class="st">'id'</span>))</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">slice_max</span>(us_cities_distance, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> distance_usa) <span class="sc">%&gt;%</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(city, state_name, distance_usa) <span class="sc">%&gt;%</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">"5 Cities Furthest from a Coastal or International Border"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div class="tabwid"><style>.cl-a1e28b40{}.cl-a1cfd7d4{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-a1d7b24c{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-a1d7b260{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-a1d7eee2{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a1d7eef6{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a1d7ef00{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a1d7ef0a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a1d7ef14{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a1d7ef1e{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-a1e28b40"><thead><tr style="overflow-wrap:break-word;"><th class="cl-a1d7eee2"><p class="cl-a1d7b24c"><span class="cl-a1cfd7d4">city</span></p></th><th class="cl-a1d7eee2"><p class="cl-a1d7b24c"><span class="cl-a1cfd7d4">state_name</span></p></th><th class="cl-a1d7eef6"><p class="cl-a1d7b260"><span class="cl-a1cfd7d4">distance_usa</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-a1d7ef00"><p class="cl-a1d7b24c"><span class="cl-a1cfd7d4">Ludell</span></p></td><td class="cl-a1d7ef00"><p class="cl-a1d7b24c"><span class="cl-a1cfd7d4">Kansas</span></p></td><td class="cl-a1d7ef0a"><p class="cl-a1d7b260"><span class="cl-a1cfd7d4">1,012.508 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a1d7ef00"><p class="cl-a1d7b24c"><span class="cl-a1cfd7d4">Dresden</span></p></td><td class="cl-a1d7ef00"><p class="cl-a1d7b24c"><span class="cl-a1cfd7d4">Kansas</span></p></td><td class="cl-a1d7ef0a"><p class="cl-a1d7b260"><span class="cl-a1cfd7d4">1,012.398 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a1d7ef00"><p class="cl-a1d7b24c"><span class="cl-a1cfd7d4">Herndon</span></p></td><td class="cl-a1d7ef00"><p class="cl-a1d7b24c"><span class="cl-a1cfd7d4">Kansas</span></p></td><td class="cl-a1d7ef0a"><p class="cl-a1d7b260"><span class="cl-a1cfd7d4">1,007.763 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a1d7ef00"><p class="cl-a1d7b24c"><span class="cl-a1cfd7d4">Hill City</span></p></td><td class="cl-a1d7ef00"><p class="cl-a1d7b24c"><span class="cl-a1cfd7d4">Kansas</span></p></td><td class="cl-a1d7ef0a"><p class="cl-a1d7b260"><span class="cl-a1cfd7d4">1,005.140 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a1d7ef14"><p class="cl-a1d7b24c"><span class="cl-a1cfd7d4">Atwood</span></p></td><td class="cl-a1d7ef14"><p class="cl-a1d7b24c"><span class="cl-a1cfd7d4">Kansas</span></p></td><td class="cl-a1d7ef1e"><p class="cl-a1d7b260"><span class="cl-a1cfd7d4">1,004.734 [km]</span></p></td></tr></tbody></table></div>
-</div>
-</div>
+<hr>
 </section>
 <section id="distance-to-states-km" class="level3">
 <h3 class="anchored" data-anchor-id="distance-to-states-km"><em>2.2</em> - Distance to States (km)</h3>
 <p>For <strong>2.2</strong> we are interested in calculating the distance of each city to the nearest state boundary. To do this we need all states to act as single unit. Convert the USA state boundaries to a <code>MULTILINESTRING</code> geometry in which the state boundaries are <strong>preserved</strong> (not resolved). In addition to storing this distance data as part of the cities <code>data.frame</code>, produce a table (<code>flextable</code>) documenting the five cities farthest from a state border. Include only the city name, state, and distance.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>state_boundary_c <span class="ot">&lt;-</span> state_boundary <span class="sc">%&gt;%</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_combine</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_cast</span>(<span class="at">to =</span> <span class="st">'MULTILINESTRING'</span>)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> state_boundary_c, <span class="fu">aes</span>()) <span class="sc">+</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>state_boundary_c <span class="ot">&lt;-</span> state_boundary <span class="sc">%&gt;%</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_combine</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_cast</span>(<span class="at">to =</span> <span class="st">'MULTILINESTRING'</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>us_cities_distance <span class="ot">&lt;-</span> us_cities_distance <span class="sc">%&gt;%</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_state =</span> <span class="fu">st_distance</span>(us_cities_distance, state_boundary_c)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_state =</span> units<span class="sc">::</span><span class="fu">set_units</span>(distance_state, km))</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">slice_max</span>(us_cities_distance, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> distance_state) <span class="sc">%&gt;%</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(city, state_name, distance_state) <span class="sc">%&gt;%</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">"5 Cities Furthest from a State Boundary"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_zebra</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="lab-02_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="960"></p>
-</figure>
+<div class="tabwid"><style>.cl-1407dd80{}.cl-13f8f284{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-13f8f28e{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-140097c8{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-140097dc{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-1400e0e8{width:0.75in;background-color:rgba(207, 207, 207, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1400e0fc{width:0.75in;background-color:rgba(207, 207, 207, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1400e110{width:0.75in;background-color:rgba(239, 239, 239, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1400e11a{width:0.75in;background-color:rgba(239, 239, 239, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1400e11b{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1400e124{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-1407dd80"><thead><tr style="overflow-wrap:break-word;"><th class="cl-1400e0e8"><p class="cl-140097c8"><span class="cl-13f8f284">city</span></p></th><th class="cl-1400e0e8"><p class="cl-140097c8"><span class="cl-13f8f284">state_name</span></p></th><th class="cl-1400e0fc"><p class="cl-140097dc"><span class="cl-13f8f284">distance_state</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-1400e110"><p class="cl-140097c8"><span class="cl-13f8f28e">Briggs</span></p></td><td class="cl-1400e110"><p class="cl-140097c8"><span class="cl-13f8f28e">Texas</span></p></td><td class="cl-1400e11a"><p class="cl-140097dc"><span class="cl-13f8f28e">309.4150 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1400e11b"><p class="cl-140097c8"><span class="cl-13f8f28e">Lampasas</span></p></td><td class="cl-1400e11b"><p class="cl-140097c8"><span class="cl-13f8f28e">Texas</span></p></td><td class="cl-1400e124"><p class="cl-140097dc"><span class="cl-13f8f28e">308.9216 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1400e110"><p class="cl-140097c8"><span class="cl-13f8f28e">Kempner</span></p></td><td class="cl-1400e110"><p class="cl-140097c8"><span class="cl-13f8f28e">Texas</span></p></td><td class="cl-1400e11a"><p class="cl-140097dc"><span class="cl-13f8f28e">302.5868 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1400e11b"><p class="cl-140097c8"><span class="cl-13f8f28e">Bertram</span></p></td><td class="cl-1400e11b"><p class="cl-140097c8"><span class="cl-13f8f28e">Texas</span></p></td><td class="cl-1400e124"><p class="cl-140097dc"><span class="cl-13f8f28e">302.5776 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1400e110"><p class="cl-140097c8"><span class="cl-13f8f28e">Harker Heights</span></p></td><td class="cl-1400e110"><p class="cl-140097c8"><span class="cl-13f8f28e">Texas</span></p></td><td class="cl-1400e11a"><p class="cl-140097dc"><span class="cl-13f8f28e">298.8138 [km]</span></p></td></tr></tbody></table></div>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>us_cities_distance <span class="ot">&lt;-</span> us_cities_distance <span class="sc">%&gt;%</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_state =</span> <span class="fu">st_distance</span>(us_cities_distance, state_boundary_c)) <span class="sc">%&gt;%</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_state =</span> units<span class="sc">::</span><span class="fu">set_units</span>(distance_state, km))</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">slice_max</span>(us_cities_distance, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> distance_state) <span class="sc">%&gt;%</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(city, state_name, distance_state) <span class="sc">%&gt;%</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">"5 Cities Furthest from a State Boundary"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div class="tabwid"><style>.cl-a44f2726{}.cl-a43c2694{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-a4445134{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-a4445148{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-a4448226{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a444823a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a4448244{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a4448245{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a4448258{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a4448262{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-a44f2726"><thead><tr style="overflow-wrap:break-word;"><th class="cl-a4448226"><p class="cl-a4445134"><span class="cl-a43c2694">city</span></p></th><th class="cl-a4448226"><p class="cl-a4445134"><span class="cl-a43c2694">state_name</span></p></th><th class="cl-a444823a"><p class="cl-a4445148"><span class="cl-a43c2694">distance_state</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-a4448244"><p class="cl-a4445134"><span class="cl-a43c2694">Briggs</span></p></td><td class="cl-a4448244"><p class="cl-a4445134"><span class="cl-a43c2694">Texas</span></p></td><td class="cl-a4448245"><p class="cl-a4445148"><span class="cl-a43c2694">309.4150 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a4448244"><p class="cl-a4445134"><span class="cl-a43c2694">Lampasas</span></p></td><td class="cl-a4448244"><p class="cl-a4445134"><span class="cl-a43c2694">Texas</span></p></td><td class="cl-a4448245"><p class="cl-a4445148"><span class="cl-a43c2694">308.9216 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a4448244"><p class="cl-a4445134"><span class="cl-a43c2694">Kempner</span></p></td><td class="cl-a4448244"><p class="cl-a4445134"><span class="cl-a43c2694">Texas</span></p></td><td class="cl-a4448245"><p class="cl-a4445148"><span class="cl-a43c2694">302.5868 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a4448244"><p class="cl-a4445134"><span class="cl-a43c2694">Bertram</span></p></td><td class="cl-a4448244"><p class="cl-a4445134"><span class="cl-a43c2694">Texas</span></p></td><td class="cl-a4448245"><p class="cl-a4445148"><span class="cl-a43c2694">302.5776 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a4448258"><p class="cl-a4445134"><span class="cl-a43c2694">Harker Heights</span></p></td><td class="cl-a4448258"><p class="cl-a4445134"><span class="cl-a43c2694">Texas</span></p></td><td class="cl-a4448262"><p class="cl-a4445148"><span class="cl-a43c2694">298.8138 [km]</span></p></td></tr></tbody></table></div>
-</div>
-</div>
+<hr>
 </section>
 <section id="distance-to-mexico-km" class="level3">
 <h3 class="anchored" data-anchor-id="distance-to-mexico-km"><em>2.3</em> - Distance to Mexico (km)</h3>
 <p>For <strong>2.3</strong> we are interested in calculating the distance of each city to the Mexican border. To do this we need to isolate Mexico from the country objects. In addition to storing this data as part of the cities data.frame, produce a table (<code>flextable</code>) documenting the five cities farthest from the Mexico border. Include only the city name, state, and distance.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>na_boundaries_mex <span class="ot">&lt;-</span> na_boundaries <span class="sc">%&gt;%</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SOV_A3 <span class="sc">==</span> <span class="st">'MEX'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_cast</span>(<span class="at">to =</span> <span class="st">'MULTILINESTRING'</span>)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(na_boundaries_mex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>na_boundaries_mex <span class="ot">&lt;-</span> na_boundaries <span class="sc">%&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SOV_A3 <span class="sc">==</span> <span class="st">'MEX'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_cast</span>(<span class="at">to =</span> <span class="st">'MULTILINESTRING'</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>us_cities_distance <span class="ot">&lt;-</span> us_cities_distance <span class="sc">%&gt;%</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_mex =</span> <span class="fu">st_distance</span>(us_cities_distance, na_boundaries_mex)) <span class="sc">%&gt;%</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_mex =</span> units<span class="sc">::</span><span class="fu">set_units</span>(distance_mex, km))</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="fu">slice_max</span>(us_cities_distance, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> distance_mex) <span class="sc">%&gt;%</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(city, state_name, distance_mex) <span class="sc">%&gt;%</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">"5 Cities Furthest from the Mexico Border"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_zebra</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="lab-02_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="960"></p>
-</figure>
-</div>
-</div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>us_cities_distance <span class="ot">&lt;-</span> us_cities_distance <span class="sc">%&gt;%</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_mex =</span> <span class="fu">st_distance</span>(us_cities_distance, na_boundaries_mex)) <span class="sc">%&gt;%</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_mex =</span> units<span class="sc">::</span><span class="fu">set_units</span>(distance_mex, km))</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">slice_max</span>(us_cities_distance, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> distance_mex) <span class="sc">%&gt;%</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(city, state_name, distance_mex) <span class="sc">%&gt;%</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">"5 Cities Furthest from the Mexico Border"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div class="tabwid"><style>.cl-a556d290{}.cl-a53e57ce{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-a549ecd8{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-a549ecf6{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-a54a5a1a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a54a5a38{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a54a5a56{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a54a5a60{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a54a5a6a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a54a5a74{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-a556d290"><thead><tr style="overflow-wrap:break-word;"><th class="cl-a54a5a1a"><p class="cl-a549ecd8"><span class="cl-a53e57ce">city</span></p></th><th class="cl-a54a5a1a"><p class="cl-a549ecd8"><span class="cl-a53e57ce">state_name</span></p></th><th class="cl-a54a5a38"><p class="cl-a549ecf6"><span class="cl-a53e57ce">distance_mex</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-a54a5a56"><p class="cl-a549ecd8"><span class="cl-a53e57ce">Grand Isle</span></p></td><td class="cl-a54a5a56"><p class="cl-a549ecd8"><span class="cl-a53e57ce">Maine</span></p></td><td class="cl-a54a5a60"><p class="cl-a549ecf6"><span class="cl-a53e57ce">3,282.825 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a54a5a56"><p class="cl-a549ecd8"><span class="cl-a53e57ce">Caribou</span></p></td><td class="cl-a54a5a56"><p class="cl-a549ecd8"><span class="cl-a53e57ce">Maine</span></p></td><td class="cl-a54a5a60"><p class="cl-a549ecf6"><span class="cl-a53e57ce">3,250.330 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a54a5a56"><p class="cl-a549ecd8"><span class="cl-a53e57ce">Presque Isle</span></p></td><td class="cl-a54a5a56"><p class="cl-a549ecd8"><span class="cl-a53e57ce">Maine</span></p></td><td class="cl-a54a5a60"><p class="cl-a549ecf6"><span class="cl-a53e57ce">3,234.570 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a54a5a56"><p class="cl-a549ecd8"><span class="cl-a53e57ce">Oakfield</span></p></td><td class="cl-a54a5a56"><p class="cl-a549ecd8"><span class="cl-a53e57ce">Maine</span></p></td><td class="cl-a54a5a60"><p class="cl-a549ecf6"><span class="cl-a53e57ce">3,175.577 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a54a5a6a"><p class="cl-a549ecd8"><span class="cl-a53e57ce">Island Falls</span></p></td><td class="cl-a54a5a6a"><p class="cl-a549ecd8"><span class="cl-a53e57ce">Maine</span></p></td><td class="cl-a54a5a74"><p class="cl-a549ecf6"><span class="cl-a53e57ce">3,162.285 [km]</span></p></td></tr></tbody></table></div>
+<div class="tabwid"><style>.cl-143b1830{}.cl-1431c83e{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-1431c848{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-14357416{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-1435742a{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-143598c4{width:0.75in;background-color:rgba(207, 207, 207, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-143598d8{width:0.75in;background-color:rgba(207, 207, 207, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-143598d9{width:0.75in;background-color:rgba(239, 239, 239, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-143598e2{width:0.75in;background-color:rgba(239, 239, 239, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-143598e3{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-143598ec{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-143b1830"><thead><tr style="overflow-wrap:break-word;"><th class="cl-143598c4"><p class="cl-14357416"><span class="cl-1431c83e">city</span></p></th><th class="cl-143598c4"><p class="cl-14357416"><span class="cl-1431c83e">state_name</span></p></th><th class="cl-143598d8"><p class="cl-1435742a"><span class="cl-1431c83e">distance_mex</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-143598d9"><p class="cl-14357416"><span class="cl-1431c848">Grand Isle</span></p></td><td class="cl-143598d9"><p class="cl-14357416"><span class="cl-1431c848">Maine</span></p></td><td class="cl-143598e2"><p class="cl-1435742a"><span class="cl-1431c848">3,282.825 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-143598e3"><p class="cl-14357416"><span class="cl-1431c848">Caribou</span></p></td><td class="cl-143598e3"><p class="cl-14357416"><span class="cl-1431c848">Maine</span></p></td><td class="cl-143598ec"><p class="cl-1435742a"><span class="cl-1431c848">3,250.330 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-143598d9"><p class="cl-14357416"><span class="cl-1431c848">Presque Isle</span></p></td><td class="cl-143598d9"><p class="cl-14357416"><span class="cl-1431c848">Maine</span></p></td><td class="cl-143598e2"><p class="cl-1435742a"><span class="cl-1431c848">3,234.570 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-143598e3"><p class="cl-14357416"><span class="cl-1431c848">Oakfield</span></p></td><td class="cl-143598e3"><p class="cl-14357416"><span class="cl-1431c848">Maine</span></p></td><td class="cl-143598ec"><p class="cl-1435742a"><span class="cl-1431c848">3,175.577 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-143598d9"><p class="cl-14357416"><span class="cl-1431c848">Island Falls</span></p></td><td class="cl-143598d9"><p class="cl-14357416"><span class="cl-1431c848">Maine</span></p></td><td class="cl-143598e2"><p class="cl-1435742a"><span class="cl-1431c848">3,162.285 [km]</span></p></td></tr></tbody></table></div>
 </div>
 </div>
 </section>
@@ -552,171 +425,163 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="distance-to-canada-km"><em>2.4</em> - Distance to Canada (km)</h3>
 <p>For <strong>2.4</strong> we are interested in calculating the distance of each city to the Canadian border. To do this we need to isolate Canada from the country objects. In addition to storing this data as part of the cities data.frame, produce a table (<code>flextable</code>) documenting the five cities farthest from a state border. Include only the city name, state, and distance.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>na_boundaries_can <span class="ot">&lt;-</span> na_boundaries <span class="sc">%&gt;%</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SOV_A3 <span class="sc">==</span> <span class="st">'CAN'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_cast</span>(<span class="at">to =</span> <span class="st">'MULTILINESTRING'</span>)</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(na_boundaries_can)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>na_boundaries_can <span class="ot">&lt;-</span> na_boundaries <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SOV_A3 <span class="sc">==</span> <span class="st">'CAN'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_cast</span>(<span class="at">to =</span> <span class="st">'MULTILINESTRING'</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>us_cities_distance <span class="ot">&lt;-</span> us_cities_distance <span class="sc">%&gt;%</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_can =</span> <span class="fu">st_distance</span>(us_cities_distance, na_boundaries_can)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_can =</span> units<span class="sc">::</span><span class="fu">set_units</span>(distance_can, km))</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="fu">slice_max</span>(us_cities_distance, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> distance_can) <span class="sc">%&gt;%</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(city, state_name, distance_can) <span class="sc">%&gt;%</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">"5 Cities Furthest from the Canada Border"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_zebra</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="lab-02_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="960"></p>
-</figure>
+<div class="tabwid"><style>.cl-14739b10{}.cl-146accb0{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-146accba{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-146e6cee{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-146e6cf8{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-146e8e72{width:0.75in;background-color:rgba(207, 207, 207, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-146e8e86{width:0.75in;background-color:rgba(207, 207, 207, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-146e8e87{width:0.75in;background-color:rgba(239, 239, 239, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-146e8e90{width:0.75in;background-color:rgba(239, 239, 239, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-146e8e9a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-146e8e9b{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-14739b10"><thead><tr style="overflow-wrap:break-word;"><th class="cl-146e8e72"><p class="cl-146e6cee"><span class="cl-146accb0">city</span></p></th><th class="cl-146e8e72"><p class="cl-146e6cee"><span class="cl-146accb0">state_name</span></p></th><th class="cl-146e8e86"><p class="cl-146e6cf8"><span class="cl-146accb0">distance_can</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-146e8e87"><p class="cl-146e6cee"><span class="cl-146accba">Guadalupe Guerra</span></p></td><td class="cl-146e8e87"><p class="cl-146e6cee"><span class="cl-146accba">Texas</span></p></td><td class="cl-146e8e90"><p class="cl-146e6cf8"><span class="cl-146accba">2,206.455 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-146e8e9a"><p class="cl-146e6cee"><span class="cl-146accba">Sandoval</span></p></td><td class="cl-146e8e9a"><p class="cl-146e6cee"><span class="cl-146accba">Texas</span></p></td><td class="cl-146e8e9b"><p class="cl-146e6cf8"><span class="cl-146accba">2,205.641 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-146e8e87"><p class="cl-146e6cee"><span class="cl-146accba">Fronton</span></p></td><td class="cl-146e8e87"><p class="cl-146e6cee"><span class="cl-146accba">Texas</span></p></td><td class="cl-146e8e90"><p class="cl-146e6cf8"><span class="cl-146accba">2,204.794 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-146e8e9a"><p class="cl-146e6cee"><span class="cl-146accba">Fronton Ranchettes</span></p></td><td class="cl-146e8e9a"><p class="cl-146e6cee"><span class="cl-146accba">Texas</span></p></td><td class="cl-146e8e9b"><p class="cl-146e6cf8"><span class="cl-146accba">2,202.118 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-146e8e87"><p class="cl-146e6cee"><span class="cl-146accba">Evergreen</span></p></td><td class="cl-146e8e87"><p class="cl-146e6cee"><span class="cl-146accba">Texas</span></p></td><td class="cl-146e8e90"><p class="cl-146e6cf8"><span class="cl-146accba">2,202.020 [km]</span></p></td></tr></tbody></table></div>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>us_cities_distance <span class="ot">&lt;-</span> us_cities_distance <span class="sc">%&gt;%</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_can =</span> <span class="fu">st_distance</span>(us_cities_distance, na_boundaries_can)) <span class="sc">%&gt;%</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_can =</span> units<span class="sc">::</span><span class="fu">set_units</span>(distance_can, km))</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="fu">slice_max</span>(us_cities_distance, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> distance_can) <span class="sc">%&gt;%</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(city, state_name, distance_can) <span class="sc">%&gt;%</span></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">"5 Cities Furthest from the Canada Border"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div class="tabwid"><style>.cl-a695088e{}.cl-a6836cb4{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-a68afe7a{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-a68afe98{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-a68b43c6{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a68b43e4{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a68b43ee{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a68b43f8{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a68b440c{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a68b4416{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-a695088e"><thead><tr style="overflow-wrap:break-word;"><th class="cl-a68b43c6"><p class="cl-a68afe7a"><span class="cl-a6836cb4">city</span></p></th><th class="cl-a68b43c6"><p class="cl-a68afe7a"><span class="cl-a6836cb4">state_name</span></p></th><th class="cl-a68b43e4"><p class="cl-a68afe98"><span class="cl-a6836cb4">distance_can</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-a68b43ee"><p class="cl-a68afe7a"><span class="cl-a6836cb4">Guadalupe Guerra</span></p></td><td class="cl-a68b43ee"><p class="cl-a68afe7a"><span class="cl-a6836cb4">Texas</span></p></td><td class="cl-a68b43f8"><p class="cl-a68afe98"><span class="cl-a6836cb4">2,206.455 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a68b43ee"><p class="cl-a68afe7a"><span class="cl-a6836cb4">Sandoval</span></p></td><td class="cl-a68b43ee"><p class="cl-a68afe7a"><span class="cl-a6836cb4">Texas</span></p></td><td class="cl-a68b43f8"><p class="cl-a68afe98"><span class="cl-a6836cb4">2,205.641 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a68b43ee"><p class="cl-a68afe7a"><span class="cl-a6836cb4">Fronton</span></p></td><td class="cl-a68b43ee"><p class="cl-a68afe7a"><span class="cl-a6836cb4">Texas</span></p></td><td class="cl-a68b43f8"><p class="cl-a68afe98"><span class="cl-a6836cb4">2,204.794 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a68b43ee"><p class="cl-a68afe7a"><span class="cl-a6836cb4">Fronton Ranchettes</span></p></td><td class="cl-a68b43ee"><p class="cl-a68afe7a"><span class="cl-a6836cb4">Texas</span></p></td><td class="cl-a68b43f8"><p class="cl-a68afe98"><span class="cl-a6836cb4">2,202.118 [km]</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a68b440c"><p class="cl-a68afe7a"><span class="cl-a6836cb4">Evergreen</span></p></td><td class="cl-a68b440c"><p class="cl-a68afe7a"><span class="cl-a6836cb4">Texas</span></p></td><td class="cl-a68b4416"><p class="cl-a68afe98"><span class="cl-a6836cb4">2,202.020 [km]</span></p></td></tr></tbody></table></div>
-</div>
-</div>
+<hr>
 </section>
 </section>
 <section id="question-3" class="level1">
 <h1>Question 3:</h1>
-<p>In this section we will focus on visualizing the distance data you calculated above. You will be using <code>ggplot</code> to make your maps, <code>ggrepl</code> to label significant features, and <code>gghighlight</code> to emphasize important criteria.</p>
+<p>In this section I visualize the distance data calculated above. I use <code>ggplot</code> to make maps, <code>ggrepl</code> to label significant features, and <code>gghighlight</code> to emphasize important criteria.</p>
 <section id="data" class="level3">
 <h3 class="anchored" data-anchor-id="data"><em>3.1</em> Data</h3>
-<p>Show the 3 continents, CONUS outline, state boundaries, and 10 largest USA cities (by population) on a single map</p>
-<ul>
-<li>Use <code>geom_sf</code> to plot your layers</li>
-<li>Use <code>lty</code> to change the line type and size to change line width</li>
-<li>Use <code>ggrepel::geom_label_repel</code> to label your cities</li>
-</ul>
+<p>Show the 3 continents, CONUS outline, state boundaries, and 10 largest USA cities (by population) on a single map.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>us_cities_size <span class="ot">&lt;-</span> us_cities_distance <span class="sc">%&gt;%</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">n =</span> <span class="dv">10</span>, <span class="at">order_by =</span> population)</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> na_boundaries, <span class="at">linewidth =</span> <span class="fl">0.75</span>, <span class="at">color =</span> <span class="st">'black'</span>) <span class="sc">+</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> state_boundary) <span class="sc">+</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_size, <span class="fu">aes</span>(<span class="at">color =</span> population)) <span class="sc">+</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>(<span class="at">option =</span> <span class="st">'turbo'</span>) <span class="sc">+</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label_repel</span>(<span class="at">data =</span> us_cities_size,</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">1</span>],</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">2</span>],</span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>                       <span class="at">label =</span> city),</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>                   <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'none'</span>) <span class="sc">+</span></span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"10 Largest U.S. Cities by Population"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>us_cities_size <span class="ot">&lt;-</span> us_cities_distance <span class="sc">%&gt;%</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">n =</span> <span class="dv">10</span>, <span class="at">order_by =</span> population)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> na_boundaries, <span class="at">linewidth =</span> <span class="fl">0.75</span>, <span class="at">color =</span> <span class="st">'black'</span>) <span class="sc">+</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> state_boundary) <span class="sc">+</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_size, <span class="fu">aes</span>(<span class="at">color =</span> population)) <span class="sc">+</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>(<span class="at">option =</span> <span class="st">'turbo'</span>) <span class="sc">+</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label_repel</span>(<span class="at">data =</span> us_cities_size,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">1</span>],</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">2</span>],</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>                       <span class="at">label =</span> city),</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>                   <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'none'</span>) <span class="sc">+</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"10 Largest U.S. Cities by Population"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="lab-02_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="960"></p>
+<p><img src="lab-02_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
+<hr>
 </section>
 <section id="city-distance-from-the-border" class="level3">
 <h3 class="anchored" data-anchor-id="city-distance-from-the-border"><em>3.2</em> City Distance from the Border</h3>
 <p>Create a map that colors USA cities by their distance from the national border. In addition, re-draw and label the 5 cities that are farthest from the border.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>us_cities_distance <span class="ot">&lt;-</span> us_cities_distance <span class="sc">%&gt;%</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_usa =</span> <span class="fu">as.numeric</span>(distance_usa),</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">distance_state =</span> <span class="fu">as.numeric</span>(distance_state),</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">distance_mex =</span> <span class="fu">as.numeric</span>(distance_mex),</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">distance_can =</span> <span class="fu">as.numeric</span>(distance_can))</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>us_cities_far <span class="ot">&lt;-</span> us_cities_distance <span class="sc">%&gt;%</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> distance_usa) <span class="sc">%&gt;%</span></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">label =</span> <span class="fu">paste</span>(city, state_id, <span class="at">sep =</span> <span class="st">','</span>))</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> state_boundary) <span class="sc">+</span></span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_distance, <span class="fu">aes</span>(<span class="at">color =</span> distance_usa), <span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>(<span class="at">option =</span> <span class="st">'rocket'</span>, <span class="at">name =</span> <span class="st">'Distance (km)'</span>) <span class="sc">+</span></span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'U.S. Cities and Distances from the Nearest Border'</span>) <span class="sc">+</span></span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_far, <span class="at">color =</span> <span class="st">'black'</span>) <span class="sc">+</span></span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label_repel</span>(<span class="at">data =</span> us_cities_far,</span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">1</span>],</span>
-<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">2</span>],</span>
-<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>                       <span class="at">label =</span> label),</span>
-<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>                       <span class="at">size =</span> <span class="fl">2.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>us_cities_distance <span class="ot">&lt;-</span> us_cities_distance <span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_usa =</span> <span class="fu">as.numeric</span>(distance_usa),</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">distance_state =</span> <span class="fu">as.numeric</span>(distance_state),</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">distance_mex =</span> <span class="fu">as.numeric</span>(distance_mex),</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">distance_can =</span> <span class="fu">as.numeric</span>(distance_can))</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>us_cities_far <span class="ot">&lt;-</span> us_cities_distance <span class="sc">%&gt;%</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> distance_usa) <span class="sc">%&gt;%</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">label =</span> <span class="fu">paste</span>(city, state_id, <span class="at">sep =</span> <span class="st">','</span>))</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> state_boundary) <span class="sc">+</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_distance, <span class="fu">aes</span>(<span class="at">color =</span> distance_usa), <span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>(<span class="at">option =</span> <span class="st">'rocket'</span>, <span class="at">name =</span> <span class="st">'Distance (km)'</span>) <span class="sc">+</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'U.S. Cities and Distances from the Nearest Border'</span>) <span class="sc">+</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_far, <span class="at">color =</span> <span class="st">'black'</span>) <span class="sc">+</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label_repel</span>(<span class="at">data =</span> us_cities_far,</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">1</span>],</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">2</span>],</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>                       <span class="at">label =</span> label),</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>                       <span class="at">size =</span> <span class="fl">2.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="lab-02_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="960"></p>
+<p><img src="lab-02_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
+<hr>
 </section>
 <section id="city-distance-from-nearest-state" class="level3">
 <h3 class="anchored" data-anchor-id="city-distance-from-nearest-state"><em>3.3</em> City Distance from Nearest State</h3>
 <p>Create a map that colors USA cities by their distance from the nearest state border. In addition, re-draw and label the 5 cities that are farthest from any border.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>us_cities_st_far <span class="ot">&lt;-</span> us_cities_distance <span class="sc">%&gt;%</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> distance_state) <span class="sc">%&gt;%</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">label =</span> <span class="fu">paste</span>(city, state_id, <span class="at">sep =</span> <span class="st">','</span>))</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>state_boundary_line <span class="ot">&lt;-</span> state_boundary <span class="sc">%&gt;%</span></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_cast</span>(<span class="at">to =</span> <span class="st">'MULTILINESTRING'</span>)</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_distance, <span class="fu">aes</span>(<span class="at">color =</span> distance_state), <span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>(<span class="at">option =</span> <span class="st">'rocket'</span>, <span class="at">name =</span> <span class="st">'Distance (km)'</span>) <span class="sc">+</span></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> state_boundary_line, <span class="at">color =</span> <span class="st">'black'</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'U.S. Cities and Distances from the Nearest State Border'</span>) <span class="sc">+</span></span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_st_far, <span class="at">color =</span> <span class="st">'black'</span>) <span class="sc">+</span></span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label_repel</span>(<span class="at">data =</span> us_cities_st_far,</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">1</span>],</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">2</span>],</span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>                       <span class="at">label =</span> label),</span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>                       <span class="at">size =</span> <span class="fl">2.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>us_cities_st_far <span class="ot">&lt;-</span> us_cities_distance <span class="sc">%&gt;%</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> distance_state) <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">label =</span> <span class="fu">paste</span>(city, state_id, <span class="at">sep =</span> <span class="st">','</span>))</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>state_boundary_line <span class="ot">&lt;-</span> state_boundary <span class="sc">%&gt;%</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_cast</span>(<span class="at">to =</span> <span class="st">'MULTILINESTRING'</span>)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_distance, <span class="fu">aes</span>(<span class="at">color =</span> distance_state), <span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>(<span class="at">option =</span> <span class="st">'rocket'</span>, <span class="at">name =</span> <span class="st">'Distance (km)'</span>) <span class="sc">+</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> state_boundary_line, <span class="at">color =</span> <span class="st">'black'</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'U.S. Cities and Distances from the Nearest State Border'</span>) <span class="sc">+</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_st_far, <span class="at">color =</span> <span class="st">'black'</span>) <span class="sc">+</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label_repel</span>(<span class="at">data =</span> us_cities_st_far,</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">1</span>],</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">2</span>],</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>                       <span class="at">label =</span> label),</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>                       <span class="at">size =</span> <span class="fl">2.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="lab-02_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="960"></p>
+<p><img src="lab-02_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
+<hr>
 </section>
 <section id="equidistance-boundary-from-mexico-and-canada" class="level3">
 <h3 class="anchored" data-anchor-id="equidistance-boundary-from-mexico-and-canada"><em>3.4</em> Equidistance boundary from Mexico and Canada</h3>
-<p>Here we provide a little more challenge. Use <code>gghighlight</code> to identify the cities that are equal distance from the Canadian <strong>AND</strong> Mexican border <span class="math inline">\(\pm\)</span> 100 km.</p>
+<p>This is slightly more challenging. Use <code>gghighlight</code> to identify the cities that are equal distance from the Canadian <strong>AND</strong> Mexican border <span class="math inline">\(\pm\)</span> 100 km.</p>
 <p>In addition, label the five (5) most populous cites in this zone.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>us_cities_eqd <span class="ot">&lt;-</span> us_cities_distance <span class="sc">%&gt;%</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">equidistant =</span> <span class="fu">abs</span>(distance_mex <span class="sc">-</span> distance_can))</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>us_cities_eqd_pop <span class="ot">&lt;-</span> us_cities_eqd <span class="sc">%&gt;%</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(equidistant <span class="sc">&lt;=</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> population) <span class="sc">%&gt;%</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">label =</span> <span class="fu">paste</span>(city, state_id, <span class="at">sep =</span> <span class="st">','</span>))</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_eqd, <span class="fu">aes</span>(<span class="at">color =</span> equidistant), <span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>(<span class="at">option =</span> <span class="st">'rocket'</span>, <span class="at">name =</span> <span class="st">'Distance (km)'</span>) <span class="sc">+</span></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gghighlight</span>(equidistant <span class="sc">&lt;=</span> <span class="dv">100</span>) <span class="sc">+</span></span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> state_boundary_line, <span class="at">color =</span> <span class="st">'black'</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'U.S. Cities Equidistant from Canada and Mexico +/- 100 km'</span>) <span class="sc">+</span></span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label_repel</span>(<span class="at">data =</span> us_cities_eqd_pop,</span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">1</span>],</span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">2</span>],</span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>                       <span class="at">label =</span> label),</span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>                       <span class="at">size =</span> <span class="fl">2.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>us_cities_eqd <span class="ot">&lt;-</span> us_cities_distance <span class="sc">%&gt;%</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">equidistant =</span> <span class="fu">abs</span>(distance_mex <span class="sc">-</span> distance_can))</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>us_cities_eqd_pop <span class="ot">&lt;-</span> us_cities_eqd <span class="sc">%&gt;%</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(equidistant <span class="sc">&lt;=</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">n =</span> <span class="dv">5</span>, <span class="at">order_by =</span> population) <span class="sc">%&gt;%</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">label =</span> <span class="fu">paste</span>(city, state_id, <span class="at">sep =</span> <span class="st">','</span>))</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_eqd, <span class="fu">aes</span>(<span class="at">color =</span> equidistant), <span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>(<span class="at">option =</span> <span class="st">'rocket'</span>, <span class="at">name =</span> <span class="st">'Distance (km)'</span>) <span class="sc">+</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gghighlight</span>(equidistant <span class="sc">&lt;=</span> <span class="dv">100</span>) <span class="sc">+</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> state_boundary_line, <span class="at">color =</span> <span class="st">'black'</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'U.S. Cities Equidistant from Canada and Mexico +/- 100 km'</span>) <span class="sc">+</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label_repel</span>(<span class="at">data =</span> us_cities_eqd_pop,</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">1</span>],</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">2</span>],</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>                       <span class="at">label =</span> label),</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>                       <span class="at">size =</span> <span class="fl">2.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="lab-02_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="960"></p>
+<p><img src="lab-02_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
-<p><strong>Hint</strong>: (create a new variable that finds the absolute difference between the distance to Mexico and the distance to Canada)</p>
+<hr>
 </section>
 </section>
 <section id="question-4" class="level1">
@@ -733,30 +598,31 @@ window.Quarto = {
 <li>What percentage of the total population is in this zone?</li>
 <li>Does it match the ACLU estimate in the link above?</li>
 </ul>
+<p><em>Report this information as a table.</em></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>us_cities_distance_border <span class="ot">&lt;-</span> us_cities_distance <span class="sc">%&gt;%</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(distance_usa <span class="sc">&lt;=</span> <span class="dv">161</span>)</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>n_cities <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">nrow</span>(us_cities_distance_border))</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>danger_pop <span class="ot">&lt;-</span> <span class="fu">sum</span>(us_cities_distance_border<span class="sc">$</span>population)</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>total_pop <span class="ot">&lt;-</span> <span class="fu">sum</span>(us_cities_distance<span class="sc">$</span>population)</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>percent_pop <span class="ot">&lt;-</span> danger_pop<span class="sc">/</span>total_pop<span class="sc">*</span><span class="dv">100</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>Q_table <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">'Total Cities'</span> <span class="ot">=</span> n_cities,</span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">'Population within 100 miles'</span> <span class="ot">=</span> danger_pop,</span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">'Total U.S. Population'</span> <span class="ot">=</span> total_pop,</span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">'% in Danger Zone'</span> <span class="ot">=</span> percent_pop,</span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">'ACLU Estimate %'</span> <span class="ot">=</span> <span class="st">'66.67'</span>)</span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a><span class="fu">flextable</span>(Q_table) <span class="sc">%&gt;%</span></span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">'Data for Cities within 100 miles of a US Border'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_footer_lines</span>(<span class="st">'ACLU Estimate and calculated % from the lab data are within 2%. The ACLU used 2010 census data and the more current data matches that.'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>us_cities_distance_border <span class="ot">&lt;-</span> us_cities_distance <span class="sc">%&gt;%</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(distance_usa <span class="sc">&lt;=</span> <span class="dv">161</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>n_cities <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">nrow</span>(us_cities_distance_border))</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>danger_pop <span class="ot">&lt;-</span> <span class="fu">sum</span>(us_cities_distance_border<span class="sc">$</span>population)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>total_pop <span class="ot">&lt;-</span> <span class="fu">sum</span>(us_cities_distance<span class="sc">$</span>population)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>percent_pop <span class="ot">&lt;-</span> danger_pop<span class="sc">/</span>total_pop<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>Q_table <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">'Total Cities'</span> <span class="ot">=</span> n_cities,</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">'Population within 100 miles'</span> <span class="ot">=</span> danger_pop,</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">'Total U.S. Population'</span> <span class="ot">=</span> total_pop,</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">'% in Danger Zone'</span> <span class="ot">=</span> percent_pop,</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">'ACLU Estimate %'</span> <span class="ot">=</span> <span class="st">'66.67'</span>)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="fu">flextable</span>(Q_table) <span class="sc">%&gt;%</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">'Data for Cities within 100 miles of a US Border'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_footer_lines</span>(<span class="st">'ACLU Estimate and calculated % from the lab data are within 2%. The ACLU used 2010 census data and the more current data matches that.'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="tabwid"><style>.cl-bfe1cae8{}.cl-bfcad5ae{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-bfd3d398{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-bfd3d3b6{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-bfd41178{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-bfd41196{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-bfd411a0{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-bfd411aa{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-bfd411be{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-bfe1cae8"><thead><tr style="overflow-wrap:break-word;"><th class="cl-bfd41178"><p class="cl-bfd3d398"><span class="cl-bfcad5ae">Total Cities</span></p></th><th class="cl-bfd41178"><p class="cl-bfd3d398"><span class="cl-bfcad5ae">Population within 100 miles</span></p></th><th class="cl-bfd41178"><p class="cl-bfd3d398"><span class="cl-bfcad5ae">Total U.S. Population</span></p></th><th class="cl-bfd41178"><p class="cl-bfd3d398"><span class="cl-bfcad5ae">% in Danger Zone</span></p></th><th class="cl-bfd41196"><p class="cl-bfd3d3b6"><span class="cl-bfcad5ae">ACLU Estimate %</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-bfd411a0"><p class="cl-bfd3d398"><span class="cl-bfcad5ae">13,220</span></p></td><td class="cl-bfd411a0"><p class="cl-bfd3d398"><span class="cl-bfcad5ae">257,834,521</span></p></td><td class="cl-bfd411a0"><p class="cl-bfd3d398"><span class="cl-bfcad5ae">396,228,558</span></p></td><td class="cl-bfd411a0"><p class="cl-bfd3d398"><span class="cl-bfcad5ae">65.07217</span></p></td><td class="cl-bfd411aa"><p class="cl-bfd3d3b6"><span class="cl-bfcad5ae">66.67</span></p></td></tr></tbody><tfoot><tr style="overflow-wrap:break-word;"><td colspan="5" class="cl-bfd411be"><p class="cl-bfd3d3b6"><span class="cl-bfcad5ae">ACLU Estimate and calculated % from the lab data are within 2%. The ACLU used 2010 census data and the more current data matches that.</span></p></td></tr></tfoot></table></div>
+<div class="tabwid"><style>.cl-1fbd9c3c{}.cl-1fb3e1b0{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-1fb7f50c{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-1fb7f520{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-1fb816b8{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1fb816c2{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1fb816cc{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1fb816d6{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1fb816d7{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-1fbd9c3c"><thead><tr style="overflow-wrap:break-word;"><th class="cl-1fb816b8"><p class="cl-1fb7f50c"><span class="cl-1fb3e1b0">Total Cities</span></p></th><th class="cl-1fb816b8"><p class="cl-1fb7f50c"><span class="cl-1fb3e1b0">Population within 100 miles</span></p></th><th class="cl-1fb816b8"><p class="cl-1fb7f50c"><span class="cl-1fb3e1b0">Total U.S. Population</span></p></th><th class="cl-1fb816b8"><p class="cl-1fb7f50c"><span class="cl-1fb3e1b0">% in Danger Zone</span></p></th><th class="cl-1fb816c2"><p class="cl-1fb7f520"><span class="cl-1fb3e1b0">ACLU Estimate %</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-1fb816cc"><p class="cl-1fb7f50c"><span class="cl-1fb3e1b0">13,220</span></p></td><td class="cl-1fb816cc"><p class="cl-1fb7f50c"><span class="cl-1fb3e1b0">257,834,521</span></p></td><td class="cl-1fb816cc"><p class="cl-1fb7f50c"><span class="cl-1fb3e1b0">396,228,558</span></p></td><td class="cl-1fb816cc"><p class="cl-1fb7f50c"><span class="cl-1fb3e1b0">65.07217</span></p></td><td class="cl-1fb816d6"><p class="cl-1fb7f520"><span class="cl-1fb3e1b0">66.67</span></p></td></tr></tbody><tfoot><tr style="overflow-wrap:break-word;"><td colspan="5" class="cl-1fb816d7"><p class="cl-1fb7f520"><span class="cl-1fb3e1b0">ACLU Estimate and calculated % from the lab data are within 2%. The ACLU used 2010 census data and the more current data matches that.</span></p></td></tr></tfoot></table></div>
 </div>
 </div>
-<p>Report this information as a table.</p>
+<hr>
 </section>
 <section id="mapping-border-zone" class="level3">
 <h3 class="anchored" data-anchor-id="mapping-border-zone"><em>4.2</em> Mapping Border Zone</h3>
@@ -766,78 +632,68 @@ window.Quarto = {
 <li>Label the 10 most populous cities in the Danger Zone</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>ten_pop <span class="ot">&lt;-</span> us_cities_distance_border <span class="sc">%&gt;%</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">n =</span> <span class="dv">10</span>, <span class="at">order_by =</span> population)</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_distance, <span class="at">color =</span> <span class="st">'black'</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">size =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_distance_border, <span class="fu">aes</span>(<span class="at">color =</span> distance_usa)) <span class="sc">+</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradient</span>(<span class="at">low =</span> <span class="st">'orange'</span>, <span class="at">high =</span> <span class="st">'darkred'</span>, <span class="at">name =</span> <span class="st">'Distance (km)'</span>) <span class="sc">+</span></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gghighlight</span>(distance_usa <span class="sc">&lt;=</span> <span class="dv">161</span>) <span class="sc">+</span></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> state_boundary_line, <span class="at">color =</span> <span class="st">'black'</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'U.S. Cities within 100 miles (160 km) of the Border'</span>) <span class="sc">+</span></span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label_repel</span>(<span class="at">data =</span> ten_pop,</span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">1</span>],</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">2</span>],</span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>                       <span class="at">label =</span> city),</span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>                       <span class="at">size =</span> <span class="fl">2.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>ten_pop <span class="ot">&lt;-</span> us_cities_distance_border <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">n =</span> <span class="dv">10</span>, <span class="at">order_by =</span> population)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_distance, <span class="at">color =</span> <span class="st">'black'</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">size =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_distance_border, <span class="fu">aes</span>(<span class="at">color =</span> distance_usa)) <span class="sc">+</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradient</span>(<span class="at">low =</span> <span class="st">'orange'</span>, <span class="at">high =</span> <span class="st">'darkred'</span>, <span class="at">name =</span> <span class="st">'Distance (km)'</span>) <span class="sc">+</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gghighlight</span>(distance_usa <span class="sc">&lt;=</span> <span class="dv">161</span>) <span class="sc">+</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> state_boundary_line, <span class="at">color =</span> <span class="st">'black'</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'U.S. Cities within 100 miles (160 km) of the Border'</span>) <span class="sc">+</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label_repel</span>(<span class="at">data =</span> ten_pop,</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">1</span>],</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">2</span>],</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>                       <span class="at">label =</span> city),</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>                       <span class="at">size =</span> <span class="fl">2.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="lab-02_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="960"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="instead-of-labeling-the-10-most-populous-cites-label-the-most-populous-city-in-each-state-within-the-danger-zone." class="level3">
-<h3 class="anchored" data-anchor-id="instead-of-labeling-the-10-most-populous-cites-label-the-most-populous-city-in-each-state-within-the-danger-zone."><em>4.3</em> : Instead of labeling the 10 most populous cites, label the most populous city in each state within the Danger Zone.</h3>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>state_pop <span class="ot">&lt;-</span> us_cities_distance_border <span class="sc">%&gt;%</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state_name) <span class="sc">%&gt;%</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(population <span class="sc">==</span> <span class="fu">max</span>(population)) <span class="sc">%&gt;%</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_distance, <span class="at">color =</span> <span class="st">'black'</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">size =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_distance_border, <span class="fu">aes</span>(<span class="at">color =</span> distance_usa)) <span class="sc">+</span></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradient</span>(<span class="at">low =</span> <span class="st">'orange'</span>, <span class="at">high =</span> <span class="st">'darkred'</span>, <span class="at">name =</span> <span class="st">'Distance (km)'</span>) <span class="sc">+</span></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gghighlight</span>(distance_usa <span class="sc">&lt;=</span> <span class="dv">161</span>) <span class="sc">+</span></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> state_boundary_line, <span class="at">color =</span> <span class="st">'black'</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'U.S. Cities within 100 miles (160 km) of the Border'</span>) <span class="sc">+</span></span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label_repel</span>(<span class="at">data =</span> state_pop,</span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>                   <span class="at">max.overlaps =</span> <span class="fu">getOption</span>(<span class="st">'ggrepel.max.overlaps'</span>, <span class="at">default =</span> <span class="dv">30</span>),</span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">1</span>],</span>
-<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">2</span>],</span>
-<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>                       <span class="at">label =</span> city),</span>
-<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>                       <span class="at">size =</span> <span class="fl">2.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="lab-02_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="960"></p>
+<p><img src="lab-02_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
 <hr>
 </section>
+<section id="instead-of-labeling-the-10-most-populous-cities-label-the-most-populous-city-in-each-state-within-the-danger-zone." class="level3">
+<h3 class="anchored" data-anchor-id="instead-of-labeling-the-10-most-populous-cities-label-the-most-populous-city-in-each-state-within-the-danger-zone."><em>4.3</em> : Instead of labeling the 10 most populous cities, label the most populous city in each state within the Danger Zone.</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>state_pop <span class="ot">&lt;-</span> us_cities_distance_border <span class="sc">%&gt;%</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state_name) <span class="sc">%&gt;%</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(population <span class="sc">==</span> <span class="fu">max</span>(population)) <span class="sc">%&gt;%</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_distance, <span class="at">color =</span> <span class="st">'black'</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">size =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_cities_distance_border, <span class="fu">aes</span>(<span class="at">color =</span> distance_usa)) <span class="sc">+</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradient</span>(<span class="at">low =</span> <span class="st">'orange'</span>, <span class="at">high =</span> <span class="st">'darkred'</span>, <span class="at">name =</span> <span class="st">'Distance (km)'</span>) <span class="sc">+</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gghighlight</span>(distance_usa <span class="sc">&lt;=</span> <span class="dv">161</span>) <span class="sc">+</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> state_boundary_line, <span class="at">color =</span> <span class="st">'black'</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'U.S. Cities within 100 miles (160 km) of the Border'</span>) <span class="sc">+</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label_repel</span>(<span class="at">data =</span> state_pop,</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>                   <span class="at">max.overlaps =</span> <span class="fu">getOption</span>(<span class="st">'ggrepel.max.overlaps'</span>, <span class="at">default =</span> <span class="dv">30</span>),</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">1</span>],</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y =</span> <span class="fu">st_coordinates</span>(geometry)[,<span class="dv">2</span>],</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>                       <span class="at">label =</span> city),</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>                       <span class="at">size =</span> <span class="fl">2.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-02_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
 </section>
-<section id="rubric" class="level1">
-<h1>Rubric</h1>
-<ul class="task-list">
-<li><label><input type="checkbox"><strong>Question 1</strong> (35)</label></li>
-<li><label><input type="checkbox"><strong>Question 2</strong> (35)</label></li>
-<li><label><input type="checkbox"><strong>Question 3</strong> (35)</label></li>
-<li><label><input type="checkbox"><strong>Question 4</strong> (35)</label></li>
-<li><label><input type="checkbox"><strong>Well Structured and appealing Qmd deployed as web page</strong> (10)</label></li>
-</ul>
-<p><strong>Total:</strong> 150 points</p>
 </section>
 
-</main>
-<!-- /main column -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -858,6 +714,150 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
   toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
   const icon = "";
   const anchorJS = new window.AnchorJS();
   anchorJS.options = {
@@ -920,8 +920,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -1032,7 +1030,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {

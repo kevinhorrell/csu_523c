@@ -5,7 +5,6 @@ author:
   - name: Kevin Horrell
     email: kevin.horrell@colostate.edu
 format: html
-
 knitr:
   opts_chunk:
     eval: true
@@ -14,6 +13,9 @@ knitr:
     warning: false
     message: false
     error: false
+editor: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r, include = F}

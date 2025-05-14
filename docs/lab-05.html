@@ -2,13 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.6.42">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Kevin Horrell">
 
-<title>Lab 5: Machine Learning in Hydrology</title>
+<title>Lab 5: Machine Learning in Hydrology – ESS 523c Labs</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -58,29 +58,121 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="lab-05_files/libs/clipboard/clipboard.min.js"></script>
-<script src="lab-05_files/libs/quarto-html/quarto.js"></script>
-<script src="lab-05_files/libs/quarto-html/popper.min.js"></script>
-<script src="lab-05_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="lab-05_files/libs/quarto-html/anchor.min.js"></script>
-<link href="lab-05_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="lab-05_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="lab-05_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="lab-05_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="lab-05_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-b53751a350365c71b6c909e95f209ed1.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-d13ac4e80c000af260af3917723b819e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-175319157c5a1d45805a17fae5d1b6b1.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
 <link href="lab-05_files/libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
 
 <script src="lab-05_files/libs/tabwid-1.1.3/tabwid.js"></script>
 
 
 
+<link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="fullcontent">
+<body>
 
-<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
-<main class="content" id="quarto-document-content">
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#libraries" id="toc-libraries" class="nav-link active" data-scroll-target="#libraries">Libraries</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#what-is-tidymodels" id="toc-what-is-tidymodels" class="nav-link" data-scroll-target="#what-is-tidymodels">What is tidymodels?</a></li>
+  <li><a href="#what-is-the-camels-dataset" id="toc-what-is-the-camels-dataset" class="nav-link" data-scroll-target="#what-is-the-camels-dataset">What is the CAMELS dataset?</a></li>
+  <li><a href="#whats-in-the-data" id="toc-whats-in-the-data" class="nav-link" data-scroll-target="#whats-in-the-data">What’s in the data?</a></li>
+  <li><a href="#lab-goals" id="toc-lab-goals" class="nav-link" data-scroll-target="#lab-goals">Lab Goals</a></li>
+  <li><a href="#data-download" id="toc-data-download" class="nav-link" data-scroll-target="#data-download">Data Download</a></li>
+  <li><a href="#getting-the-documentation-pdf" id="toc-getting-the-documentation-pdf" class="nav-link" data-scroll-target="#getting-the-documentation-pdf">Getting the documentation PDF</a></li>
+  <li><a href="#getting-basin-characteristics" id="toc-getting-basin-characteristics" class="nav-link" data-scroll-target="#getting-basin-characteristics">Getting Basin characteristics</a></li>
+  <li><a href="#question-1" id="toc-question-1" class="nav-link" data-scroll-target="#question-1">Question 1</a>
+  <ul class="collapse">
+  <li><a href="#your-turn" id="toc-your-turn" class="nav-link" data-scroll-target="#your-turn"><em>Your Turn</em></a></li>
+  <li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis" class="nav-link" data-scroll-target="#exploratory-data-analysis">Exploratory Data Analysis</a></li>
+  </ul></li>
+  <li><a href="#question-2" id="toc-question-2" class="nav-link" data-scroll-target="#question-2">Question 2</a>
+  <ul class="collapse">
+  <li><a href="#your-turn-1" id="toc-your-turn-1" class="nav-link" data-scroll-target="#your-turn-1"><em>Your Turn</em></a></li>
+  <li><a href="#model-preparation" id="toc-model-preparation" class="nav-link" data-scroll-target="#model-preparation">Model Preparation</a></li>
+  <li><a href="#visual-eda" id="toc-visual-eda" class="nav-link" data-scroll-target="#visual-eda">Visual EDA</a></li>
+  </ul></li>
+  <li><a href="#model-building" id="toc-model-building" class="nav-link" data-scroll-target="#model-building">Model Building</a>
+  <ul class="collapse">
+  <li><a href="#lets-start-by-splitting-the-data" id="toc-lets-start-by-splitting-the-data" class="nav-link" data-scroll-target="#lets-start-by-splitting-the-data">Lets start by splitting the data</a></li>
+  <li><a href="#preprocessor-recipe" id="toc-preprocessor-recipe" class="nav-link" data-scroll-target="#preprocessor-recipe">Preprocessor: recipe</a></li>
+  <li><a href="#naive-base-lm-approach" id="toc-naive-base-lm-approach" class="nav-link" data-scroll-target="#naive-base-lm-approach">Naive base lm approach:</a></li>
+  <li><a href="#where-things-get-a-little-messy" id="toc-where-things-get-a-little-messy" class="nav-link" data-scroll-target="#where-things-get-a-little-messy">Where things get a little messy…</a></li>
+  <li><a href="#correct-version-prep---bake---predict" id="toc-correct-version-prep---bake---predict" class="nav-link" data-scroll-target="#correct-version-prep---bake---predict">Correct version: prep -&gt; bake -&gt; predict</a></li>
+  <li><a href="#model-evaluation-statistical-and-visual" id="toc-model-evaluation-statistical-and-visual" class="nav-link" data-scroll-target="#model-evaluation-statistical-and-visual">Model Evaluation: statistical and visual</a></li>
+  <li><a href="#using-a-workflow-instead" id="toc-using-a-workflow-instead" class="nav-link" data-scroll-target="#using-a-workflow-instead">Using a workflow instead</a></li>
+  <li><a href="#making-predictions" id="toc-making-predictions" class="nav-link" data-scroll-target="#making-predictions">Making Predictions</a></li>
+  <li><a href="#model-evaluation-statistical-vs.-visual" id="toc-model-evaluation-statistical-vs.-visual" class="nav-link" data-scroll-target="#model-evaluation-statistical-vs.-visual">Model Evaluation: statistical vs.&nbsp;visual</a></li>
+  <li><a href="#switch-it-up" id="toc-switch-it-up" class="nav-link" data-scroll-target="#switch-it-up">Switch it up!</a></li>
+  <li><a href="#predictions" id="toc-predictions" class="nav-link" data-scroll-target="#predictions">Predictions</a></li>
+  <li><a href="#model-evaluation-statistical-and-visual-1" id="toc-model-evaluation-statistical-and-visual-1" class="nav-link" data-scroll-target="#model-evaluation-statistical-and-visual-1">Model Evaluation: statistical and visual</a></li>
+  <li><a href="#a-workflowset-approach" id="toc-a-workflowset-approach" class="nav-link" data-scroll-target="#a-workflowset-approach">A workflowset approach</a></li>
+  </ul></li>
+  <li><a href="#final-model" id="toc-final-model" class="nav-link" data-scroll-target="#final-model">Final Model</a>
+  <ul class="collapse">
+  <li><a href="#evaluation" id="toc-evaluation" class="nav-link" data-scroll-target="#evaluation">Evaluation</a></li>
+  </ul></li>
+  <li><a href="#question-3-your-turn" id="toc-question-3-your-turn" class="nav-link" data-scroll-target="#question-3-your-turn">Question 3: Your Turn</a>
+  <ul class="collapse">
+  <li><a href="#comparing-models" id="toc-comparing-models" class="nav-link" data-scroll-target="#comparing-models">Comparing Models</a></li>
+  </ul></li>
+  <li><a href="#question-4-build-your-own" id="toc-question-4-build-your-own" class="nav-link" data-scroll-target="#question-4-build-your-own">Question 4: Build Your Own</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content column-page-left" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -90,7 +182,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<div class="quarto-title-meta">
+<div class="quarto-title-meta column-page-left">
 
     <div>
     <div class="quarto-title-meta-heading">Author</div>
@@ -1291,10 +1383,11 @@ area_geospa_fabric         1.00000000</code></pre>
 </div>
 </div>
 </div>
+
+
 </section>
 
-</main>
-<!-- /main column -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -1315,6 +1408,150 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
   toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
   const icon = "";
   const anchorJS = new window.AnchorJS();
   anchorJS.options = {
@@ -1377,8 +1614,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -1489,7 +1724,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {

@@ -1,28 +1,32 @@
 ---
 title: 'Lab 2: Distances and Projections'
-subtitle: 'Ecosystem Science and Sustainability 523c'
+subtitle: 'Populations Across Space'
 author:
   - name: Kevin Horrell
     email: kevin.horrell@colostate.edu
 format: html
-execute:
-  eval: true
-  echo: true
-  warning: false
-  message: false
-  error: false
+knitr:
+  opts_chunk:
+    eval: true
+    echo: true
+    out.width: "100%"
+    warning: false
+    message: false
+    error: false
+editor: 
+  markdown: 
+    wrap: 72
 ---
-
+![Cities Data](data/us_cities1.jpg)
 ```{r, include = F}
-knitr::opts_chunk$set(fig.width = 10,
-                      comment = "", 
+knitr::opts_chunk$set(comment = "", 
                       cache = FALSE, 
                       fig.retina = 3)
 ```
 
-In this lab we will explore the properties of `sf`, `sfc`, and `sfg` features & objects; how they are stored; and issues related to distance calculation and coordinate transformation. 
+In this lab I explored the properties of `sf`, `sfc`, and `sfg` features & objects; how they are stored; and issues related to distance calculation and coordinate transformation. 
 
-We will continue to build on our data wrangling and data visualization skills; as well as document preparation via Quarto and GitHub.
+I continue to build on my data wrangling and visualization skills; as well as document preparation via Quarto and GitHub.
 
 ****
 
@@ -56,13 +60,11 @@ In this lab, 4 main skills are covered:
 3. **Calculating** distances (Q2)
 4. **Building** maps using ggplot (Q3)
 
-Hints and Tricks for this lab are available [here](lab2-hints.qmd)
-
 ******
 
 # Question 1: 
 
-For this lab we need three (3) datasets. 
+For this lab three (3) datasets are needed. 
 
   1. Spatial boundaries of continental USA states (1.1) 
   2. Boundaries of Canada, Mexico and the United States (1.2)
@@ -71,7 +73,7 @@ For this lab we need three (3) datasets.
 
 ### _1.1_ Define a Projection
 
-For this lab we want to calculate distances between features, therefore we need a projection that preserves distance at the scale of CONUS. For this, we will use the North America Equidistant Conic:
+For this lab I want to calculate distances between features, therefore I need a projection that preserves distance at the scale of CONUS. For this, I will use the North America Equidistant Conic:
 
 ```{r}
 eqdc <- '+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs'
@@ -95,18 +97,9 @@ This projection is commonly used for mapping large areas with an east-west exten
 ### _1.2_ - Get USA state boundaries 
 
 In R, USA boundaries are stored in the `USAboundaries` package.
-In case this package and data are **not** installed: 
 
-```{r}
-library(remotes)
-library(USAboundaries)
-library(USAboundariesData)
-```
-
-Once installed: 
-
-- USA state boundaries can be accessed with `USAboundaries::us_states(resolution = "low")`. Given the precision needed for this analysis we are ok with the low resolution. 
-- Make sure you only have the states in the continental United States (CONUS) (**Hint** use `filter`)
+- USA state boundaries can be accessed with `USAboundaries::us_states(resolution = "low")`. Given the precision needed for this analysis, low resolution is sufficient. 
+- Make sure only the states in the continental United States (CONUS) are selected
 - Make sure the data is in a projected coordinate system suitable for distance measurements at the national scale (`eqdc`).
 
 ```{r}
@@ -123,15 +116,14 @@ ggplot(data = state_boundary) +
   theme_void()
 ```
 
-
 *****
 
 ### _1.3_ - Get country boundaries for Mexico, the United States of America, and Canada
 
 In R, country boundaries are stored in the `rnaturalearth` package.
 - World boundaries can be accessed with `rnaturalearth::countries110`. 
-- Make sure the data is in simple features (`sf`) format (**Hint** use the `st_as_sf` variable).
-- Make sure you only have the countries you want (**Hint** `filter` on the `admin` variable)
+- Make sure the data is in simple features (`sf`) format
+- Make sure to only have the countries wanted
 - Make sure the data is in a projected coordinate system suitable for distance measurements at the national scale (`eqdc`). 
 
 
@@ -150,22 +142,21 @@ ggplot(data = na_boundaries) +
   theme_void()
 ```
 
-
 *****
 
 ### _1.4_ - Get city locations from the CSV file 
 
-The process of finding, downloading and accessing data is the first step of every analysis. Here we will go through these steps (minus finding the data).
+The process of finding, downloading and accessing data is the first step of every analysis. 
 
-First go to this [site](https://simplemaps.com/data/us-cities) and download the appropriate (free) dataset into the data directory of this project.
+Data was accessed at this (free) [site](https://simplemaps.com/data/us-cities) and downloaded as a dataset into the data directory of this project.
 
-Once downloaded, read it into your working session using `readr::read_csv()` and explore the dataset until you are comfortable with the information it contains.
+Once downloaded, read it into my working session using and explored the dataset until comfortable with the information it contained.
 
-While this data has everything we want, it is not yet spatial. Convert the `data.frame` to a spatial object using `st_as_sf` and prescribing the coordinate variables and CRS (**Hint** what projection are the raw coordinates in?)
+The data has everything but it is not spatial. Convert the `data.frame` to a spatial object using `st_as_sf` and prescribing the coordinate variables and CRS.
 
-Finally, remove cities in states not wanted and make sure the data is in a projected coordinate system suitable for distance measurements at the national scale:
+Finally, remove cities in states not wanted and make sure the data is in a projected coordinate system suitable for distance measurements at the national scale.
 
-Congratulations! You now have three real-world, large datasets ready for analysis.
+Congratulations! here are three real-world, large datasets ready for analysis.
 
 ```{r}
 us_cities <- read_csv('data/uscities.csv') %>%
@@ -181,15 +172,13 @@ ggplot(data = us_cities) +
   geom_sf() +
   theme_void()
 ```
-
+****
 
 # Question 2: 
 
-Here we will focus on calculating the distance of each USA city to (1) the national border (2) the nearest state border (3) the Mexican border and (4) the Canadian border. You will need to manipulate you existing spatial geometries to do this using either `st_union` or `st_combine` depending on the situation. In all cases, since we are after distances to borders, we will need to cast (`st_cast`) our `MULTIPOLYGON` geometries to `MULTILINESTRING` geometries. To perform these distance calculations we will use `st_distance`(). 
+Here I focus on calculating the distance of each USA city to (1) the national border (2) the nearest state border (3) the Mexican border and (4) the Canadian border. The existing spatial geometries are manipulated to do this.
 
 ### _2.1_ -  Distance to USA Border (coastline or national) (km)
-
-For **2.1** we are interested in calculating the distance of each USA city to the USA border (coastline or national border). To do this we need all states to act as single unit. Convert the USA state boundaries to a `MULTILINESTRING` geometry in which the state boundaries are **resolved**. Please do this starting with the states object and _NOT_ with a filtered country object.  In addition to storing this distance data as part of the cities `data.frame`, produce a table (`flextable`) documenting the five cities farthest from an international border. Include only the city name, state, and distance.
 
 ```{r}
 state_boundary_u <- state_boundary %>%
@@ -205,9 +194,10 @@ slice_max(us_cities_distance, n = 5, order_by = distance_usa) %>%
   st_drop_geometry() %>%
   select(city, state_name, distance_usa) %>%
   flextable() %>%
-  set_caption("5 Cities Furthest from a Coastal or International Border")
+  set_caption("5 Cities Furthest from a Coastal or International Border") %>%
+  theme_zebra()
 ```
-
+****
 
 ### _2.2_ -  Distance to States (km)
 
@@ -226,9 +216,10 @@ slice_max(us_cities_distance, n = 5, order_by = distance_state) %>%
   st_drop_geometry() %>%
   select(city, state_name, distance_state) %>%
   flextable() %>%
-  set_caption("5 Cities Furthest from a State Boundary")
-
+  set_caption("5 Cities Furthest from a State Boundary") %>%
+  theme_zebra()
 ```
+****
 
 ### _2.3_ -  Distance to Mexico (km)
 
@@ -247,7 +238,8 @@ slice_max(us_cities_distance, n = 5, order_by = distance_mex) %>%
   st_drop_geometry() %>%
   select(city, state_name, distance_mex) %>%
   flextable() %>%
-  set_caption("5 Cities Furthest from the Mexico Border")
+  set_caption("5 Cities Furthest from the Mexico Border") %>%
+  theme_zebra()
 ```
 
 ### _2.4_ -  Distance to Canada (km)
@@ -267,20 +259,18 @@ slice_max(us_cities_distance, n = 5, order_by = distance_can) %>%
   st_drop_geometry() %>%
   select(city, state_name, distance_can) %>%
   flextable() %>%
-  set_caption("5 Cities Furthest from the Canada Border")
+  set_caption("5 Cities Furthest from the Canada Border") %>%
+  theme_zebra()
 ```
+****
 
 # Question 3:
 
-In this section we will focus on visualizing the distance data you calculated above. You will be using `ggplot` to make your maps, `ggrepl` to label significant features, and `gghighlight` to emphasize important criteria.
+In this section I visualize the distance data calculated above. I use `ggplot` to make maps, `ggrepl` to label significant features, and `gghighlight` to emphasize important criteria.
 
 ### _3.1_ Data
 
-Show the 3 continents, CONUS outline, state boundaries, and 10 largest USA cities (by population) on a single map
-
- - Use `geom_sf` to plot your layers
- - Use `lty` to change the line type and size to change line width
- - Use `ggrepel::geom_label_repel` to label your cities
+Show the 3 continents, CONUS outline, state boundaries, and 10 largest USA cities (by population) on a single map.
  
 ```{r}
 us_cities_size <- us_cities_distance %>%
@@ -300,7 +290,7 @@ ggplot() +
   theme(legend.position = 'none') +
   labs(title = "10 Largest U.S. Cities by Population")
 ```
-
+****
  
 ### _3.2_  City Distance from the Border
 
@@ -330,6 +320,7 @@ ggplot() +
                        label = label),
                        size = 2.5)
 ```
+****
 
 ### _3.3_  City Distance from Nearest State
 
@@ -356,10 +347,11 @@ ggplot() +
                        label = label),
                        size = 2.5)
 ```
+****
 
 ### _3.4_  Equidistance boundary from Mexico and Canada
 
-Here we provide a little more challenge. Use `gghighlight` to identify the cities that are equal distance from the Canadian **AND** Mexican border $\pm$ 100 km.
+This is slightly  more challenging. Use `gghighlight` to identify the cities that are equal distance from the Canadian **AND** Mexican border $\pm$ 100 km.
 
 In addition, label the five (5) most populous cites in this zone.
 
@@ -385,8 +377,7 @@ ggplot() +
                        label = label),
                        size = 2.5)
 ```
-
-**Hint**: (create a new variable that finds the absolute difference between the distance to Mexico and the distance to Canada)
+****
 
 # Question 4: 
 
@@ -400,6 +391,8 @@ Recently, Federal Agencies have claimed basic constitutional rights protected by
 - How many people live in a city within 100 miles of the border?
 - What percentage of the total population is in this zone?
 - Does it match the ACLU estimate in the link above?
+
+*Report this information as a table.*
 
 ```{r}
 us_cities_distance_border <- us_cities_distance %>%
@@ -421,8 +414,8 @@ flextable(Q_table) %>%
   set_caption('Data for Cities within 100 miles of a US Border') %>%
   add_footer_lines('ACLU Estimate and calculated % from the lab data are within 2%. The ACLU used 2010 census data and the more current data matches that.')
 ```
+****
 
-Report this information as a table.
 
 ### _4.2_  Mapping Border Zone
 
@@ -448,8 +441,9 @@ ggplot() +
                        label = city),
                        size = 2.5)
 ```
+****
 
-### _4.3_ : Instead of labeling the 10 most populous cites, label the most populous city in each state within the Danger Zone.
+### _4.3_ : Instead of labeling the 10 most populous cities, label the most populous city in each state within the Danger Zone.
 
 ```{r}
 state_pop <- us_cities_distance_border %>%
@@ -472,15 +466,3 @@ ggplot() +
                        label = city),
                        size = 2.5)
 ```
-
-****
-
-# Rubric
-
-- [ ] **Question 1** (35)
-- [ ] **Question 2** (35)
-- [ ] **Question 3** (35)
-- [ ] **Question 4** (35)
-- [ ] **Well Structured and appealing Qmd deployed as web page** (10)
-
-**Total:** 150 points

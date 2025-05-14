@@ -4,6 +4,8 @@ install.packages('remotes')
 library(remotes)
 
 remotes::install_github("mikejohnson51/AOI")
+remotes::install_github("ropensci/USAboundaries")
+remotes::install_github("ropensci/USAboundariesData")
 
 #data Retrieval from USGS
 install.packages('dataRetrieval')

@@ -2,13 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.6.42">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Kevin Horrell">
 
-<title>Lab 4: Palo, Iowa Flooding</title>
+<title>Lab 4: Palo, Iowa Flooding – ESS 523c Labs</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -58,25 +58,101 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="lab-04_files/libs/clipboard/clipboard.min.js"></script>
-<script src="lab-04_files/libs/quarto-html/quarto.js"></script>
-<script src="lab-04_files/libs/quarto-html/popper.min.js"></script>
-<script src="lab-04_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="lab-04_files/libs/quarto-html/anchor.min.js"></script>
-<link href="lab-04_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="lab-04_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="lab-04_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="lab-04_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="lab-04_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-b53751a350365c71b6c909e95f209ed1.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-d13ac4e80c000af260af3917723b819e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-175319157c5a1d45805a17fae5d1b6b1.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
 
 
+<link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="fullcontent">
+<body>
 
-<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
-<main class="content" id="quarto-document-content">
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#background" id="toc-background" class="nav-link active" data-scroll-target="#background">Background</a></li>
+  <li><a href="#libraries" id="toc-libraries" class="nav-link" data-scroll-target="#libraries">Libraries</a>
+  <ul class="collapse">
+  <li><a href="#step-1-aoi-identification" id="toc-step-1-aoi-identification" class="nav-link" data-scroll-target="#step-1-aoi-identification">Step 1: AOI Identification</a></li>
+  <li><a href="#step-2-temporal-identification" id="toc-step-2-temporal-identification" class="nav-link" data-scroll-target="#step-2-temporal-identification">Step 2: Temporal Identification</a></li>
+  <li><a href="#step-3-identifying-the-relevant-images" id="toc-step-3-identifying-the-relevant-images" class="nav-link" data-scroll-target="#step-3-identifying-the-relevant-images">Step 3: Identifying the relevant Images</a></li>
+  <li><a href="#step-4.-downloading-the-needed-images" id="toc-step-4.-downloading-the-needed-images" class="nav-link" data-scroll-target="#step-4.-downloading-the-needed-images">Step 4. Downloading the needed Images</a></li>
+  </ul></li>
+  <li><a href="#question-1-data-access" id="toc-question-1-data-access" class="nav-link" data-scroll-target="#question-1-data-access">Question 1: Data Access</a>
+  <ul class="collapse">
+  <li><a href="#step-1.1-aalyze-the-images" id="toc-step-1.1-aalyze-the-images" class="nav-link" data-scroll-target="#step-1.1-aalyze-the-images"><em>Step 1.1</em> Aalyze the Images</a></li>
+  </ul></li>
+  <li><a href="#question-2-data-visualization" id="toc-question-2-data-visualization" class="nav-link" data-scroll-target="#question-2-data-visualization">Question 2: Data Visualization</a></li>
+  <li><a href="#question-3-indices-and-thresholds" id="toc-question-3-indices-and-thresholds" class="nav-link" data-scroll-target="#question-3-indices-and-thresholds">Question 3: Indices and Thresholds</a>
+  <ul class="collapse">
+  <li><a href="#step-3.1-raster-algebra" id="toc-step-3.1-raster-algebra" class="nav-link" data-scroll-target="#step-3.1-raster-algebra"><em>Step 3.1</em> Raster Algebra</a></li>
+  <li><a href="#step-3.2-raster-thresholding" id="toc-step-3.2-raster-thresholding" class="nav-link" data-scroll-target="#step-3.2-raster-thresholding"><em>Step 3.2</em> Raster Thresholding</a></li>
+  <li><a href="#step-3.3" id="toc-step-3.3" class="nav-link" data-scroll-target="#step-3.3"><em>Step 3.3</em></a></li>
+  </ul></li>
+  <li><a href="#question-4" id="toc-question-4" class="nav-link" data-scroll-target="#question-4">Question 4:</a>
+  <ul class="collapse">
+  <li><a href="#step-4.1" id="toc-step-4.1" class="nav-link" data-scroll-target="#step-4.1"><em>Step 4.1</em></a></li>
+  <li><a href="#step-4.2" id="toc-step-4.2" class="nav-link" data-scroll-target="#step-4.2"><em>Step 4.2</em></a></li>
+  <li><a href="#step-4.3" id="toc-step-4.3" class="nav-link" data-scroll-target="#step-4.3"><em>Step 4.3</em></a></li>
+  <li><a href="#step-4.4" id="toc-step-4.4" class="nav-link" data-scroll-target="#step-4.4"><em>Step 4.4</em></a></li>
+  <li><a href="#step-4.5" id="toc-step-4.5" class="nav-link" data-scroll-target="#step-4.5"><em>Step 4.5</em></a></li>
+  </ul></li>
+  <li><a href="#question-5" id="toc-question-5" class="nav-link" data-scroll-target="#question-5">Question 5:</a></li>
+  <li><a href="#extra-credit" id="toc-extra-credit" class="nav-link" data-scroll-target="#extra-credit">Extra Credit</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content column-page-left" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -86,7 +162,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<div class="quarto-title-meta">
+<div class="quarto-title-meta column-page-left">
 
     <div>
     <div class="quarto-title-meta-heading">Author</div>
@@ -796,10 +872,11 @@ use the st_point constructor to create an sfg; convert it to an sfc with the app
 Use terra::extract to extract the binary flood values at that location from the six layer flood map stack
 
 How many of the maps captured the flooding at that location?</code></pre>
+
+
 </section>
 
-</main>
-<!-- /main column -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -820,6 +897,150 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
   toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
   const icon = "";
   const anchorJS = new window.AnchorJS();
   anchorJS.options = {
@@ -882,8 +1103,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -994,7 +1213,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {
