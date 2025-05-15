@@ -8,6 +8,23 @@ website:
     left:
       - href: index.qmd
         text: Home
+        
+  sidebar:
+    - title: "Labs"
+      style: "docked"
+      contents:
+        - text: "Lab 01: Data Wrangling"
+          href: lab-01.qmd
+        - text: "Lab 02: Distances and Projections"
+          href: lab-02.qmd
+        - text: "Lab 03: Tesselations"
+          href: lab-03.qmd
+        - text: "Lab 04: Rasters and Remote Sensing"
+          href: lab-04.qmd
+        - text: "Lab 05: CAMELS and Modeling"
+          href: lab-05.qmd
+        - text: "Lab 06: Time Series Modeling"
+          href: lab-06.qmd
 
 format:
   html:
