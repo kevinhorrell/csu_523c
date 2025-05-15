@@ -17,4 +17,12 @@ editor:
     wrap: 72
 ---
 
-![Poudre River](data/poudre1.jpg)
+![Upper Poudre River](data/poudre1.jpg)
+
+
+[Lab 1](https://kevinhorrell.github.io/csu_523c/lab-01.html)
+[Lab 2](https://kevinhorrell.github.io/csu_523c/lab-02.html)
+[Lab 3](https://kevinhorrell.github.io/csu_523c/lab-03.html)
+[Lab 4](https://kevinhorrell.github.io/csu_523c/lab-04.html)
+[Lab 5](https://kevinhorrell.github.io/csu_523c/lab-05.html)
+[Lab 6](https://kevinhorrell.github.io/csu_523c/lab-06.html)

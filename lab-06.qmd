@@ -26,7 +26,10 @@ knitr::opts_chunk$set(comment = "",
 
 # Introduction
 
-In this lab, I downloaded stream flow data from the Cache la Poudre River (USGS site 06752260) and analyzed it using a few time series methods. I then predicted future stream flow data `modeltime` with respect to historic and future climate data.
+In this lab, I downloaded stream flow data from the Cache la Poudre
+River (USGS site 06752260) and analyzed it using a few time series
+methods. I then predicted future stream flow data `modeltime` with
+respect to historic and future climate data.
 
 Packages Necessary:
 
@@ -51,7 +54,8 @@ library(earth)
 
 #### Getting Requisite Data:
 
-Get the data using 'dataRetrieval', from January 1, 2013 to December 31, 2023, and summarize it into monthly averages.
+Get the data using 'dataRetrieval', from January 1, 2013 to December 31,
+2023, and summarize it into monthly averages.
 
 ```{r}
 q_poudre <- readNWISdv(siteNumber = "06752260",
@@ -64,9 +68,15 @@ q_poudre <- readNWISdv(siteNumber = "06752260",
   summarise(Flow = mean(Flow))
 ```
 
-Download climate data from the GridMET and MACA data sets. The GridMET data set provides high-resolution climate data for the United States, while the MACA data set provides down-scaled climate data futures. These data sets are used to obtain climate data for the Cache la Poudre River Basin.
+Download climate data from the GridMET and MACA data sets. The GridMET
+data set provides high-resolution climate data for the United States,
+while the MACA data set provides down-scaled climate data futures. These
+data sets are used to obtain climate data for the Cache la Poudre River
+Basin.
 
-To start, we will use the findNLDI function to find the basin for the Cache la Poudre River. This function will return a list of features, including the basin polygon, which we can use to extract climate data.
+To start, use the findNLDI function to find the basin for the
+Cache la Poudre River. This function will return a list of features,
+including the basin polygon, which can be used to extract climate data.
 
 ```{r}
 basin <- findNLDI(nwis = "06752260", find = "basin")
@@ -74,7 +84,13 @@ basin <- findNLDI(nwis = "06752260", find = "basin")
 mapview::mapview(basin$basin)
 ```
 
-With an AOI defined, the `climateR` package is used to download climate data from the GridMET and MACA datasets. The code below downloads monthly climate data for the Cache la Poudre River Basin from January 1, 2013 to December 31, 2023. It then uses the `exactextractr` package to extract the climate data for the basin polygon. The code also converts the climate data into a tidy format, necessary for time series analysis and joins the data to the stream flow data.
+With an AOI defined, the `climateR` package is used to download climate
+data from the GridMET and MACA datasets. The code below downloads
+monthly climate data for the Cache la Poudre River Basin from January 1,
+2013 to December 31, 2023. It then uses the `exactextractr` package to
+extract the climate data for the basin polygon. The code also converts
+the climate data into a tidy format, necessary for time series analysis
+and joins the data to the stream flow data.
 
 ```{r}
 sdate <- as.Date("2013-01-01")
@@ -98,11 +114,23 @@ historic <- mutate(gm, id = "gridmet") %>%
   right_join(q_poudre, by = "Date")
 ```
 
-We are interested in using exogenous climate data to predict future stream flow. Any time exogenous data is used to predict future values, it is required that we have values for the future. In other words, if we want to use precipitation (ppt) to predict stream flow in the future, we must have future ppt values.
+We are interested in using exogenous climate data to predict future
+stream flow. Any time exogenous data is used to predict future values,
+it is required that we have values for the future. In other words, if we
+want to use precipitation (ppt) to predict stream flow in the future, we
+must have future ppt values.
 
-The MACA data set is used to download future climate data for the Cache la Poudre River Basin from January 1, 2024 to December 31, 2033. The code below downloads the future climate data and converts it into a tidy format. The MACA data is used because it is developed by the same lab that created GridMET ensuring many of the same assumptions and methods are used.
+The MACA data set is used to download future climate data for the Cache
+la Poudre River Basin from January 1, 2024 to December 31, 2033. The
+code below downloads the future climate data and converts it into a tidy
+format. The MACA data is used because it is developed by the same lab
+that created GridMET ensuring many of the same assumptions and methods
+are used.
 
-Two quirks with MACA vs GridMET are that the units of temperature are in Kelvin and the names of the variables are different. The code below converts the temperature from Kelvin to Celsius and renames the variables to match those in the GridMET data set.
+Two quirks with MACA vs GridMET are that the units of temperature are in
+Kelvin and the names of the variables are different. The code below
+converts the temperature from Kelvin to Celsius and renames the
+variables to match those in the GridMET data set.
 
 ```{r}
 sdate <- as.Date("2024-01-01")
@@ -132,16 +160,15 @@ future <- mutate(future, tmax = tmax - 273.15)
 
 # Your turn!
 
-In this lab, the above data sets are used to analyze patterns in stream flow and predict future stream flow based on climate data.
+In this lab, the above data sets are used to analyze patterns in stream
+flow and predict future stream flow based on climate data.
 
-#### 1. Convert to tsibble
+#### 1. Convert to a tsibble
 
 ```{r}
 historic <- as_tsibble(historic)
 head(historic)
-
 ```
-
 
 #### 2. Plotting the time series
 
@@ -156,10 +183,12 @@ ggplot(data = historic, aes(x = Date, y = Flow)) +
 )
 ```
 
-
 #### 3. Subseries Plotting
 
-Next, we are going to use the `gg_subseries()` function to visualize the seasonal patterns in the data. This function will create a sub-series plot, which shows the seasonal patterns in the data by plotting each “season” as a separate plot
+Next, use the `gg_subseries()` function to visualize the
+seasonal patterns in the data. This function will create a sub-series
+plot, which shows the seasonal patterns in the data by plotting each
+“season” as a separate plot
 
 ```{r}
 ggplotly(
@@ -170,12 +199,18 @@ gg_subseries(historic, y = Flow, period = '1y') +
 )
 ```
 
-Describe what you see in the plot. How are “seasons” defined in this plot? What do you think the “subseries” represent?
+Describe what you see in the plot. How are “seasons” defined in this
+plot? What do you think the “subseries” represent? 
+
 *The 'seasons' here are defined as months. So, over the 11 years shown, we can see that streamflow peaks in May and June each year. There is an outlier in September of 2013 when Colorado received a large amount of precipitation and many of the front range streams flooded due to that event.*
 
 #### 4. Decomposition
 
-The `model(STL(...))` pattern is used to decompose the time series data into its components of trend, seasonality, and residuals. Choose a window that you feel is most appropriate to this data and explain your choice. Use the `components()` function to extract the components of the time series and `autoplot` to visualize the components.
+The `model(STL(...))` pattern is used to decompose the time series data
+into its components of trend, seasonality, and residuals. Choose a
+window that you feel is most appropriate to this data and explain your
+choice. Use the `components()` function to extract the components of the
+time series and `autoplot` to visualize the components.
 
 ```{r}
 historic_decomp <- historic %>%
@@ -189,14 +224,23 @@ autoplot(historic_decomp) +
 )
 ```
 
-Describe what you see and if it matches your understanding of the Poudre System / Western water trends. How do the components change over time? What do you think the trend and seasonal components represent?
+Describe what you see and if it matches your understanding of the Poudre
+System / Western water trends. How do the components change over time?
+What do you think the trend and seasonal components represent? 
+
 *The overall trend shows a decrease in streamflow from 2015 to 2024. This is likely due to a particularly wet year and 11 years may not be enough time to see a decline in overall streamflow. The season shows a clear high flow period each year which aligns with snowmelt in the Poudre. This is typical of many mountain to plains streams where flow is dependent on snowpack and peaks with seasonal snow melt. The residuals show a some variability from year to year which is expected based on the variability of precipitation from year to year and annual or semi-annual precipitation and climate patterns (like the El Nino Southern Oscillation patterns).*
+****
 
 ## Modeltime Prediction
 
 #### Data Prep
 
-Now we are going to use the `modeltime` package to predict future streamflow using the climate data. We will use the  `modeltime` package to create a time series model. First, we need to prep the data. In this case we want both the historic and future data to be in the same format where the date column is a `Date` object (name it date for ease) and the other columns are numeric. In both cases each need to be a tibble:
+Now we are going to use the `modeltime` package to predict future
+streamflow using the climate data. We will use the `modeltime` package
+to create a time series model. First, we need to prep the data. In this
+case we want both the historic and future data to be in the same format
+where the date column is a `Date` object (name it date for ease) and the
+other columns are numeric. In both cases each need to be a tibble:
 
 ```{r}
 historic_mod <- historic %>%
@@ -212,8 +256,14 @@ future_mod <- future %>%
   select(-Date)
 ```
 
-
-We will use the `time_series_split()` function to split the data into training and testing sets. The training set will be used to train the model and the testing set will be used to test the model. Remember in this case we are using a time series split, so the training set will be defined by a period rather then a percent of hold out data. In this case we will use a 24 month period testing set (`assess`). Make sure to set a seed and extract the training and testing data.frames with `training()` and `testing()`.
+We will use the `time_series_split()` function to split the data into
+training and testing sets. The training set will be used to train the
+model and the testing set will be used to test the model. Remember in
+this case we are using a time series split, so the training set will be
+defined by a period rather then a percent of hold out data. In this case
+we will use a 24 month period testing set (`assess`). Make sure to set a
+seed and extract the training and testing data.frames with `training()`
+and `testing()`.
 
 ```{r}
 set.seed(329)
@@ -224,10 +274,10 @@ training <- training(splits)
 testing <- training(splits)
 ```
 
-
 #### Model Definition
 
-Chose at least three models to test - with one being arima and one being prophet. Store these models (specification + engine) in a list.
+Chose at least three models to test - with one being arima and one being
+prophet. Store these models (specification + engine) in a list.
 
 ```{r}
 mods <- list(
@@ -248,18 +298,26 @@ mods <- list(
 )
 ```
 
-
 #### Model Fitting
 
-Next, we will use the `fit()` function to fit the models to the training data. We will use the `map()` function from the `purrr` package to iterate over the list of models and fit each model to the training data. The `fit()` function takes a formula, a model specification, and a data.frame as arguments. Here you can build any formula you see fit. What components of the date object do you want to use (e.g. month? season?). What climate variables do you want to use?
+Next, we will use the `fit()` function to fit the models to the training
+data. We will use the `map()` function from the `purrr` package to
+iterate over the list of models and fit each model to the training data.
+The `fit()` function takes a formula, a model specification, and a
+data.frame as arguments. Here you can build any formula you see fit.
+What components of the date object do you want to use (e.g. month?
+season?). What climate variables do you want to use?
 
-The only requirement is that the response variable is `Flow` and the date variable is included as a predictor.
+The only requirement is that the response variable is `Flow` and the
+date variable is included as a predictor.
 
-Once the models are fitted, we will use the `as_modeltime_table()` function to convert the list of fit models into a modeltime table. This will allow us to use the `modeltime` package to make predictions.
+Once the models are fitted, we will use the `as_modeltime_table()`
+function to convert the list of fit models into a modeltime table. This
+will allow us to use the `modeltime` package to make predictions.
 
 ```{r}
 models <- map(mods, function(model_spec){
-  model_spec %>% fit(Flow ~ date, data = training)
+  model_spec %>% fit(Flow ~ date + tmax + ppt, data = training)
 })
 
 mod_tbl <- as_modeltime_table(models)
@@ -267,11 +325,16 @@ mod_tbl <- as_modeltime_table(models)
 
 #### Model Calibration
 
-Next, we will use the `modeltime_calibrate()` function to calibrate the models. This function takes a modeltime table and a data.frame of testing data as arguments. The function will return a modeltime table with the calibrated models.
+Next, we will use the `modeltime_calibrate()` function to calibrate the
+models. This function takes a modeltime table and a data.frame of
+testing data as arguments. The function will return a modeltime table
+with the calibrated models.
 
-The results of the calibration can be passed to `modeltime_accuracy()` to assess the accuracy of the models.
+The results of the calibration can be passed to `modeltime_accuracy()`
+to assess the accuracy of the models.
 
-Calibrate the models using the testing data and assess the accuracy of the models describing what you see!
+Calibrate the models using the testing data and assess the accuracy of
+the models describing what you see!
 
 ```{r}
 cal_table <- modeltime_calibrate(mod_tbl, testing, quiet = FALSE)
@@ -279,31 +342,42 @@ cal_table <- modeltime_calibrate(mod_tbl, testing, quiet = FALSE)
 modeltime_accuracy(cal_table) %>%
   arrange(mae)
 ```
-
+*Here the xgboost prophet model performs the best by far.*
 
 #### Forecasting
 
-With a calibrated model set in place, we can now make predictions using the `modeltime_forecast()`. Because we are using exogenous data, we need to pass the actual data to the function. This is because the model needs to know what the actual values are in order to make predictions.
+With a calibrated model set in place, we can now make predictions using
+the `modeltime_forecast()`. Because we are using exogenous data, we need
+to pass the actual data to the function. This is because the model needs
+to know what the actual values are in order to make predictions.
 
-As a first step, lets use the calibrated models to make predictions on the testing data. Here you will need to specify the `actual_data` (historic data tibble) and the `new_data` (testing).
+As a first step, lets use the calibrated models to make predictions on
+the testing data. Here you will need to specify the `actual_data`
+(historic data tibble) and the `new_data` (testing).
 
-The outputs can be passed to the `plot_modeltime_forecast()` function to visualize the predictions.
+The outputs can be passed to the `plot_modeltime_forecast()` function to
+visualize the predictions.
 
 ```{r}
 fc <- cal_table %>%
-  modeltime_forecast(h = '24 months',
-                     new_data = testing,
+  modeltime_forecast(new_data = testing,
                      actual_data = historic_mod)
 
 plot_modeltime_forecast(fc)
 ```
 
-
 #### Refitting the Model
 
-Now that we have a calibrated model set, we can refit the models to the full dataset. This is important because the models are only as good as the data they are trained on. By refitting the models to the full dataset, we can improve the accuracy of the predictions.
+Now that we have a calibrated model set, we can refit the models to the
+full dataset. This is important because the models are only as good as
+the data they are trained on. By refitting the models to the full
+dataset, we can improve the accuracy of the predictions.
 
-To do this, we will use the `modeltime_refit()` function. This function takes a calibrataion table and the full historic tibble as the `data` argument. The function will return a modeltime table with the refitted models. Like before, the accuracy of the models can be assessed using the `modeltime_accuracy()` function.
+To do this, we will use the `modeltime_refit()` function. This function
+takes a calibrataion table and the full historic tibble as the `data`
+argument. The function will return a modeltime table with the refitted
+models. Like before, the accuracy of the models can be assessed using
+the `modeltime_accuracy()` function.
 
 ```{r}
 refit_tbl <- cal_table %>%
@@ -313,27 +387,38 @@ modeltime_accuracy(refit_tbl) %>%
   arrange(mae)
 ```
 
-
 #### Looking into the future
 
-Now we are at the end! We can use the refitted models to make predictions on the future data. This is where we will use the `future` tibble we created earlier as the `new_data`. The `actual_data` argument will be the historic data tibble.
+Now we are at the end! We can use the refitted models to make
+predictions on the future data. This is where we will use the `future`
+tibble we created earlier as the `new_data`. The `actual_data` argument
+will be the historic data tibble.
 
-Using your refitted models, the `modeltime_forecast()` function will return a modeltime table with the predictions that can be passed to the `plot_modeltime_forecast()` function to visualize the predictions.
+Using your refitted models, the `modeltime_forecast()` function will
+return a modeltime table with the predictions that can be passed to the
+`plot_modeltime_forecast()` function to visualize the predictions.
 
 ```{r}
 refit_tbl %>%
-  modeltime_forecast(h = '10 years',
-                     new_data = future_mod,
+  modeltime_forecast(new_data = future_mod,
                      actual_data = historic_mod) %>%
   plot_modeltime_forecast()
 ```
 
-
 #### Wrap up
 
-Looking at your predictions what do you think? How do the models compare? What do you think the future streamflow will be? What are the limitations of this analysis? What are the assumptions of the models?
+Looking at your predictions what do you think? How do the models
+compare? What do you think the future streamflow will be? What are the
+limitations of this analysis? What are the assumptions of the models?
 
-*The models do capture the monthly variation of streamflow peaking in June. There is an overall negative trend, predicting decreased streamflow from the Poudre River over 10 years. The limitation here is that only the historical discharge data has been taken into account, not temperature, precipitation, aridity, water rights, or any other potential predictors that may affect true streamflow in the future. The model assumes the historical trend will continue, and that the system is mostly stationary. Climate is non-stationary of course and these values are limited. The model also predicts the trend will continue, even though there may be extreme highs or lows in the near future based on precipitation patterns.*
-
-Perhaps you see negative values in the predictions; perhaps you don't see strong agreement between the future starting points around Jan 2024; perhaps you see other patterns that seem systemic and questionably wrong. At this stage that is quite alright. In this simple lab, we did not worry about issue like cross validation, feature engineering, or hyperparameter tuning. These are all important steps in the modeling process and should be considered in a real world application.
-
+*The models do capture the monthly variation of streamflow peaking in
+June. There is an overall negative trend, predicting decreased
+streamflow from the Poudre River over 10 years. The limitation here is
+that only the historical discharge data has been taken into account, not
+temperature, precipitation, aridity, water rights, or any other
+potential predictors that may affect true streamflow in the future. The
+model assumes the historical trend will continue, and that the system is
+mostly stationary. Climate is non-stationary of course and these values
+are limited. The model also predicts the trend will continue, even
+though there may be extreme highs or lows in the near future based on
+precipitation patterns.*
